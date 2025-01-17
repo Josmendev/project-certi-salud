@@ -1,26 +1,51 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateRoleDto } from './dto/create-role.dto';
 import { UpdateRoleDto } from './dto/update-role.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Role } from './entities/role.entity';
+import { Repository } from 'typeorm';
+import { RoleResponse } from './interfaces/role-response.interface';
+import { TransformRole } from './helpers/transform-role.helper';
+
 
 @Injectable()
 export class RolesService {
-  create(createRoleDto: CreateRoleDto) {
-    return 'This action adds a new role';
+
+  constructor(
+    @InjectRepository(Role)
+    private readonly roleRepository: Repository<Role>
+  ){}
+
+  async create(createRoleDto: CreateRoleDto): Promise<RoleResponse> {
+    const role = this.roleRepository.create(createRoleDto);
+    await this.roleRepository.save(role);
+    return TransformRole(role);
   }
 
-  findAll() {
-    return `This action returns all roles`;
+  async findAll(): Promise<RoleResponse[]> {
+    const roles = await this.roleRepository.find({where: {isActive: true}});
+    return roles.map(TransformRole);
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} role`;
+  async findOne(id: number): Promise<RoleResponse | null> {
+    const role = await this.roleRepository.findOneBy({roleId: id, isActive: true});
+    if(!role) throw new NotFoundException(`Rol con el ID ${id} no fue encontrado`);
+    return TransformRole(role);
   }
 
-  update(id: number, updateRoleDto: UpdateRoleDto) {
-    return `This action updates a #${id} role`;
+  async update(id: number, updateRoleDto: UpdateRoleDto): Promise<RoleResponse> {
+    const role = await this.roleRepository.preload({
+      roleId: id,
+      ...updateRoleDto
+    });
+    if(!role || !role.isActive) throw new NotFoundException(`Rol con el ID ${id} no fue encontrado`);
+    await this.roleRepository.save(role);
+    return TransformRole(role);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} role`;
+  async remove(id: number): Promise<void> {
+    const role = await this.findOne(id);
+    role.isActive = false;
+    await this.roleRepository.save(role);
   }
 }
