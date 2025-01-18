@@ -1,3 +1,6 @@
+@import "./shared/components/UI/styles/textInput.css";
+@import "./shared/components/UI/styles/button.css";
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
