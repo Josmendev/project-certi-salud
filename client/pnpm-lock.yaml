@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      '@fontsource-variable/montserrat':
+        specifier: ^5.1.1
+        version: 5.1.1
       react:
         specifier: ^18.3.1
         version: 18.3.1
@@ -247,6 +250,9 @@ packages:
   '@eslint/plugin-kit@0.2.5':
     resolution: {integrity: sha512-lB05FkqEdUg2AA0xEbUz0SnkXT1LcCTa438W4IWTUh4hdOnVbQyOJ81OrDXsJk/LSiJHubgGEFoR5EHq1NsH1A==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
+
+  '@fontsource-variable/montserrat@5.1.1':
+    resolution: {integrity: sha512-eHmSruS3B+4wVaHk6ShNUJj1MbWEohOuriwN/oYR2VY8jRS83a5SKQeG1wu4Eku3v3f5cXTIbfd1tHeQ7GXkiA==}
 
   '@humanfs/core@0.19.1':
     resolution: {integrity: sha512-5DyQ4+1JEUzejeK1JGICcideyfUbGixgS9jNgex5nqkW+cY7WZhxBigmieN5Qnw9ZosSNVC9KQKyb+GUaGyKUA==}
@@ -1414,6 +1420,8 @@ snapshots:
     dependencies:
       '@eslint/core': 0.10.0
       levn: 0.4.1
+
+  '@fontsource-variable/montserrat@5.1.1': {}
 
   '@humanfs/core@0.19.1': {}
 
