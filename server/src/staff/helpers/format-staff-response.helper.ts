@@ -1,9 +1,11 @@
-export const formatStaffResponse = (personStaff: any) => {
-  const {identityDocumentNumber, name, paternalSurname, maternalSurname, personId, staff} = personStaff;
-  const {staffId, isActive} = staff;
+import { Staff } from "../entities/staff.entity";
+
+export const formatStaffResponse = (staff: Staff) => {
+  const {staffId, isActive, person} = staff;
+  const { identityDocumentNumber, name, paternalSurname, maternalSurname, personId} = person;
   return {
-    staffId: staffId,
-    isActive: isActive,
+    staffId,
+    isActive,
     person: {
       identityDocumentNumber,
       name,

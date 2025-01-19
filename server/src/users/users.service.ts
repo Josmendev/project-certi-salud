@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { Repository } from 'typeorm';
+import { Repository, QueryRunner } from 'typeorm';
 import { User } from './entities/user.entity';
 import { UuidAdapter } from 'src/common/adapters/uuid.adapter';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -14,7 +14,7 @@ export class UsersService {
     private readonly uuidAdapter: UuidAdapter
   ){}
 
-  async create(createUserDto: CreateUserDto): Promise<User> {
+  async create(createUserDto: CreateUserDto, queryRunner: QueryRunner): Promise<any> {
     const { identityDocumentNumber, staff } = createUserDto;
     const user = this.userRepository.create({
       username: identityDocumentNumber,
@@ -22,7 +22,7 @@ export class UsersService {
       staff,
       token: this.uuidAdapter.generate()
     });
-    return user;
+    return queryRunner.manager.save(user);
   }
 
   findAll() {

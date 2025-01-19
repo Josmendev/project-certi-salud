@@ -13,8 +13,7 @@ export class Staff extends Timestamped {
 
   @OneToOne(
     () => Person, 
-    person => person.staff,
-    {eager: true}
+    person => person.staff
   )
   @JoinColumn({
     name: 'person_id'

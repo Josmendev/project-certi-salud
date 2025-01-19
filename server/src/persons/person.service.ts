@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Person } from "./entities/person.entity";
-import { Repository } from "typeorm";
+import { QueryRunner, Repository } from "typeorm";
 import { CreatePersonDto } from './dto/create-person.dto';
 
 @Injectable()
@@ -11,13 +11,14 @@ export class PersonService {
     private readonly personRepository: Repository<Person>
   ){}
 
-  async create(createPersonDto: CreatePersonDto) {
-    const person = this.personRepository.create(createPersonDto);
-    return person;
+  async create(createPersonDto: CreatePersonDto, queryRunner: QueryRunner): Promise<any> {
+    const person = queryRunner.manager.create(Person, createPersonDto);
+    return queryRunner.manager.save(person);
   }
 
   async validatePersonAndStaff(identityDocumentNumber: string) : Promise<boolean> {
     const person = await this.personRepository.findOne({where: {identityDocumentNumber}, relations: ['staff']});
+    console.log(person);
     if(!person) return true;
     const staff = person.staff;
     if(!staff) throw new BadRequestException(`Persona con DNI ${identityDocumentNumber} ya está registrada como paciente`);

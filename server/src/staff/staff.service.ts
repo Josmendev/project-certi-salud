@@ -27,21 +27,19 @@ export class StaffService {
     try {
       await this.personService.validatePersonAndStaff(identityDocumentNumber);
       
-      const staff = this.staffRepository.create({});
+      const staff = queryRunner.manager.create(Staff, {});
       await queryRunner.manager.save(staff);
       
-      const personStaff = await this.personService.create({...createStaffDto, staff});
-      await queryRunner.manager.save(personStaff);
+      await this.personService.create({...createStaffDto, staff}, queryRunner);
 
-      const user = await this.userService.create({identityDocumentNumber, staff});
-      await queryRunner.manager.save(user);
+      await this.userService.create({identityDocumentNumber, staff}, queryRunner);
 
       await queryRunner.commitTransaction();
       
-      return formatStaffResponse(personStaff);
+      const staffSaved = await this.findOne(staff.staffId);
+      return formatStaffResponse(staffSaved);
 
     } catch (error) {
-      console.log(error);
       await queryRunner.rollbackTransaction();
       throw error;
     } finally {
@@ -49,13 +47,14 @@ export class StaffService {
     }
   }
 
-  async findAll() {
-    const staff = await this.staffRepository.find({where: {isActive: true}});
-    return staff;
+  async findAll(): Promise<StaffResponse[]> {
+    const staff = await this.staffRepository.find({where: {isActive: true}, relations: { person: true}});
+    return staff.map(formatStaffResponse);
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} staff`;
+  async findOne(staffId: number): Promise<Staff> {
+    const staffSaved = await this.staffRepository.findOne({where: {staffId}, relations: { person: true}});
+    return staffSaved;
   }
 
   update(id: number, updateStaffDto: UpdateStaffDto) {
