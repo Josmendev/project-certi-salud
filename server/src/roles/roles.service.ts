@@ -5,8 +5,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Role } from './entities/role.entity';
 import { Repository } from 'typeorm';
 import { RoleResponse } from './interfaces/role-response.interface';
-import { TransformRole } from './helpers/transform-role.helper';
-
+import { formatRoleResponse } from './helpers/format-role-response.helper';
 
 @Injectable()
 export class RolesService {
@@ -19,18 +18,18 @@ export class RolesService {
   async create(createRoleDto: CreateRoleDto): Promise<RoleResponse> {
     const role = this.roleRepository.create(createRoleDto);
     await this.roleRepository.save(role);
-    return TransformRole(role);
+    return formatRoleResponse(role);
   }
 
   async findAll(): Promise<RoleResponse[]> {
     const roles = await this.roleRepository.find({where: {isActive: true}});
-    return roles.map(TransformRole);
+    return roles.map(formatRoleResponse);
   }
 
   async findOne(id: number): Promise<RoleResponse | null> {
     const role = await this.roleRepository.findOneBy({roleId: id, isActive: true});
     if(!role) throw new NotFoundException(`Rol con el ID ${id} no fue encontrado`);
-    return TransformRole(role);
+    return formatRoleResponse(role);
   }
 
   async update(id: number, updateRoleDto: UpdateRoleDto): Promise<RoleResponse> {
@@ -40,7 +39,7 @@ export class RolesService {
     });
     if(!role || !role.isActive) throw new NotFoundException(`Rol con el ID ${id} no fue encontrado`);
     await this.roleRepository.save(role);
-    return TransformRole(role);
+    return formatRoleResponse(role);
   }
 
   async remove(id: number): Promise<void> {
