@@ -25,8 +25,10 @@ export class AllExceptionsFilter implements ExceptionFilter {
     const { errno, sqlMessage } = exception as any;
     if (errno === 1062) {  // Error de duplicado de entrada (clave única)
       status = HttpStatus.BAD_REQUEST;
+      const match = sqlMessage.match(/Duplicate entry '(.+?)'/);
+      const duplicateValue = match ? match[1] : 'valor duplicado';
       // Mensaje de error para duplicado de clave
-      message = [`${sqlMessage || 'Record already exists.'}`];
+      message = [`El valor ingresado '${duplicateValue}' ya se encuentra registrado`];
       error = 'Duplicate Record';
     }
 

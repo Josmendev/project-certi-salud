@@ -9,6 +9,7 @@ import { UsersService } from 'src/users/users.service';
 import { formatStaffResponse } from './helpers/format-staff-response.helper';
 import { StaffResponse } from './interfaces/staff-response.interface';
 import { Person } from 'src/persons/entities/person.entity';
+import { TermRelation } from 'src/persons/enum/term-relation.enum';
 
 @Injectable()
 export class StaffService {
@@ -22,9 +23,9 @@ export class StaffService {
   async create(createStaffDto: CreateStaffDto): Promise<StaffResponse> {
     
     const { identityDocumentNumber } = createStaffDto;
-    const person = await this.personService.isPersonRegistered(identityDocumentNumber);
+    const termRelation = TermRelation.staff
+    const person = await this.personService.isPersonRegistered({identityDocumentNumber, termRelation});
     if (person) await this.isStaffRegistered(person, identityDocumentNumber);
-    
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
@@ -64,9 +65,10 @@ export class StaffService {
     return staff;
   }
 
-  update(id: number, updateStaffDto: UpdateStaffDto) {
-    return `This action updates a #${id} staff`;
-  }
+  async update(personId: number, updateStaffDto: UpdateStaffDto): Promise<any> {
+    const person = await this.personService.update(personId, updateStaffDto);
+    return person;
+  } 
 
   remove(id: number) {
     return `This action removes a #${id} staff`;

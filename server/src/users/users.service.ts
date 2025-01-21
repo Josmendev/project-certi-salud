@@ -16,7 +16,7 @@ export class UsersService {
     private readonly uuidAdapter: UuidAdapter
   ){}
 
-  async create(createUserDto: CreateUserDto, queryRunner?: QueryRunner): Promise<any> {
+  async create(createUserDto: CreateUserDto, queryRunner?: QueryRunner): Promise<User> {
     
     const { identityDocumentNumber, staff, role } = createUserDto;
     const repository = queryRunner? queryRunner.manager.getRepository(User) : this.userRepository;
