@@ -1,13 +1,14 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateStaffDto } from './dto/create-staff.dto';
 import { UpdateStaffDto } from './dto/update-staff.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Staff } from './entities/staff.entity';
-import { DataSource, Repository } from 'typeorm';
+import { DataSource, QueryRunner, Repository } from 'typeorm';
 import { PersonService } from 'src/persons/person.service';
 import { UsersService } from 'src/users/users.service';
 import { formatStaffResponse } from './helpers/format-staff-response.helper';
 import { StaffResponse } from './interfaces/staff-response.interface';
+import { Person } from 'src/persons/entities/person.entity';
 
 @Injectable()
 export class StaffService {
@@ -21,30 +22,34 @@ export class StaffService {
   async create(createStaffDto: CreateStaffDto): Promise<StaffResponse> {
     
     const { identityDocumentNumber } = createStaffDto;
+    const person = await this.personService.isPersonRegistered(identityDocumentNumber);
+    if (person) await this.isStaffRegistered(person, identityDocumentNumber);
+    
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
+    let staff: Staff;
     try {
-      await this.personService.validatePersonAndStaff(identityDocumentNumber);
-      
-      const staff = queryRunner.manager.create(Staff, {});
-      await queryRunner.manager.save(staff);
-      
-      await this.personService.create({...createStaffDto, staff}, queryRunner);
-
-      await this.userService.create({identityDocumentNumber, staff}, queryRunner);
-
+      staff = await this.createStaff(queryRunner);
+      await Promise.all([
+        this.personService.create({...createStaffDto, staff}, queryRunner),
+        this.userService.create({identityDocumentNumber, staff}, queryRunner)
+      ]);
       await queryRunner.commitTransaction();
-      
-      const staffSaved = await this.findOne(staff.staffId);
-      return formatStaffResponse(staffSaved);
-
     } catch (error) {
       await queryRunner.rollbackTransaction();
       throw error;
     } finally {
       await queryRunner.release();
     }
+    const staffSaved = await this.findOne(staff.staffId);
+    return formatStaffResponse(staffSaved);
+  }
+
+  async createStaff (queryRunner?: QueryRunner): Promise<Staff> {
+    const repository = queryRunner? queryRunner.manager.getRepository(Staff) : this.staffRepository;
+    const staff = repository.create({});
+    return repository.save(staff);
   }
 
   async findAll(): Promise<StaffResponse[]> {
@@ -52,9 +57,10 @@ export class StaffService {
     return staff.map(formatStaffResponse);
   }
 
-  async findOne(staffId: number): Promise<Staff> {
-    const staffSaved = await this.staffRepository.findOne({where: {staffId}, relations: { person: true}});
-    return staffSaved;
+  async findOne(staffId: number): Promise<Staff | null> {
+    const staff = await this.staffRepository.findOne({where: {staffId}, relations: { person: true}});
+    if(!staff) throw new NotFoundException(`El personal no se encuentra registrado`);
+    return staff;
   }
 
   update(id: number, updateStaffDto: UpdateStaffDto) {
@@ -64,4 +70,12 @@ export class StaffService {
   remove(id: number) {
     return `This action removes a #${id} staff`;
   }
+
+  async isStaffRegistered(person: Person, identityDocumentNumber: string): Promise<any> {
+    const staff = person.staff;
+    if(!staff) throw new BadRequestException(`Persona con DNI ${identityDocumentNumber} ya está registrada como paciente`);
+    if (!staff.isActive) throw new BadRequestException(`El personal con DNI ${identityDocumentNumber} se encuentra desactivado`);
+    throw new BadRequestException(`El personal con DNI ${identityDocumentNumber} ya se encuentra registrado`);
+  }
+
 }

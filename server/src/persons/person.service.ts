@@ -11,18 +11,14 @@ export class PersonService {
     private readonly personRepository: Repository<Person>
   ){}
 
-  async create(createPersonDto: CreatePersonDto, queryRunner: QueryRunner): Promise<any> {
-    const person = queryRunner.manager.create(Person, createPersonDto);
-    return queryRunner.manager.save(person);
+  async create(createPersonDto: CreatePersonDto, queryRunner?: QueryRunner): Promise<any> {
+    const repository = queryRunner? queryRunner.manager.getRepository(Person) : this.personRepository;
+    const person = repository.create(createPersonDto);
+    return repository.save(person);
   }
 
-  async validatePersonAndStaff(identityDocumentNumber: string) : Promise<boolean> {
+  async isPersonRegistered(identityDocumentNumber: string) : Promise<Person> {
     const person = await this.personRepository.findOne({where: {identityDocumentNumber}, relations: ['staff']});
-    console.log(person);
-    if(!person) return true;
-    const staff = person.staff;
-    if(!staff) throw new BadRequestException(`Persona con DNI ${identityDocumentNumber} ya está registrada como paciente`);
-    if (!staff.isActive) throw new BadRequestException(`El personal con DNI ${identityDocumentNumber} se encuentra desactivado`);
-    throw new BadRequestException(`El personal con DNI ${identityDocumentNumber} ya se encuentra registrado`);
+    return person;
   }
 }
