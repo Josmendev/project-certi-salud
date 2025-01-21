@@ -3,7 +3,7 @@ import { CreateRoleDto } from './dto/create-role.dto';
 import { UpdateRoleDto } from './dto/update-role.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Role } from './entities/role.entity';
-import { Repository } from 'typeorm';
+import { Repository, QueryRunner } from 'typeorm';
 import { RoleResponse } from './interfaces/role-response.interface';
 import { formatRoleResponse } from './helpers/format-role-response.helper';
 
@@ -46,5 +46,13 @@ export class RolesService {
     const role = await this.findOne(id);
     role.isActive = false;
     await this.roleRepository.save(role);
+  }
+
+  async assignRolesToUser(role?: Role[], queryRunner?: QueryRunner): Promise<Role[]> {
+    if(role && role.length > 0) return role;
+    const repository = queryRunner? queryRunner.manager.getRepository(Role) : this.roleRepository;
+    const registerRole = await repository.findOne({where: {roleId: 2}});
+    if (!registerRole) throw new NotFoundException('El rol no se encuentra registrado');
+    return [registerRole];
   }
 }

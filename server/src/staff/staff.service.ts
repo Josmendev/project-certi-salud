@@ -37,6 +37,7 @@ export class StaffService {
       ]);
       await queryRunner.commitTransaction();
     } catch (error) {
+      console.log(error);
       await queryRunner.rollbackTransaction();
       throw error;
     } finally {

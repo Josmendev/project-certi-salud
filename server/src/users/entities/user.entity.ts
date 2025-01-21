@@ -1,7 +1,8 @@
 import { BcryptAdapter } from "src/common/adapters/bcrypt.adapter";
 import { Timestamped } from "src/common/entities/timestamped.entity";
+import { Role } from "src/roles/entities/role.entity";
 import { Staff } from "src/staff/entities/staff.entity";
-import { BeforeInsert, Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { BeforeInsert, Column, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity({name: 'user'})
 export class User extends Timestamped {
@@ -54,6 +55,23 @@ export class User extends Timestamped {
     name: 'staff_id'
   })
   staff: Staff;
+  
+  @ManyToMany(
+    () => Role,
+    {eager:true}
+  )
+  @JoinTable({
+    name: 'user_has_roles',
+    joinColumn: {
+      name: 'user_id',
+      referencedColumnName: 'userId'
+    },
+    inverseJoinColumn: {
+      name: 'role_id',
+      referencedColumnName: 'roleId'
+    }
+  })
+  role: Role[]
 
   @BeforeInsert()
   async hashPassword() {

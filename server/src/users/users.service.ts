@@ -1,23 +1,24 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { Repository, QueryRunner } from 'typeorm';
 import { User } from './entities/user.entity';
 import { UuidAdapter } from 'src/common/adapters/uuid.adapter';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Person } from 'src/persons/entities/person.entity';
+import { RolesService } from 'src/roles/roles.service';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
+    private readonly rolesService: RolesService,
     private readonly uuidAdapter: UuidAdapter
   ){}
 
   async create(createUserDto: CreateUserDto, queryRunner?: QueryRunner): Promise<any> {
     
-    const { identityDocumentNumber, staff } = createUserDto;
+    const { identityDocumentNumber, staff, role } = createUserDto;
     const repository = queryRunner? queryRunner.manager.getRepository(User) : this.userRepository;
     const user = repository.create({
       username: identityDocumentNumber,
@@ -25,6 +26,7 @@ export class UsersService {
       staff,
       token: this.uuidAdapter.generate()
     });
+    user.role = await this.rolesService.assignRolesToUser(role, queryRunner);
     return repository.save(user);
   }
 
