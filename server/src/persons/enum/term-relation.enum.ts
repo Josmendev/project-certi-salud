@@ -1,4 +1,4 @@
-export const enum TermRelation {
+export const enum TermRelationWithPerson {
   staff = 'staff',
   patient = 'patient'
 }
