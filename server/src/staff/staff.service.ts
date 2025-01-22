@@ -59,6 +59,23 @@ export class StaffService {
     return staff.map(formatStaffResponse);
   }
 
+  async search(term: string): Promise<StaffResponse[]> {
+    const queryBuilder = this.staffRepository.createQueryBuilder('staff');
+    const searchTerm = `%${term.toLowerCase()}%`;
+    const staff = await queryBuilder
+      .innerJoinAndSelect('staff.person', 'person')
+      .where(
+        'staff.isActive = true ' +
+        'AND (LOWER(person.identityDocumentNumber) LIKE :searchTerm ' +
+        'OR LOWER(person.name) LIKE :searchTerm ' +
+        'OR LOWER(person.paternalSurname) LIKE :searchTerm ' +
+        'OR LOWER(person.maternalSurname) LIKE :searchTerm)',
+        { searchTerm }
+      )
+      .getMany();
+    return staff.map(formatStaffResponse);
+  }
+
   async findOne(staffId: number): Promise<Staff | null> {
     const staff = await this.staffRepository.findOne({where: {staffId}, relations: { person: true}});
     if(!staff) throw new NotFoundException(`El personal no se encuentra registrado`);
@@ -70,10 +87,16 @@ export class StaffService {
     const person = await this.personService.update(staff.person.personId, updateStaffDto);
     staff.person = person;
     return formatStaffResponse(staff);
-  } 
+  }
 
-  remove(id: number) {
-    return `This action removes a #${id} staff`;
+  async activate(staffId: number): Promise<void> {
+    const staff = await this.staffRepository.update({staffId}, {isActive: true});
+    if(staff.affected === 0) throw new NotFoundException(`El personal no se encuentra registrado`);
+  }
+
+  async remove(staffId: number): Promise<void> {
+    const staff = await this.staffRepository.update({staffId}, {isActive: false});
+    if(staff.affected === 0) throw new NotFoundException(`El personal no se encuentra registrado`);
   }
 
   async isStaffRegistered(person: Person, identityDocumentNumber: string): Promise<any> {

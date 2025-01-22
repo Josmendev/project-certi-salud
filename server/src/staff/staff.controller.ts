@@ -17,14 +17,19 @@ export class StaffController {
     return this.staffService.findAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.staffService.findOne(+id);
+  @Get(':term')
+  search(@Param('term') term: string) {
+    return this.staffService.search(term);
   }
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateStaffDto: UpdateStaffDto) {
     return this.staffService.update(+id, updateStaffDto);
+  }
+
+  @Patch(':id/activate')
+  activate(@Param('id') id: string) {
+    return this.staffService.activate(+id);
   }
 
   @Delete(':id')

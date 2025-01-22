@@ -32,6 +32,8 @@ export class AllExceptionsFilter implements ExceptionFilter {
       error = 'Duplicate Record';
     }
 
+    console.log(exception);
+
     this.logger.error(
       `HTTP ${status} Error: ${JSON.stringify(message)}`,
     );
