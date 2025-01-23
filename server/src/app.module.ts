@@ -7,6 +7,7 @@ import { PersonsModule } from './persons/persons.module';
 import { StaffModule } from './staff/staff.module';
 import { PatientsModule } from './patients/patients.module';
 import { UsersModule } from './users/users.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -22,7 +23,7 @@ import { UsersModule } from './users/users.module';
       synchronize: true
     }),
     RolesModule, 
-    CommonModule, PersonsModule, StaffModule, PatientsModule, UsersModule],
+    CommonModule, PersonsModule, StaffModule, PatientsModule, UsersModule, AuthModule],
   controllers: [],
   providers: [],
 })

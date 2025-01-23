@@ -51,6 +51,11 @@ export class RolesService {
     return formatRoleResponse(role);
   }
 
+  async active(roleId: number): Promise<void> {
+    const role = await this.roleRepository.update({roleId},{isActive: true});
+    if(role.affected === 0) throw new NotFoundException(`Rol con el ID ${roleId} no fue encontrado`);
+  }
+
   async remove(roleId: number): Promise<void> {
     const role = await this.roleRepository.update({roleId},{isActive: false});
     if(role.affected === 0) throw new NotFoundException(`Rol con el ID ${roleId} no fue encontrado`);
