@@ -30,7 +30,7 @@ import { JwtStrategy } from './strategies/jwt.strategy';
       })
     })
   ],
-  exports: [JwtStrategy],
+  exports: [JwtStrategy, PassportModule, JwtModule],
   providers: [AuthService, JwtStrategy],
   controllers: [AuthController]
 })
