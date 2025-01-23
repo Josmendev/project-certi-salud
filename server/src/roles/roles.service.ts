@@ -26,26 +26,34 @@ export class RolesService {
     return roles.map(formatRoleResponse);
   }
 
-  async findOne(id: number): Promise<RoleResponse | null> {
-    const role = await this.roleRepository.findOneBy({roleId: id, isActive: true});
-    if(!role) throw new NotFoundException(`Rol con el ID ${id} no fue encontrado`);
+  async findOne(roleId: number): Promise<RoleResponse | null> {
+    const role = await this.roleRepository.findOneBy({roleId, isActive: true});
+    if(!role) throw new NotFoundException(`Rol con el ID ${roleId} no fue encontrado`);
     return formatRoleResponse(role);
   }
 
-  async update(id: number, updateRoleDto: UpdateRoleDto): Promise<RoleResponse> {
+  async search(term: string): Promise<RoleResponse[]> {
+    const queryBuilder = this.roleRepository.createQueryBuilder('role');
+    const searchTerm = `%${term.toLowerCase()}%`;
+    const roles = await queryBuilder
+      .where('isActive = true AND LOWER(description) LIKE :searchTerm', {searchTerm})
+      .getMany();
+    return roles.map(formatRoleResponse);
+  }
+
+  async update(roleId: number, updateRoleDto: UpdateRoleDto): Promise<RoleResponse> {
     const role = await this.roleRepository.preload({
-      roleId: id,
+      roleId,
       ...updateRoleDto
     });
-    if(!role || !role.isActive) throw new NotFoundException(`Rol con el ID ${id} no fue encontrado`);
+    if(!role || !role.isActive) throw new NotFoundException(`Rol con el ID ${roleId} no fue encontrado`);
     await this.roleRepository.save(role);
     return formatRoleResponse(role);
   }
 
-  async remove(id: number): Promise<void> {
-    const role = await this.findOne(id);
-    role.isActive = false;
-    await this.roleRepository.save(role);
+  async remove(roleId: number): Promise<void> {
+    const role = await this.roleRepository.update({roleId},{isActive: false});
+    if(role.affected === 0) throw new NotFoundException(`Rol con el ID ${roleId} no fue encontrado`);
   }
 
   async assignRolesToUser(role?: Role[], queryRunner?: QueryRunner): Promise<Role[]> {
