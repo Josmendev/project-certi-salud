@@ -15,7 +15,7 @@ export class AuthService {
     private readonly jwtService: JwtService
   ){}
 
-  async signIn (signInDto: SignInDto) {
+  async login (signInDto: SignInDto) {
     const { username, password } = signInDto;
     const user = await this.userService.findOne(username);
     if(!user) throw new NotFoundException(`Las credenciales no son válidas (nombre de usuario)`);
