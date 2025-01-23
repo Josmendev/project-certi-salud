@@ -6,7 +6,7 @@ import { User } from './entities/user.entity';
 import { UuidAdapter } from 'src/common/adapters/uuid.adapter';
 import { InjectRepository } from '@nestjs/typeorm';
 import { RolesService } from 'src/roles/roles.service';
-import { formatUserResponseWithLogin } from './helpers/format-user-response-with-login';
+import { formatUserResponseForLogin } from '../auth/helpers/format-user-response-for-login';
 
 @Injectable()
 export class UsersService {
@@ -37,8 +37,8 @@ export class UsersService {
 
   async findOne(username: string) {
     const user = await this.userRepository.findOne({where: {username}});
-    if(!user) throw new NotFoundException(`Las credenciales no son válidas (nombre de usuario)`);
-    return formatUserResponseWithLogin(user);
+    return user;
+    
   }
 
   update(id: number, updateUserDto: UpdateUserDto) {
