@@ -1,4 +1,4 @@
 export interface EncryptionService {
-  hash(password: string, saltRounds: number) : Promise<string>,
-  compare(password: string, hash: string) : Promise<boolean>
+  hash(data: string) : Promise<string>,
+  compare(data: string, hash: string) : Promise<boolean>
 }
