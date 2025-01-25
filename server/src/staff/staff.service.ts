@@ -20,6 +20,8 @@ export class StaffService {
     private readonly personService: PersonService,
     private readonly dataSource: DataSource
   ){}
+  
+  // Methods for endpoints
   async create(createStaffDto: CreateStaffDto): Promise<StaffResponse> {
     
     const { identityDocumentNumber } = createStaffDto;
@@ -48,12 +50,6 @@ export class StaffService {
     return formatStaffResponse(staffSaved);
   }
 
-  async createStaff (queryRunner?: QueryRunner): Promise<Staff> {
-    const repository = queryRunner? queryRunner.manager.getRepository(Staff) : this.staffRepository;
-    const staff = repository.create({});
-    return repository.save(staff);
-  }
-
   async findAll(): Promise<StaffResponse[]> {
     const staff = await this.staffRepository.find({where: {isActive: true}, relations: { person: true}});
     return staff.map(formatStaffResponse);
@@ -76,12 +72,6 @@ export class StaffService {
     return staff.map(formatStaffResponse);
   }
 
-  async findOne(staffId: number): Promise<Staff | null> {
-    const staff = await this.staffRepository.findOne({where: {staffId}, relations: { person: true}});
-    if(!staff) throw new NotFoundException(`El personal no se encuentra registrado`);
-    return staff;
-  }
-
   async update(staffId: number, updateStaffDto: UpdateStaffDto): Promise<StaffResponse> {
     const staff = await this.findOne(staffId);
     const person = await this.personService.update(staff.person.personId, updateStaffDto);
@@ -99,7 +89,20 @@ export class StaffService {
     if(staff.affected === 0) throw new NotFoundException(`El personal no se encuentra registrado`);
   }
 
-  async isStaffRegistered(person: Person, identityDocumentNumber: string): Promise<any> {
+  // Internal helper methods
+  private async createStaff (queryRunner?: QueryRunner): Promise<Staff> {
+    const repository = queryRunner? queryRunner.manager.getRepository(Staff) : this.staffRepository;
+    const staff = repository.create({});
+    return repository.save(staff);
+  }
+
+  private async findOne(staffId: number): Promise<Staff | null> {
+    const staff = await this.staffRepository.findOne({where: {staffId}, relations: { person: true}});
+    if(!staff) throw new NotFoundException(`El personal no se encuentra registrado`);
+    return staff;
+  }
+
+  private isStaffRegistered(person: Person, identityDocumentNumber: string): Promise<any> {
     const staff = person.staff;
     if(!staff) throw new BadRequestException(`Persona con DNI ${identityDocumentNumber} ya está registrada como paciente`);
     if (!staff.isActive) throw new BadRequestException(`El personal con DNI ${identityDocumentNumber} se encuentra desactivado`);

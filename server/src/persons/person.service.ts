@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, NotFoundException } from "@nestjs/common";
+import { Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Person } from "./entities/person.entity";
 import { QueryRunner, Repository } from "typeorm";
@@ -13,6 +13,7 @@ export class PersonService {
     private readonly personRepository: Repository<Person>
   ){}
 
+  // Internal helpers methods
   async create(createPersonDto: CreatePersonDto, queryRunner?: QueryRunner): Promise<Person> {
     const repository = queryRunner? queryRunner.manager.getRepository(Person) : this.personRepository;
     const person = repository.create(createPersonDto);

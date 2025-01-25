@@ -15,6 +15,7 @@ export class RolesService {
     private readonly roleRepository: Repository<Role>
   ){}
 
+  // Methods for endopoints
   async create(createRoleDto: CreateRoleDto): Promise<RoleResponse> {
     const role = this.roleRepository.create(createRoleDto);
     await this.roleRepository.save(role);
@@ -24,12 +25,6 @@ export class RolesService {
   async findAll(): Promise<RoleResponse[]> {
     const roles = await this.roleRepository.find({where: {isActive: true}});
     return roles.map(formatRoleResponse);
-  }
-
-  async findOne(roleId: number): Promise<RoleResponse | null> {
-    const role = await this.roleRepository.findOneBy({roleId, isActive: true});
-    if(!role) throw new NotFoundException(`Rol con el ID ${roleId} no fue encontrado`);
-    return formatRoleResponse(role);
   }
 
   async search(term: string): Promise<RoleResponse[]> {
@@ -61,6 +56,7 @@ export class RolesService {
     if(role.affected === 0) throw new NotFoundException(`Rol con el ID ${roleId} no fue encontrado`);
   }
 
+  // Internal helper methods
   async assignRolesToUser(role?: Role[], queryRunner?: QueryRunner): Promise<Role[]> {
     if(role && role.length > 0) return role;
     const repository = queryRunner? queryRunner.manager.getRepository(Role) : this.roleRepository;
