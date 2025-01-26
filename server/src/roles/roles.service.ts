@@ -3,10 +3,9 @@ import { CreateRoleDto } from './dto/create-role.dto';
 import { UpdateRoleDto } from './dto/update-role.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Role } from './entities/role.entity';
-import { Repository } from 'typeorm';
+import { Repository, QueryRunner } from 'typeorm';
 import { RoleResponse } from './interfaces/role-response.interface';
-import { TransformRole } from './helpers/transform-role.helper';
-
+import { formatRoleResponse } from './helpers/format-role-response.helper';
 
 @Injectable()
 export class RolesService {
@@ -16,36 +15,53 @@ export class RolesService {
     private readonly roleRepository: Repository<Role>
   ){}
 
+  // Methods for endopoints
   async create(createRoleDto: CreateRoleDto): Promise<RoleResponse> {
     const role = this.roleRepository.create(createRoleDto);
     await this.roleRepository.save(role);
-    return TransformRole(role);
+    return formatRoleResponse(role);
   }
 
   async findAll(): Promise<RoleResponse[]> {
     const roles = await this.roleRepository.find({where: {isActive: true}});
-    return roles.map(TransformRole);
+    return roles.map(formatRoleResponse);
   }
 
-  async findOne(id: number): Promise<RoleResponse | null> {
-    const role = await this.roleRepository.findOneBy({roleId: id, isActive: true});
-    if(!role) throw new NotFoundException(`Rol con el ID ${id} no fue encontrado`);
-    return TransformRole(role);
+  async search(term: string): Promise<RoleResponse[]> {
+    const queryBuilder = this.roleRepository.createQueryBuilder('role');
+    const searchTerm = `%${term.toLowerCase()}%`;
+    const roles = await queryBuilder
+      .where('isActive = true AND LOWER(description) LIKE :searchTerm', {searchTerm})
+      .getMany();
+    return roles.map(formatRoleResponse);
   }
 
-  async update(id: number, updateRoleDto: UpdateRoleDto): Promise<RoleResponse> {
+  async update(roleId: number, updateRoleDto: UpdateRoleDto): Promise<RoleResponse> {
     const role = await this.roleRepository.preload({
-      roleId: id,
+      roleId,
       ...updateRoleDto
     });
-    if(!role || !role.isActive) throw new NotFoundException(`Rol con el ID ${id} no fue encontrado`);
+    if(!role || !role.isActive) throw new NotFoundException(`Rol con el ID ${roleId} no fue encontrado`);
     await this.roleRepository.save(role);
-    return TransformRole(role);
+    return formatRoleResponse(role);
   }
 
-  async remove(id: number): Promise<void> {
-    const role = await this.findOne(id);
-    role.isActive = false;
-    await this.roleRepository.save(role);
+  async active(roleId: number): Promise<void> {
+    const role = await this.roleRepository.update({roleId},{isActive: true});
+    if(role.affected === 0) throw new NotFoundException(`Rol con el ID ${roleId} no fue encontrado`);
+  }
+
+  async remove(roleId: number): Promise<void> {
+    const role = await this.roleRepository.update({roleId},{isActive: false});
+    if(role.affected === 0) throw new NotFoundException(`Rol con el ID ${roleId} no fue encontrado`);
+  }
+
+  // Internal helper methods
+  async assignRolesToUser(role?: Role[], queryRunner?: QueryRunner): Promise<Role[]> {
+    if(role && role.length > 0) return role;
+    const repository = queryRunner? queryRunner.manager.getRepository(Role) : this.roleRepository;
+    const registerRole = await repository.findOne({where: {roleId: 2}});
+    if (!registerRole) throw new NotFoundException('El rol no se encuentra registrado');
+    return [registerRole];
   }
 }

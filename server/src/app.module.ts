@@ -3,6 +3,11 @@ import { RolesModule } from './roles/roles.module';
 import { CommonModule } from './common/common.module';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { PersonsModule } from './persons/persons.module';
+import { StaffModule } from './staff/staff.module';
+import { PatientsModule } from './patients/patients.module';
+import { UsersModule } from './users/users.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -18,7 +23,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
       synchronize: true
     }),
     RolesModule, 
-    CommonModule],
+    CommonModule, PersonsModule, StaffModule, PatientsModule, UsersModule, AuthModule],
   controllers: [],
   providers: [],
 })

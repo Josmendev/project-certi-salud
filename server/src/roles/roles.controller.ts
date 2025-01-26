@@ -17,14 +17,19 @@ export class RolesController {
     return this.rolesService.findAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.rolesService.findOne(+id);
+  @Get(':term')
+  search(@Param('term') term: string) {
+    return this.rolesService.search(term);
   }
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateRoleDto: UpdateRoleDto) {
     return this.rolesService.update(+id, updateRoleDto);
+  }
+
+  @Patch(':id/activate')
+  activate(@Param('id') id: string) {
+    return this.rolesService.remove(+id);
   }
 
   @Delete(':id')
