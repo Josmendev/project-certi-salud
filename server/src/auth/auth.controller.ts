@@ -1,18 +1,23 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
-import { SignInDto } from './dto/sign-in.dto';
+import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { GetUser } from './decorators/get-user.decorator';
 import { User } from 'src/users/entities/user.entity';
-import { Role } from './enums/role.enum';
 import { Auth } from './decorators/auth.decorator';
+import { LoginDto } from './dto/login.dto';
+import { ConfirmAccountDto } from './dto/confirm-acount.dto';
 
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService){}
 
   @Post('login')
-  signIn(@Body() signInDto: SignInDto) {
-    return this.authService.login(signInDto);
+  login(@Body() loginDto: LoginDto) {
+    return this.authService.login(loginDto);
+  }
+
+  @Post('confirm-account/:id')
+  confirmAcount(@Param('id') id: number, @Body() confirmAccountDto: ConfirmAccountDto) {
+    return this.authService.confirmAccount(id, confirmAccountDto);
   }
 
   @Auth()

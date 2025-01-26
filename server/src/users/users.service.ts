@@ -6,6 +6,7 @@ import { User } from './entities/user.entity';
 import { UuidAdapter } from 'src/common/adapters/uuid.adapter';
 import { InjectRepository } from '@nestjs/typeorm';
 import { RolesService } from 'src/roles/roles.service';
+import { BcryptAdapter } from 'src/common/adapters/bcrypt.adapter';
 
 @Injectable()
 export class UsersService {
@@ -13,7 +14,8 @@ export class UsersService {
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
     private readonly rolesService: RolesService,
-    private readonly uuidAdapter: UuidAdapter
+    private readonly uuidAdapter: UuidAdapter,
+    private readonly bcrypt: BcryptAdapter
   ){}
 
   async create(createUserDto: CreateUserDto, queryRunner?: QueryRunner): Promise<User> {
@@ -42,6 +44,14 @@ export class UsersService {
   async findOneById(userId: number) {
     const user = await this.userRepository.findOne({where: {userId}, relations: ['staff', 'staff.person']});
     return user;
+  }
+
+  async updatePasswordAndConfirm(userId: number, password: string) {
+    const user = await this.userRepository.update(
+      {userId},
+      {password: this.bcrypt.hashSync(password), isConfirm: true}
+    );
+    if(user.affected === 0) throw new NotFoundException(`Usuario con el ID ${userId} no fue encontrado`);
   }
 
   update(id: number, updateUserDto: UpdateUserDto) {

@@ -1,6 +1,6 @@
-import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { UsersService } from 'src/users/users.service';
-import { SignInDto } from './dto/sign-in.dto';
+import { LoginDto } from './dto/login.dto';
 import { BcryptAdapter } from 'src/common/adapters/bcrypt.adapter';
 import { formatUserResponseForLogin } from './helpers/format-user-response-for-login';
 import { JwtPayload } from './interfaces/jwt-payload.interface';
@@ -8,6 +8,8 @@ import { JwtService } from '@nestjs/jwt';
 import { LoginResponse } from './interfaces/login-response.interface';
 import { ValidateUserResponse } from './interfaces/validate-user-response.interface';
 import { formatValidateUserResponse } from './helpers/format-validate-user-response.helper';
+import { ConfirmAccountDto } from './dto/confirm-acount.dto';
+import { ConfirmAccountResponse } from './interfaces/confirm-account.interface';
 
 @Injectable()
 export class AuthService {
@@ -19,8 +21,8 @@ export class AuthService {
   ){}
 
   // Methods for endpoints
-  async login (signInDto: SignInDto): Promise<LoginResponse> {
-    const { username, password } = signInDto;
+  async login (loginDto: LoginDto): Promise<LoginResponse> {
+    const { username, password } = loginDto;
     const user = await this.userService.findOneByUsername(username);
     if(!user) throw new NotFoundException(`Las credenciales no son válidas (nombre de usuario)`);
     const isPasswordValid = await this.bcrypt.compare(password, user.password);
@@ -30,6 +32,15 @@ export class AuthService {
     return {
       ...formatUserResponseForLogin(user),
       token
+    };
+  }
+
+  async confirmAccount(userId: number, confirmAccountDto: ConfirmAccountDto): Promise<ConfirmAccountResponse> {
+    const { newPassword, repeatPassword } = confirmAccountDto;
+    if(newPassword !== repeatPassword) throw new BadRequestException(`Las contraseñas no coinciden`);
+    await this.userService.updatePasswordAndConfirm(userId, newPassword);
+    return {
+      token: this.getJwtToken({id: userId})
     };
   }
 
