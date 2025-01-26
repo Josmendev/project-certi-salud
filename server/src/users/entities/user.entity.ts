@@ -76,7 +76,7 @@ export class User extends Timestamped {
   @BeforeInsert()
   async hashPassword() {
     const bcrypt = new BcryptAdapter();
-    this.password = await bcrypt.hash(this.password, +process.env.HASH_SALT);
+    this.password = await bcrypt.hash(this.password);
   }
 
 }

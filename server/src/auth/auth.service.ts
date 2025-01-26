@@ -15,20 +15,22 @@ export class AuthService {
     private readonly jwtService: JwtService
   ){}
 
+  // Methods for endpoints
   async login (signInDto: SignInDto) {
     const { username, password } = signInDto;
-    const user = await this.userService.findOne(username);
+    const user = await this.userService.findOneByUsername(username);
     if(!user) throw new NotFoundException(`Las credenciales no son válidas (nombre de usuario)`);
     const isPasswordValid = await this.bcrypt.compare(password, user.password);
     if(!isPasswordValid) throw new UnauthorizedException(`Las credenciales no son válidas (contraseña)`);
     return {
       ...formatUserResponseForLogin(user),
-      token: this.getJwtToken({username: user.username})
+      token: this.getJwtToken({id: user.userId})
     };
   }
 
-  async validateUser (username: string) {
-    const user = await this.userService.findOne(username);
+  // Internal helpers methods
+  async validateUser (id: number) {
+    const user = await this.userService.findOneById(id);
     if(!user) throw new UnauthorizedException(`Token no válido`);
     if(!user.isActive) throw new UnauthorizedException(`El usuario se encuentra inactivo, contactarse con el administrador`);
     if(!user.isConfirm) throw new UnauthorizedException(`El usuario no ha confirmado su cuenta`);

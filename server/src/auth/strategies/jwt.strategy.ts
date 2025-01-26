@@ -22,7 +22,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   
   async validate(payload: JwtPayload): Promise<any> {
     // validate: validate the payload with the issued data once the token has been approved
-    const { username } = payload;
-    return await this.AuthService.validateUser(username);
+    const { id } = payload;
+    return await this.AuthService.validateUser(id);
   }
 }

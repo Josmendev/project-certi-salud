@@ -4,12 +4,10 @@ import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class BcryptAdapter implements EncryptionService {
-  constructor(
-    private readonly saltRounds: number
-  ){}
+  constructor(){}
 
   async hash(data: string): Promise<string> {
-    return bcrypt.hash(data, this.saltRounds);
+    return bcrypt.hash(data, +process.env.HASH_ROUND);
   }
   async compare(data: string, hash: string): Promise<boolean> {
     return bcrypt.compare(data, hash);

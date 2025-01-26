@@ -6,7 +6,6 @@ import { User } from './entities/user.entity';
 import { UuidAdapter } from 'src/common/adapters/uuid.adapter';
 import { InjectRepository } from '@nestjs/typeorm';
 import { RolesService } from 'src/roles/roles.service';
-import { formatUserResponseForLogin } from '../auth/helpers/format-user-response-for-login';
 
 @Injectable()
 export class UsersService {
@@ -35,10 +34,14 @@ export class UsersService {
     return `This action returns all users`;
   }
 
-  async findOne(username: string) {
-    const user = await this.userRepository.findOne({where: {username}});
+  async findOneByUsername(username: string) {
+    const user = await this.userRepository.findOne({where: {username, isActive: true}});
     return user;
-    
+  }
+
+  async findOneById(userId: number) {
+    const user = await this.userRepository.findOne({where: {userId}});
+    return user;
   }
 
   update(id: number, updateUserDto: UpdateUserDto) {
