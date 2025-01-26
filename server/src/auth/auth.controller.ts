@@ -15,12 +15,9 @@ export class AuthController {
     return this.authService.login(signInDto);
   }
 
-  @Get('private')
-  @Auth(Role.administrador)
-  testingPrivateRoute(@GetUser() user: User) {
-    return {
-      ok: true,
-      message: 'Hola mundo private'
-    }
+  @Auth()
+  @Get('user-profile')
+  userProfile(@GetUser() user: User) {
+    return user;
   }
 }

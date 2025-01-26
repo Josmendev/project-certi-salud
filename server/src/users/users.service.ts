@@ -34,13 +34,13 @@ export class UsersService {
     return `This action returns all users`;
   }
 
-  async findOneByUsername(username: string) {
+  async findOneByUsername(username: string): Promise<User> {
     const user = await this.userRepository.findOne({where: {username, isActive: true}});
     return user;
   }
 
   async findOneById(userId: number) {
-    const user = await this.userRepository.findOne({where: {userId}});
+    const user = await this.userRepository.findOne({where: {userId}, relations: ['staff', 'staff.person']});
     return user;
   }
 

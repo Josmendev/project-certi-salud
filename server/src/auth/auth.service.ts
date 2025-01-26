@@ -5,6 +5,9 @@ import { BcryptAdapter } from 'src/common/adapters/bcrypt.adapter';
 import { formatUserResponseForLogin } from './helpers/format-user-response-for-login';
 import { JwtPayload } from './interfaces/jwt-payload.interface';
 import { JwtService } from '@nestjs/jwt';
+import { LoginResponse } from './interfaces/login-response.interface';
+import { ValidateUserResponse } from './interfaces/validate-user-response.interface';
+import { formatValidateUserResponse } from './helpers/format-validate-user-response.helper';
 
 @Injectable()
 export class AuthService {
@@ -16,25 +19,27 @@ export class AuthService {
   ){}
 
   // Methods for endpoints
-  async login (signInDto: SignInDto) {
+  async login (signInDto: SignInDto): Promise<LoginResponse> {
     const { username, password } = signInDto;
     const user = await this.userService.findOneByUsername(username);
     if(!user) throw new NotFoundException(`Las credenciales no son válidas (nombre de usuario)`);
     const isPasswordValid = await this.bcrypt.compare(password, user.password);
     if(!isPasswordValid) throw new UnauthorizedException(`Las credenciales no son válidas (contraseña)`);
+    const token = user.isConfirm? this.getJwtToken({id: user.userId}) : null;
+
     return {
       ...formatUserResponseForLogin(user),
-      token: this.getJwtToken({id: user.userId})
+      token
     };
   }
 
   // Internal helpers methods
-  async validateUser (id: number) {
+  async validateUser (id: number): Promise<ValidateUserResponse> {
     const user = await this.userService.findOneById(id);
     if(!user) throw new UnauthorizedException(`Token no válido`);
     if(!user.isActive) throw new UnauthorizedException(`El usuario se encuentra inactivo, contactarse con el administrador`);
     if(!user.isConfirm) throw new UnauthorizedException(`El usuario no ha confirmado su cuenta`);
-    return user;
+    return formatValidateUserResponse(user);
   }
 
   private getJwtToken (payload: JwtPayload) {
