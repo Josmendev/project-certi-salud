@@ -34,13 +34,6 @@ export class User extends Timestamped {
   isConfirm: boolean;
 
   @Column({
-    name: 'token',
-    type: 'varchar',
-    length: 50
-  })
-  token: string;
-
-  @Column({
     name: 'isActive',
     type: 'boolean',
     default: true

@@ -25,8 +25,7 @@ export class UsersService {
     const user = repository.create({
       username: identityDocumentNumber,
       password: identityDocumentNumber,
-      staff,
-      token: this.uuidAdapter.generate()
+      staff
     });
     user.role = await this.rolesService.assignRolesToUser(role, queryRunner);
     return repository.save(user);
