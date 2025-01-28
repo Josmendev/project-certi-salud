@@ -6,6 +6,9 @@ import { User } from './entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { RolesService } from 'src/roles/roles.service';
 import { BcryptAdapter } from 'src/common/adapters/bcrypt.adapter';
+import { formatUserResponse } from './helpers/format-user-response.helper';
+import { UserResponse } from './interfaces/user-response.interface';
+import { Staff } from 'src/staff/entities/staff.entity';
 
 @Injectable()
 export class UsersService {
@@ -16,8 +19,25 @@ export class UsersService {
     private readonly bcrypt: BcryptAdapter
   ){}
 
-  async create(createUserDto: CreateUserDto, queryRunner?: QueryRunner): Promise<User> {
+  // Methods for endpoints
+  async findAll(): Promise<UserResponse[]> {
+    const users = await this.userRepository.find({where: {isActive: true}, relations: ['staff', 'staff.person']});
+    return users.map(formatUserResponse);
+  }
+
+  async update(userId: number, updateUserDto: UpdateUserDto): Promise<UserResponse> {
+    const user = await this.findOneById(userId);
+    const { role } = updateUserDto;
+    if(!role || role.length === 0) return formatUserResponse(user);
+    const newRolesInUser = await this.rolesService.findForUdateInUsers(role);
+    user.role = newRolesInUser;
+    const userUpdate = await this.userRepository.save(user);
+    return formatUserResponse(userUpdate);
     
+  }
+
+  // Internal helper methods
+  async create(createUserDto: CreateUserDto, queryRunner?: QueryRunner): Promise<User> {
     const { identityDocumentNumber, staff, role } = createUserDto;
     const repository = queryRunner? queryRunner.manager.getRepository(User) : this.userRepository;
     const user = repository.create({
@@ -29,16 +49,12 @@ export class UsersService {
     return repository.save(user);
   }
 
-  findAll() {
-    return `This action returns all users`;
-  }
-
   async findOneByUsername(username: string): Promise<User> {
     const user = await this.userRepository.findOne({where: {username, isActive: true}});
     return user;
   }
 
-  async findOneById(userId: number) {
+  async findOneById(userId: number): Promise<User> {
     const user = await this.userRepository.findOne({where: {userId}, relations: ['staff', 'staff.person']});
     return user;
   }
@@ -51,11 +67,15 @@ export class UsersService {
     if(user.affected === 0) throw new NotFoundException(`Usuario con el ID ${userId} no fue encontrado`);
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
+  async remove(staff: Staff, queryRunner?: QueryRunner): Promise<void> {
+    const repository = queryRunner? queryRunner.manager.getRepository(User) : this.userRepository;
+    const user = await repository.update({staff}, {isActive: false});
+    if(user.affected === 0) throw new NotFoundException(`El usuario no se encuentra registrado`);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+  async activate(staff: Staff, queryRunner?: QueryRunner): Promise<void> {
+    const repository = queryRunner? queryRunner.manager.getRepository(User) : this.userRepository;
+    const user = await repository.update({staff}, {isActive: true});
+    if(user.affected === 0) throw new NotFoundException(`El usuario no se encuentra registrado`);
   }
 }

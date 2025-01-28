@@ -3,7 +3,7 @@ import { CreateRoleDto } from './dto/create-role.dto';
 import { UpdateRoleDto } from './dto/update-role.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Role } from './entities/role.entity';
-import { Repository, QueryRunner } from 'typeorm';
+import { Repository, QueryRunner, In } from 'typeorm';
 import { RoleResponse } from './interfaces/role-response.interface';
 import { formatRoleResponse } from './helpers/format-role-response.helper';
 
@@ -57,6 +57,16 @@ export class RolesService {
   }
 
   // Internal helper methods
+  
+  async findForUdateInUsers(rolesId: number[]): Promise<Role[]> {
+    const roles = await this.roleRepository.find({where: {roleId: In(rolesId)}});
+    if(roles.length !== rolesId.length) {
+      const missingIds = rolesId.filter(roleId => !roles.some(role => role.roleId === roleId));
+      throw new NotFoundException(`Roles no encontrados: ${missingIds.join(', ')}`);
+    }
+    return roles;
+  }
+
   async assignRolesToUser(role?: Role[], queryRunner?: QueryRunner): Promise<Role[]> {
     if(role && role.length > 0) return role;
     const repository = queryRunner? queryRunner.manager.getRepository(Role) : this.roleRepository;

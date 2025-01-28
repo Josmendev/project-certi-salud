@@ -40,7 +40,7 @@ export class StaffService {
       ]);
       await queryRunner.commitTransaction();
     } catch (error) {
-      console.log(error);
+      // console.log(error);
       await queryRunner.rollbackTransaction();
       throw error;
     } finally {
@@ -80,13 +80,43 @@ export class StaffService {
   }
 
   async activate(staffId: number): Promise<void> {
-    const staff = await this.staffRepository.update({staffId}, {isActive: true});
-    if(staff.affected === 0) throw new NotFoundException(`El personal no se encuentra registrado`);
+    const staff = await this.findOne(staffId);
+    const queryRunner = this.dataSource.createQueryRunner();
+    queryRunner.connect();
+    queryRunner.startTransaction();
+    try {
+      staff.isActive = true;
+      await Promise.all ([
+        queryRunner.manager.save(staff),
+        this.userService.activate(staff, queryRunner)
+      ]);
+      await queryRunner.commitTransaction();
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      throw error;
+    } finally {
+      await queryRunner.release();
+    }
   }
 
   async remove(staffId: number): Promise<void> {
-    const staff = await this.staffRepository.update({staffId}, {isActive: false});
-    if(staff.affected === 0) throw new NotFoundException(`El personal no se encuentra registrado`);
+    const staff = await this.findOne(staffId);
+    const queryRunner = this.dataSource.createQueryRunner();
+    queryRunner.connect();
+    queryRunner.startTransaction();
+    try {
+      staff.isActive = false;
+      await Promise.all ([
+        queryRunner.manager.save(staff),
+        this.userService.remove(staff, queryRunner)
+      ]);
+      await queryRunner.commitTransaction();
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      throw error;
+    } finally {
+      await queryRunner.release();
+    }
   }
 
   // Internal helper methods
