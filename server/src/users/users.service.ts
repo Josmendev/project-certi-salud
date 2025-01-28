@@ -3,7 +3,6 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { Repository, QueryRunner } from 'typeorm';
 import { User } from './entities/user.entity';
-import { UuidAdapter } from 'src/common/adapters/uuid.adapter';
 import { InjectRepository } from '@nestjs/typeorm';
 import { RolesService } from 'src/roles/roles.service';
 import { BcryptAdapter } from 'src/common/adapters/bcrypt.adapter';
@@ -14,7 +13,6 @@ export class UsersService {
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
     private readonly rolesService: RolesService,
-    private readonly uuidAdapter: UuidAdapter,
     private readonly bcrypt: BcryptAdapter
   ){}
 
