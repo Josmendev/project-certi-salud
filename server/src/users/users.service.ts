@@ -25,6 +25,26 @@ export class UsersService {
     return users.map(formatUserResponse);
   }
 
+  async search(term: string): Promise<UserResponse[]> {
+    const queryBuilder = this.userRepository.createQueryBuilder('user');
+    const searchTerm = `%${term.toLowerCase()}%`;
+    const user = await queryBuilder
+      .innerJoinAndSelect('user.staff', 'staff')
+      .innerJoinAndSelect('user.role', 'role')
+      .innerJoinAndSelect('staff.person', 'person')
+      .where(
+        'user.isActive = true ' +
+        'AND (LOWER(user.username) LIKE :searchTerm ' +
+        'OR LOWER(person.name) LIKE :searchTerm ' +
+        'OR LOWER(person.paternalSurname) LIKE :searchTerm ' +
+        'OR LOWER(person.maternalSurname) LIKE :searchTerm '+
+        'OR LOWER(role.description) LIKE :searchTerm)',
+        { searchTerm }
+      )
+      .getMany();
+    return user.map(formatUserResponse);
+  }
+
   async update(userId: number, updateUserDto: UpdateUserDto): Promise<UserResponse> {
     const user = await this.findOneById(userId);
     const { role } = updateUserDto;
