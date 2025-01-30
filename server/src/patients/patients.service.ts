@@ -1,19 +1,51 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreatePatientDto } from './dto/create-patient.dto';
 import { UpdatePatientDto } from './dto/update-patient.dto';
+import { TermRelationWithPerson } from 'src/persons/enum/term-relation.enum';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Patient } from './entities/patient.entity';
+import { DataSource, QueryRunner, Repository } from 'typeorm';
+import { PersonService } from 'src/persons/person.service';
+import { Person } from 'src/persons/entities/person.entity';
+import { formatPatientResponse } from './helpers/format-patient-response.helper';
+import { PatientResponse } from './interfaces/patient-response.interface';
 
 @Injectable()
 export class PatientsService {
-  create(createPatientDto: CreatePatientDto) {
-    return 'This action adds a new patient';
+  constructor(
+    @InjectRepository(Patient)
+    private readonly patientRepository: Repository<Patient>,
+    private readonly personService: PersonService,
+    private readonly dataSource: DataSource
+  ){}
+
+  // Methods for endpoints
+  async create(createPatientDto: CreatePatientDto): Promise<PatientResponse> {
+    const { identityDocumentNumber, age } = createPatientDto;
+    const termRelation = TermRelationWithPerson.patient;
+    const person = await this.personService.isPersonRegistered({identityDocumentNumber, termRelation});
+    if(person) return await this.isStaffRegistered(person, identityDocumentNumber);
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+    let patient: Patient;
+    try {
+      patient = await this.createPatient(age, queryRunner);
+      await this.personService.create({...createPatientDto, patient}, queryRunner);
+      await queryRunner.commitTransaction();
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      throw error;
+    } finally {
+      await queryRunner.release();
+    }
+    const patientSaved = await this.findOne(patient.patientId);
+    return formatPatientResponse(patientSaved);
   }
 
-  findAll() {
-    return `This action returns all patients`;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} patient`;
+  async findAll(): Promise<PatientResponse[]> {
+    const patients = await this.patientRepository.find({where: {isActive: true}, relations: {person: true}});
+    return patients.map(formatPatientResponse);
   }
 
   update(id: number, updatePatientDto: UpdatePatientDto) {
@@ -22,5 +54,25 @@ export class PatientsService {
 
   remove(id: number) {
     return `This action removes a #${id} patient`;
+  }
+  
+  // Internal helpers methods
+  private async createPatient(age: number, queryRunner?: QueryRunner): Promise<Patient> {
+    const repository = queryRunner? queryRunner.manager.getRepository(Patient) : this.patientRepository;
+    const patient = repository.create({age});
+    return await repository.save(patient);
+  }
+
+  private async findOne(patientId: number): Promise<Patient | null> {
+    const patient = await this.patientRepository.findOne({where: {patientId}, relations: { person: true}});
+    if(!patient) throw new NotFoundException(`El personal no se encuentra registrado`);
+    return patient;
+  }
+
+  private isStaffRegistered(person: Person, identityDocumentNumber: string): Promise<any> {
+    const patient = person.patient;
+    if(!patient) throw new BadRequestException(`Persona con DNI ${identityDocumentNumber} ya está registrada como personal`);
+    if (!patient.isActive) throw new BadRequestException(`El paciente con DNI ${identityDocumentNumber} se encuentra desactivado`);
+    throw new BadRequestException(`El paciente con DNI ${identityDocumentNumber} ya se encuentra registrado`);
   }
 }
