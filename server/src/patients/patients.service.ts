@@ -9,6 +9,8 @@ import { PersonService } from 'src/persons/person.service';
 import { Person } from 'src/persons/entities/person.entity';
 import { formatPatientResponse } from './helpers/format-patient-response.helper';
 import { PatientResponse } from './interfaces/patient-response.interface';
+import { paginate } from 'src/common/helpers/paginate.helper';
+import { PaginationDto } from 'src/common/dto/pagination.dto';
 
 @Injectable()
 export class PatientsService {
@@ -43,8 +45,13 @@ export class PatientsService {
     return formatPatientResponse(patientSaved);
   }
 
-  async findAll(): Promise<PatientResponse[]> {
-    const patients = await this.patientRepository.find({where: {isActive: true}, relations: {person: true}});
+  async findAll(paginationDto: PaginationDto): Promise<PatientResponse[]> {
+    const queryBuilder = this.patientRepository.createQueryBuilder('patient');
+    queryBuilder
+      .leftJoinAndSelect('patient.person', 'person')
+      .where('isActive = true')
+      .orderBy('patient.createdAt', 'ASC');
+    const patients = await paginate(queryBuilder, paginationDto);
     return patients.map(formatPatientResponse);
   }
 
@@ -86,8 +93,14 @@ export class PatientsService {
     return formatPatientResponse(patient);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} patient`;
+  async activate(patientId: number): Promise<void> {
+    const patient = await this.patientRepository.update({patientId}, {isActive: true});
+    if(patient.affected === 0) throw new NotFoundException(`El paciente no se encuentra registrado`);
+  }
+
+  async remove(patientId: number): Promise<void> {
+    const patient = await this.patientRepository.update({patientId}, {isActive: false});
+    if(patient.affected === 0) throw new NotFoundException(`El paciente no se encuentra registrado`);
   }
   
   // Internal helpers methods
