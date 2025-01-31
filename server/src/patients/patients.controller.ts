@@ -17,10 +17,10 @@ export class PatientsController {
     return this.patientsService.findAll();
   }
 
-  // @Get(':id')
-  // findOne(@Param('id') id: string) {
-  //   return this.patientsService.findOne(+id);
-  // }
+  @Get(':term')
+  search(@Param('term') term: string) {
+    return this.patientsService.search(term);
+  }
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updatePatientDto: UpdatePatientDto) {

@@ -48,8 +48,42 @@ export class PatientsService {
     return patients.map(formatPatientResponse);
   }
 
-  update(id: number, updatePatientDto: UpdatePatientDto) {
-    return `This action updates a #${id} patient`;
+  async search(term: string): Promise<PatientResponse[]> {
+    const queryBuilder = this.patientRepository.createQueryBuilder('patient');
+    const searchTerm = `%${term.toLowerCase()}%`;
+    const patients = await queryBuilder
+      .innerJoinAndSelect('patient.person', 'person')
+      .where(
+        'patient.isActive = true ' +
+        'AND (LOWER(person.identityDocumentNumber) LIKE :searchTerm ' +
+        'OR LOWER(person.name) LIKE :searchTerm ' +
+        'OR LOWER(person.paternalSurname) LIKE :searchTerm ' +
+        'OR LOWER(person.maternalSurname) LIKE :searchTerm)' +
+        'OR patient.age LIKE :searchTerm',
+        { searchTerm })
+      .getMany();
+    return patients.map(formatPatientResponse);
+  }
+
+  async update(patientId: number, updatePatientDto: UpdatePatientDto): Promise<PatientResponse> {
+    let patient = await this.findOne(patientId);
+    const { age, ...updateDataPerson } = updatePatientDto;
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+    try {
+      patient.age = age? age : patient.age;
+      await queryRunner.manager.save(patient);
+      const person = await this.personService.update(patient.person.personId, updateDataPerson, queryRunner);
+      patient.person = person;
+      await queryRunner.commitTransaction();
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      throw error;
+    } finally {
+      await queryRunner.release();
+    }
+    return formatPatientResponse(patient);
   }
 
   remove(id: number) {
@@ -65,7 +99,7 @@ export class PatientsService {
 
   private async findOne(patientId: number): Promise<Patient | null> {
     const patient = await this.patientRepository.findOne({where: {patientId}, relations: { person: true}});
-    if(!patient) throw new NotFoundException(`El personal no se encuentra registrado`);
+    if(!patient) throw new NotFoundException(`El paciente no se encuentra registrado`);
     return patient;
   }
 

@@ -20,13 +20,14 @@ export class PersonService {
     return repository.save(person);
   }
 
-  async update (personId: number, updatePersonDto: UpdatePersonDto): Promise<Person> {
-    const person = await this.personRepository.preload({
+  async update (personId: number, updatePersonDto: UpdatePersonDto, queryRunner?: QueryRunner): Promise<Person> {
+    const repository = queryRunner? queryRunner.manager.getRepository(Person) : this.personRepository;
+    const person = await repository.preload({
       personId,
       ...updatePersonDto
     });
     if(!person) throw new NotFoundException(`La persona no se encuentra registrada`);
-    return await this.personRepository.save(person);
+    return await repository.save(person);
   };
 
   async isPersonRegistered(isPersonRegisterdDto: IsPersonRegisterDto) : Promise<Person> {
