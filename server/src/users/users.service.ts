@@ -10,7 +10,7 @@ import { formatUserResponse } from './helpers/format-user-response.helper';
 import { UserResponse } from './interfaces/user-response.interface';
 import { Staff } from 'src/staff/entities/staff.entity';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
-import { paginated } from '../common/interfaces/paginated.interface';
+import { Paginated } from '../common/interfaces/paginated.interface';
 import { paginate } from 'src/common/helpers/paginate.helper';
 
 @Injectable()
@@ -23,7 +23,7 @@ export class UsersService {
   ){}
 
   // Methods for endpoints
-  async findAll(paginationDto: PaginationDto): Promise<paginated<UserResponse>> {
+  async findAll(paginationDto: PaginationDto): Promise<Paginated<UserResponse>> {
     const queryBuilder = this.userRepository.createQueryBuilder('user')
       .leftJoinAndSelect('user.staff', 'staff')
       .innerJoinAndSelect('user.role', 'role')
@@ -37,24 +37,27 @@ export class UsersService {
     }
   }
 
-  async search(term: string): Promise<UserResponse[]> {
-    const queryBuilder = this.userRepository.createQueryBuilder('user');
-    const searchTerm = `%${term.toLowerCase()}%`;
-    const user = await queryBuilder
-      .innerJoinAndSelect('user.staff', 'staff')
+  async search(term: string, paginationDto: PaginationDto): Promise<Paginated<UserResponse>> {
+    const searchTerm = `%${term}%`;
+    const queryBuilder = this.userRepository.createQueryBuilder('user')
+      .leftJoinAndSelect('user.staff', 'staff')
       .innerJoinAndSelect('user.role', 'role')
       .innerJoinAndSelect('staff.person', 'person')
       .where(
         'user.isActive = true ' +
-        'AND (LOWER(user.username) LIKE :searchTerm ' +
-        'OR LOWER(person.name) LIKE :searchTerm ' +
-        'OR LOWER(person.paternalSurname) LIKE :searchTerm ' +
-        'OR LOWER(person.maternalSurname) LIKE :searchTerm '+
-        'OR LOWER(role.description) LIKE :searchTerm)',
+        'AND (user.username LIKE :searchTerm ' +
+        'OR person.name LIKE :searchTerm ' +
+        'OR person.paternalSurname LIKE :searchTerm ' +
+        'OR person.maternalSurname LIKE :searchTerm '+
+        'OR role.description LIKE :searchTerm)',
         { searchTerm }
       )
-      .getMany();
-    return user.map(formatUserResponse);
+      .orderBy('user.createdAt', 'ASC');
+    const users = await paginate(queryBuilder, paginationDto);
+    return {
+      ...users,
+      data: users.data.map(formatUserResponse)
+    }
   }
 
   async update(userId: number, updateUserDto: UpdateUserDto): Promise<UserResponse> {

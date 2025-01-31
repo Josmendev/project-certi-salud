@@ -13,8 +13,8 @@ export class UsersController {
   }
 
   @Get(':term')
-  search(@Param('term') term: string) {
-    return this.usersService.search(term);
+  search(@Param('term') term: string, @Query() paginationDto: PaginationDto) {
+    return this.usersService.search(term, paginationDto);
   }
 
   @Patch(':id')

@@ -19,8 +19,8 @@ export class RolesController {
   }
 
   @Get(':term')
-  search(@Param('term') term: string) {
-    return this.rolesService.search(term);
+  search(@Param('term') term: string, @Query() paginationDto: PaginationDto) {
+    return this.rolesService.search(term, paginationDto);
   }
 
   @Patch(':id')

@@ -19,8 +19,8 @@ export class PatientsController {
   }
 
   @Get(':term')
-  search(@Param('term') term: string) {
-    return this.patientsService.search(term);
+  search(@Param('term') term: string, @Query() paginationDto: PaginationDto) {
+    return this.patientsService.search(term, paginationDto);
   }
 
   @Patch(':id')

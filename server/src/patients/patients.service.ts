@@ -11,7 +11,7 @@ import { formatPatientResponse } from './helpers/format-patient-response.helper'
 import { PatientResponse } from './interfaces/patient-response.interface';
 import { paginate } from 'src/common/helpers/paginate.helper';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
-import { paginated } from 'src/common/interfaces/paginated.interface';
+import { Paginated } from 'src/common/interfaces/paginated.interface';
 
 @Injectable()
 export class PatientsService {
@@ -46,7 +46,7 @@ export class PatientsService {
     return formatPatientResponse(patientSaved);
   }
 
-  async findAll(paginationDto: PaginationDto): Promise<paginated<PatientResponse>> {
+  async findAll(paginationDto: PaginationDto): Promise<Paginated<PatientResponse>> {
     const queryBuilder = this.patientRepository.createQueryBuilder('patient');
     queryBuilder
       .leftJoinAndSelect('patient.person', 'person')
@@ -59,21 +59,25 @@ export class PatientsService {
     };
   }
 
-  async search(term: string): Promise<PatientResponse[]> {
+  async search(term: string, paginationDto: PaginationDto): Promise<Paginated<PatientResponse>> {
+    const searchTerm = `%${term}%`;
     const queryBuilder = this.patientRepository.createQueryBuilder('patient');
-    const searchTerm = `%${term.toLowerCase()}%`;
-    const patients = await queryBuilder
-      .innerJoinAndSelect('patient.person', 'person')
+    queryBuilder
+      .leftJoinAndSelect('patient.person', 'person')
       .where(
         'patient.isActive = true ' +
-        'AND (LOWER(person.identityDocumentNumber) LIKE :searchTerm ' +
-        'OR LOWER(person.name) LIKE :searchTerm ' +
-        'OR LOWER(person.paternalSurname) LIKE :searchTerm ' +
-        'OR LOWER(person.maternalSurname) LIKE :searchTerm)' +
-        'OR patient.age LIKE :searchTerm',
+        'AND (person.identityDocumentNumber LIKE :searchTerm ' +
+        'OR person.name LIKE :searchTerm ' +
+        'OR person.paternalSurname LIKE :searchTerm ' +
+        'OR person.maternalSurname LIKE :searchTerm ' +
+        'OR patient.age LIKE :searchTerm)',
         { searchTerm })
-      .getMany();
-    return patients.map(formatPatientResponse);
+      .orderBy('patient.createdAt', 'ASC');
+    const patients = await paginate(queryBuilder, paginationDto);
+    return {
+      ...patients,
+      data: patients.data.map(formatPatientResponse)
+    };
   }
 
   async update(patientId: number, updatePatientDto: UpdatePatientDto): Promise<PatientResponse> {

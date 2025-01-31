@@ -12,7 +12,7 @@ import { Person } from 'src/persons/entities/person.entity';
 import { TermRelationWithPerson } from 'src/persons/enum/term-relation.enum';
 import { paginate } from 'src/common/helpers/paginate.helper';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
-import { paginated } from '../common/interfaces/paginated.interface';
+import { Paginated } from '../common/interfaces/paginated.interface';
 
 @Injectable()
 export class StaffService {
@@ -51,7 +51,7 @@ export class StaffService {
     return formatStaffResponse(staffSaved);
   }
 
-  async findAll(paginationDto: PaginationDto): Promise<paginated<StaffResponse>> {
+  async findAll(paginationDto: PaginationDto): Promise<Paginated<StaffResponse>> {
     const queryBuilder = this.staffRepository.createQueryBuilder('staff');
     queryBuilder
       .leftJoinAndSelect('staff.person', 'person')
@@ -64,21 +64,25 @@ export class StaffService {
     };
   }
 
-  async search(term: string): Promise<StaffResponse[]> {
+  async search(term: string, paginationDto: PaginationDto): Promise<Paginated<StaffResponse>> {
+    const searchTerm = `%${term}%`;
     const queryBuilder = this.staffRepository.createQueryBuilder('staff');
-    const searchTerm = `%${term.toLowerCase()}%`;
-    const staff = await queryBuilder
-      .innerJoinAndSelect('staff.person', 'person')
+    queryBuilder
+      .leftJoinAndSelect('staff.person', 'person')
       .where(
         'staff.isActive = true ' +
-        'AND (LOWER(person.identityDocumentNumber) LIKE :searchTerm ' +
-        'OR LOWER(person.name) LIKE :searchTerm ' +
-        'OR LOWER(person.paternalSurname) LIKE :searchTerm ' +
-        'OR LOWER(person.maternalSurname) LIKE :searchTerm)',
+        'AND (person.identityDocumentNumber LIKE :searchTerm ' +
+        'OR person.name LIKE :searchTerm ' +
+        'OR person.paternalSurname LIKE :searchTerm ' +
+        'OR person.maternalSurname LIKE :searchTerm)',
         { searchTerm }
       )
-      .getMany();
-    return staff.map(formatStaffResponse);
+      .orderBy('staff.createdAt', 'ASC');
+    const staff = await paginate(queryBuilder, paginationDto);
+    return {
+      ...staff,
+      data: staff.data.map(formatStaffResponse)
+    };
   }
 
   async update(staffId: number, updateStaffDto: UpdateStaffDto): Promise<StaffResponse> {

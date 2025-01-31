@@ -8,7 +8,7 @@ import { RoleResponse } from './interfaces/role-response.interface';
 import { formatRoleResponse } from './helpers/format-role-response.helper';
 import { paginate } from 'src/common/helpers/paginate.helper';
 import { PaginationDto } from '../common/dto/pagination.dto';
-import { paginated } from 'src/common/interfaces/paginated.interface';
+import { Paginated } from 'src/common/interfaces/paginated.interface';
 
 @Injectable()
 export class RolesService {
@@ -25,7 +25,7 @@ export class RolesService {
     return formatRoleResponse(role);
   }
 
-  async findAll(paginationDto: PaginationDto): Promise<paginated<RoleResponse>> {
+  async findAll(paginationDto: PaginationDto): Promise<Paginated<RoleResponse>> {
     const queryBuilder = this.roleRepository.createQueryBuilder('role')
     .orderBy('role.createdAt', 'ASC');
     const roles = await paginate(queryBuilder, paginationDto);
@@ -35,13 +35,16 @@ export class RolesService {
     };
   }
 
-  async search(term: string): Promise<RoleResponse[]> {
-    const queryBuilder = this.roleRepository.createQueryBuilder('role');
+  async search(term: string, paginationDto: PaginationDto): Promise<Paginated<RoleResponse>> {
     const searchTerm = `%${term.toLowerCase()}%`;
-    const roles = await queryBuilder
-      .where('LOWER(description) LIKE :searchTerm', {searchTerm})
-      .getMany();
-    return roles.map(formatRoleResponse);
+    const queryBuilder = this.roleRepository.createQueryBuilder('role')
+      .where('description LIKE :searchTerm', {searchTerm})
+      .orderBy('role.createdAt', 'ASC');
+    const roles = await paginate(queryBuilder, paginationDto);
+    return {
+      ...roles,
+      data: roles.data.map(formatRoleResponse)
+    };
   }
 
   async update(roleId: number, updateRoleDto: UpdateRoleDto): Promise<RoleResponse> {

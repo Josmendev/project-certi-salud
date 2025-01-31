@@ -19,8 +19,8 @@ export class StaffController {
   }
 
   @Get(':term')
-  search(@Param('term') term: string) {
-    return this.staffService.search(term);
+  search(@Param('term') term: string, @Query() paginationDto: PaginationDto) {
+    return this.staffService.search(term, paginationDto);
   }
 
   @Patch(':id')

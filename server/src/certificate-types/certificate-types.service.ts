@@ -7,7 +7,7 @@ import { Repository } from 'typeorm';
 import { formatCertificateTypeResponse } from './helpers/format-certificate-type-response.helper';
 import { CertificateTypeResponse } from './interfaces/certificate-type-response.interface';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
-import { paginated } from '../common/interfaces/paginated.interface';
+import { Paginated } from '../common/interfaces/paginated.interface';
 import { paginate } from 'src/common/helpers/paginate.helper';
 
 @Injectable()
@@ -24,9 +24,9 @@ export class CertificateTypesService {
     return formatCertificateTypeResponse(certificateType);
   }
 
-  async findAll(paginationDto: PaginationDto): Promise<paginated<CertificateTypeResponse>> {
-    const queryBuilder = this.certificateTypeRepository.createQueryBuilder('certificate_type')
-      .orderBy('certificate_type.createdAt', 'ASC')
+  async findAll(paginationDto: PaginationDto): Promise<Paginated<CertificateTypeResponse>> {
+    const queryBuilder = this.certificateTypeRepository.createQueryBuilder('certificateType')
+      .orderBy('certificateType.createdAt', 'ASC')
     const certificateTypes = await paginate(queryBuilder, paginationDto);
     return {
       ...certificateTypes,
@@ -34,13 +34,16 @@ export class CertificateTypesService {
     }
   }
 
-  async search(term: string): Promise<CertificateTypeResponse[]> {
-    const queryBuilder = this.certificateTypeRepository.createQueryBuilder('role');
-    const searchTerm = `%${term.toLowerCase()}%`;
-    const certificateTypes = await queryBuilder
-      .where('LOWER(description) LIKE :searchTerm', {searchTerm})
-      .getMany();
-    return certificateTypes.map(formatCertificateTypeResponse);
+  async search(term: string, paginationDto: PaginationDto): Promise<Paginated<CertificateTypeResponse>> {
+    const searchTerm = `%${term}%`;
+    const queryBuilder = this.certificateTypeRepository.createQueryBuilder('certificateType')
+      .where('description LIKE :searchTerm', {searchTerm})
+      .orderBy('certificateType.createdAt', 'ASC');
+    const certificateTypes = await paginate(queryBuilder, paginationDto);
+    return {
+      ...certificateTypes,
+      data: certificateTypes.data.map(formatCertificateTypeResponse)
+    }
   }
 
   async update(certificateTypeId: number, updateCertificateTypeDto: UpdateCertificateTypeDto) {

@@ -19,8 +19,8 @@ export class CertificateTypesController {
   }
 
   @Get(':term')
-  search(@Param('term') term: string) {
-    return this.certificateTypesService.search(term);
+  search(@Param('term') term: string, @Query() paginationDto: PaginationDto) {
+    return this.certificateTypesService.search(term, paginationDto);
   }
 
   @Patch(':id')
