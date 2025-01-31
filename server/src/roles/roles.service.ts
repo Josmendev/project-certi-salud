@@ -27,7 +27,7 @@ export class RolesService {
 
   async findAll(paginationDto: PaginationDto): Promise<paginated<RoleResponse>> {
     const queryBuilder = this.roleRepository.createQueryBuilder('role')
-      .where('isActive = true');
+    .orderBy('role.createdAt', 'ASC');
     const roles = await paginate(queryBuilder, paginationDto);
     return {
       ...roles,
@@ -39,7 +39,7 @@ export class RolesService {
     const queryBuilder = this.roleRepository.createQueryBuilder('role');
     const searchTerm = `%${term.toLowerCase()}%`;
     const roles = await queryBuilder
-      .where('isActive = true AND LOWER(description) LIKE :searchTerm', {searchTerm})
+      .where('LOWER(description) LIKE :searchTerm', {searchTerm})
       .getMany();
     return roles.map(formatRoleResponse);
   }

@@ -26,7 +26,6 @@ export class CertificateTypesService {
 
   async findAll(paginationDto: PaginationDto): Promise<paginated<CertificateTypeResponse>> {
     const queryBuilder = this.certificateTypeRepository.createQueryBuilder('certificate_type')
-      .where('isActive = true')
       .orderBy('certificate_type.createdAt', 'ASC')
     const certificateTypes = await paginate(queryBuilder, paginationDto);
     return {
@@ -39,7 +38,7 @@ export class CertificateTypesService {
     const queryBuilder = this.certificateTypeRepository.createQueryBuilder('role');
     const searchTerm = `%${term.toLowerCase()}%`;
     const certificateTypes = await queryBuilder
-      .where('isActive = true AND LOWER(description) LIKE :searchTerm', {searchTerm})
+      .where('LOWER(description) LIKE :searchTerm', {searchTerm})
       .getMany();
     return certificateTypes.map(formatCertificateTypeResponse);
   }
