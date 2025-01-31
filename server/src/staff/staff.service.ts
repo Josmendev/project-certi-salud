@@ -10,6 +10,8 @@ import { formatStaffResponse } from './helpers/format-staff-response.helper';
 import { StaffResponse } from './interfaces/staff-response.interface';
 import { Person } from 'src/persons/entities/person.entity';
 import { TermRelationWithPerson } from 'src/persons/enum/term-relation.enum';
+import { paginate } from 'src/common/helpers/paginate.helper';
+import { PaginationDto } from 'src/common/dto/pagination.dto';
 
 @Injectable()
 export class StaffService {
@@ -49,8 +51,15 @@ export class StaffService {
     return formatStaffResponse(staffSaved);
   }
 
-  async findAll(): Promise<StaffResponse[]> {
-    const staff = await this.staffRepository.find({where: {isActive: true}, relations: { person: true}});
+  async findAll(paginationDto: PaginationDto): Promise<StaffResponse[]> {
+    // const staff = await this.staffRepository.find({where: {isActive: true}, relations: { person: true}});
+    // return staff.map(formatStaffResponse);
+    const queryBuilder = this.staffRepository.createQueryBuilder('staff');
+    queryBuilder
+      .leftJoinAndSelect('staff.person', 'person')
+      .where('isActive = true')
+      .orderBy('staff.createdAt', 'ASC');
+    const staff = await paginate(queryBuilder, paginationDto);
     return staff.map(formatStaffResponse);
   }
 
