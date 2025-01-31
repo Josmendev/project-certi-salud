@@ -11,6 +11,7 @@ import { formatPatientResponse } from './helpers/format-patient-response.helper'
 import { PatientResponse } from './interfaces/patient-response.interface';
 import { paginate } from 'src/common/helpers/paginate.helper';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
+import { paginated } from 'src/common/interfaces/paginated.interface';
 
 @Injectable()
 export class PatientsService {
@@ -45,14 +46,17 @@ export class PatientsService {
     return formatPatientResponse(patientSaved);
   }
 
-  async findAll(paginationDto: PaginationDto): Promise<PatientResponse[]> {
+  async findAll(paginationDto: PaginationDto): Promise<paginated<PatientResponse>> {
     const queryBuilder = this.patientRepository.createQueryBuilder('patient');
     queryBuilder
       .leftJoinAndSelect('patient.person', 'person')
       .where('isActive = true')
       .orderBy('patient.createdAt', 'ASC');
     const patients = await paginate(queryBuilder, paginationDto);
-    return patients.map(formatPatientResponse);
+    return {
+      ...patients,
+      data: patients.data.map(formatPatientResponse)
+    };
   }
 
   async search(term: string): Promise<PatientResponse[]> {

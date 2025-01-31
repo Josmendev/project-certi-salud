@@ -6,6 +6,9 @@ import { CertificateType } from './entities/certificate-type.entity';
 import { Repository } from 'typeorm';
 import { formatCertificateTypeResponse } from './helpers/format-certificate-type-response.helper';
 import { CertificateTypeResponse } from './interfaces/certificate-type-response.interface';
+import { PaginationDto } from 'src/common/dto/pagination.dto';
+import { paginated } from '../common/interfaces/paginated.interface';
+import { paginate } from 'src/common/helpers/paginate.helper';
 
 @Injectable()
 export class CertificateTypesService {
@@ -21,9 +24,15 @@ export class CertificateTypesService {
     return formatCertificateTypeResponse(certificateType);
   }
 
-  async findAll(): Promise<CertificateTypeResponse[]> {
-    const certificateTypes = await this.certificateTypeRepository.find({where: {isActive: true}});
-    return certificateTypes.map(formatCertificateTypeResponse);
+  async findAll(paginationDto: PaginationDto): Promise<paginated<CertificateTypeResponse>> {
+    const queryBuilder = this.certificateTypeRepository.createQueryBuilder('certificate_type')
+      .where('isActive = true')
+      .orderBy('certificate_type.createdAt', 'ASC')
+    const certificateTypes = await paginate(queryBuilder, paginationDto);
+    return {
+      ...certificateTypes,
+      data: certificateTypes.data.map(formatCertificateTypeResponse)
+    }
   }
 
   async search(term: string): Promise<CertificateTypeResponse[]> {

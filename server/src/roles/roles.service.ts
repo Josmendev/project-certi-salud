@@ -6,6 +6,9 @@ import { Role } from './entities/role.entity';
 import { Repository, QueryRunner, In } from 'typeorm';
 import { RoleResponse } from './interfaces/role-response.interface';
 import { formatRoleResponse } from './helpers/format-role-response.helper';
+import { paginate } from 'src/common/helpers/paginate.helper';
+import { PaginationDto } from '../common/dto/pagination.dto';
+import { paginated } from 'src/common/interfaces/paginated.interface';
 
 @Injectable()
 export class RolesService {
@@ -22,9 +25,14 @@ export class RolesService {
     return formatRoleResponse(role);
   }
 
-  async findAll(): Promise<RoleResponse[]> {
-    const roles = await this.roleRepository.find({where: {isActive: true}});
-    return roles.map(formatRoleResponse);
+  async findAll(paginationDto: PaginationDto): Promise<paginated<RoleResponse>> {
+    const queryBuilder = this.roleRepository.createQueryBuilder('role')
+      .where('isActive = true');
+    const roles = await paginate(queryBuilder, paginationDto);
+    return {
+      ...roles,
+      data: roles.data.map(formatRoleResponse)
+    };
   }
 
   async search(term: string): Promise<RoleResponse[]> {

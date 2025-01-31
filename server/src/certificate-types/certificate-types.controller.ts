@@ -1,7 +1,8 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
 import { CertificateTypesService } from './certificate-types.service';
 import { CreateCertificateTypeDto } from './dto/create-certificate-type.dto';
 import { UpdateCertificateTypeDto } from './dto/update-certificate-type.dto';
+import { PaginationDto } from 'src/common/dto/pagination.dto';
 
 @Controller('certificate-types')
 export class CertificateTypesController {
@@ -13,8 +14,8 @@ export class CertificateTypesController {
   }
 
   @Get()
-  findAll() {
-    return this.certificateTypesService.findAll();
+  findAll(@Query() paginationDto: PaginationDto) {
+    return this.certificateTypesService.findAll(paginationDto);
   }
 
   @Get(':term')

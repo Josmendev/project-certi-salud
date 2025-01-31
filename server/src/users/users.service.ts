@@ -9,6 +9,9 @@ import { BcryptAdapter } from 'src/common/adapters/bcrypt.adapter';
 import { formatUserResponse } from './helpers/format-user-response.helper';
 import { UserResponse } from './interfaces/user-response.interface';
 import { Staff } from 'src/staff/entities/staff.entity';
+import { PaginationDto } from 'src/common/dto/pagination.dto';
+import { paginated } from '../common/interfaces/paginated.interface';
+import { paginate } from 'src/common/helpers/paginate.helper';
 
 @Injectable()
 export class UsersService {
@@ -20,9 +23,18 @@ export class UsersService {
   ){}
 
   // Methods for endpoints
-  async findAll(): Promise<UserResponse[]> {
-    const users = await this.userRepository.find({where: {isActive: true}, relations: ['staff', 'staff.person']});
-    return users.map(formatUserResponse);
+  async findAll(paginationDto: PaginationDto): Promise<paginated<UserResponse>> {
+    const queryBuilder = this.userRepository.createQueryBuilder('user')
+      .leftJoinAndSelect('user.staff', 'staff')
+      .innerJoinAndSelect('user.role', 'role')
+      .innerJoinAndSelect('staff.person', 'person')
+      .where('user.isActive = true')
+      .orderBy('user.createdAt', 'ASC');
+    const users = await paginate(queryBuilder, paginationDto);
+    return {
+      ...users,
+      data: users.data.map(formatUserResponse)
+    }
   }
 
   async search(term: string): Promise<UserResponse[]> {

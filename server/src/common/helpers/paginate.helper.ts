@@ -1,16 +1,23 @@
 import { SelectQueryBuilder } from "typeorm";
 import { PaginationDto } from "../dto/pagination.dto";
+import { paginated } from "../interfaces/paginated.interface";
 
 export const paginate = async <T> (
   queryBuilder: SelectQueryBuilder<T>,
   paginationDto: PaginationDto
-): Promise<T[]> => {
+): Promise<paginated<T>> => {
   const { page = 1, limit = 5 } = paginationDto;
   const skip = (page - 1) * limit;
-  const data = await queryBuilder
+  const [data, total] = await queryBuilder
     .skip(skip)
     .take(limit)
-    .getMany();
+    .getManyAndCount();
   
-  return data;
+  return {
+    data,
+    total,
+    page,
+    limit,
+    totalPages: Math.ceil(total / limit)
+  };
 }

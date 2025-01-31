@@ -12,6 +12,7 @@ import { Person } from 'src/persons/entities/person.entity';
 import { TermRelationWithPerson } from 'src/persons/enum/term-relation.enum';
 import { paginate } from 'src/common/helpers/paginate.helper';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
+import { paginated } from '../common/interfaces/paginated.interface';
 
 @Injectable()
 export class StaffService {
@@ -25,7 +26,6 @@ export class StaffService {
   
   // Methods for endpoints
   async create(createStaffDto: CreateStaffDto): Promise<StaffResponse> {
-    
     const { identityDocumentNumber } = createStaffDto;
     const termRelation = TermRelationWithPerson.staff;
     const person = await this.personService.isPersonRegistered({identityDocumentNumber, termRelation});
@@ -51,16 +51,17 @@ export class StaffService {
     return formatStaffResponse(staffSaved);
   }
 
-  async findAll(paginationDto: PaginationDto): Promise<StaffResponse[]> {
-    // const staff = await this.staffRepository.find({where: {isActive: true}, relations: { person: true}});
-    // return staff.map(formatStaffResponse);
+  async findAll(paginationDto: PaginationDto): Promise<paginated<StaffResponse>> {
     const queryBuilder = this.staffRepository.createQueryBuilder('staff');
     queryBuilder
       .leftJoinAndSelect('staff.person', 'person')
       .where('isActive = true')
       .orderBy('staff.createdAt', 'ASC');
     const staff = await paginate(queryBuilder, paginationDto);
-    return staff.map(formatStaffResponse);
+    return {
+      ...staff,
+      data: staff.data.map(formatStaffResponse)
+    };
   }
 
   async search(term: string): Promise<StaffResponse[]> {
