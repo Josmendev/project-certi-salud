@@ -3,9 +3,12 @@ import { CreateRoleDto } from './dto/create-role.dto';
 import { UpdateRoleDto } from './dto/update-role.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Role } from './entities/role.entity';
-import { Repository, QueryRunner } from 'typeorm';
+import { Repository, QueryRunner, In } from 'typeorm';
 import { RoleResponse } from './interfaces/role-response.interface';
 import { formatRoleResponse } from './helpers/format-role-response.helper';
+import { paginate } from 'src/common/helpers/paginate.helper';
+import { PaginationDto } from '../common/dto/pagination.dto';
+import { Paginated } from 'src/common/interfaces/paginated.interface';
 
 @Injectable()
 export class RolesService {
@@ -22,18 +25,26 @@ export class RolesService {
     return formatRoleResponse(role);
   }
 
-  async findAll(): Promise<RoleResponse[]> {
-    const roles = await this.roleRepository.find({where: {isActive: true}});
-    return roles.map(formatRoleResponse);
+  async findAll(paginationDto: PaginationDto): Promise<Paginated<RoleResponse>> {
+    const queryBuilder = this.roleRepository.createQueryBuilder('role')
+    .orderBy('role.createdAt', 'ASC');
+    const roles = await paginate(queryBuilder, paginationDto);
+    return {
+      ...roles,
+      data: roles.data.map(formatRoleResponse)
+    };
   }
 
-  async search(term: string): Promise<RoleResponse[]> {
-    const queryBuilder = this.roleRepository.createQueryBuilder('role');
+  async search(term: string, paginationDto: PaginationDto): Promise<Paginated<RoleResponse>> {
     const searchTerm = `%${term.toLowerCase()}%`;
-    const roles = await queryBuilder
-      .where('isActive = true AND LOWER(description) LIKE :searchTerm', {searchTerm})
-      .getMany();
-    return roles.map(formatRoleResponse);
+    const queryBuilder = this.roleRepository.createQueryBuilder('role')
+      .where('description LIKE :searchTerm', {searchTerm})
+      .orderBy('role.createdAt', 'ASC');
+    const roles = await paginate(queryBuilder, paginationDto);
+    return {
+      ...roles,
+      data: roles.data.map(formatRoleResponse)
+    };
   }
 
   async update(roleId: number, updateRoleDto: UpdateRoleDto): Promise<RoleResponse> {
@@ -57,6 +68,16 @@ export class RolesService {
   }
 
   // Internal helper methods
+  
+  async findForUdateInUsers(rolesId: number[]): Promise<Role[]> {
+    const roles = await this.roleRepository.find({where: {roleId: In(rolesId)}});
+    if(roles.length !== rolesId.length) {
+      const missingIds = rolesId.filter(roleId => !roles.some(role => role.roleId === roleId));
+      throw new NotFoundException(`Roles no encontrados: ${missingIds.join(', ')}`);
+    }
+    return roles;
+  }
+
   async assignRolesToUser(role?: Role[], queryRunner?: QueryRunner): Promise<Role[]> {
     if(role && role.length > 0) return role;
     const repository = queryRunner? queryRunner.manager.getRepository(Role) : this.roleRepository;

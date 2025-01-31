@@ -1,6 +1,6 @@
 import { IsNumberString, IsString, Length } from "class-validator";
 
-export class SignInDto {
+export class LoginDto {
 
   @IsNumberString()
   @Length(8, 8)

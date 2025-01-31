@@ -10,6 +10,9 @@ import { formatStaffResponse } from './helpers/format-staff-response.helper';
 import { StaffResponse } from './interfaces/staff-response.interface';
 import { Person } from 'src/persons/entities/person.entity';
 import { TermRelationWithPerson } from 'src/persons/enum/term-relation.enum';
+import { paginate } from 'src/common/helpers/paginate.helper';
+import { PaginationDto } from 'src/common/dto/pagination.dto';
+import { Paginated } from '../common/interfaces/paginated.interface';
 
 @Injectable()
 export class StaffService {
@@ -23,7 +26,6 @@ export class StaffService {
   
   // Methods for endpoints
   async create(createStaffDto: CreateStaffDto): Promise<StaffResponse> {
-    
     const { identityDocumentNumber } = createStaffDto;
     const termRelation = TermRelationWithPerson.staff;
     const person = await this.personService.isPersonRegistered({identityDocumentNumber, termRelation});
@@ -40,7 +42,6 @@ export class StaffService {
       ]);
       await queryRunner.commitTransaction();
     } catch (error) {
-      console.log(error);
       await queryRunner.rollbackTransaction();
       throw error;
     } finally {
@@ -50,26 +51,38 @@ export class StaffService {
     return formatStaffResponse(staffSaved);
   }
 
-  async findAll(): Promise<StaffResponse[]> {
-    const staff = await this.staffRepository.find({where: {isActive: true}, relations: { person: true}});
-    return staff.map(formatStaffResponse);
+  async findAll(paginationDto: PaginationDto): Promise<Paginated<StaffResponse>> {
+    const queryBuilder = this.staffRepository.createQueryBuilder('staff');
+    queryBuilder
+      .leftJoinAndSelect('staff.person', 'person')
+      .where('isActive = true')
+      .orderBy('staff.createdAt', 'ASC');
+    const staff = await paginate(queryBuilder, paginationDto);
+    return {
+      ...staff,
+      data: staff.data.map(formatStaffResponse)
+    };
   }
 
-  async search(term: string): Promise<StaffResponse[]> {
+  async search(term: string, paginationDto: PaginationDto): Promise<Paginated<StaffResponse>> {
+    const searchTerm = `%${term}%`;
     const queryBuilder = this.staffRepository.createQueryBuilder('staff');
-    const searchTerm = `%${term.toLowerCase()}%`;
-    const staff = await queryBuilder
-      .innerJoinAndSelect('staff.person', 'person')
+    queryBuilder
+      .leftJoinAndSelect('staff.person', 'person')
       .where(
         'staff.isActive = true ' +
-        'AND (LOWER(person.identityDocumentNumber) LIKE :searchTerm ' +
-        'OR LOWER(person.name) LIKE :searchTerm ' +
-        'OR LOWER(person.paternalSurname) LIKE :searchTerm ' +
-        'OR LOWER(person.maternalSurname) LIKE :searchTerm)',
+        'AND (person.identityDocumentNumber LIKE :searchTerm ' +
+        'OR person.name LIKE :searchTerm ' +
+        'OR person.paternalSurname LIKE :searchTerm ' +
+        'OR person.maternalSurname LIKE :searchTerm)',
         { searchTerm }
       )
-      .getMany();
-    return staff.map(formatStaffResponse);
+      .orderBy('staff.createdAt', 'ASC');
+    const staff = await paginate(queryBuilder, paginationDto);
+    return {
+      ...staff,
+      data: staff.data.map(formatStaffResponse)
+    };
   }
 
   async update(staffId: number, updateStaffDto: UpdateStaffDto): Promise<StaffResponse> {
@@ -80,13 +93,43 @@ export class StaffService {
   }
 
   async activate(staffId: number): Promise<void> {
-    const staff = await this.staffRepository.update({staffId}, {isActive: true});
-    if(staff.affected === 0) throw new NotFoundException(`El personal no se encuentra registrado`);
+    const staff = await this.findOne(staffId);
+    const queryRunner = this.dataSource.createQueryRunner();
+    queryRunner.connect();
+    queryRunner.startTransaction();
+    try {
+      staff.isActive = true;
+      await Promise.all ([
+        queryRunner.manager.save(staff),
+        this.userService.activate(staff, queryRunner)
+      ]);
+      await queryRunner.commitTransaction();
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      throw error;
+    } finally {
+      await queryRunner.release();
+    }
   }
 
   async remove(staffId: number): Promise<void> {
-    const staff = await this.staffRepository.update({staffId}, {isActive: false});
-    if(staff.affected === 0) throw new NotFoundException(`El personal no se encuentra registrado`);
+    const staff = await this.findOne(staffId);
+    const queryRunner = this.dataSource.createQueryRunner();
+    queryRunner.connect();
+    queryRunner.startTransaction();
+    try {
+      staff.isActive = false;
+      await Promise.all ([
+        queryRunner.manager.save(staff),
+        this.userService.remove(staff, queryRunner)
+      ]);
+      await queryRunner.commitTransaction();
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      throw error;
+    } finally {
+      await queryRunner.release();
+    }
   }
 
   // Internal helper methods
