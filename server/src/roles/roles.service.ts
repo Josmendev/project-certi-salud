@@ -6,7 +6,6 @@ import { Role } from './entities/role.entity';
 import { Repository, QueryRunner, In } from 'typeorm';
 import { RoleResponse } from './interfaces/role-response.interface';
 import { formatRoleResponse } from './helpers/format-role-response.helper';
-import { paginate } from 'src/common/helpers/paginate.helper';
 import { PaginationDto } from '../common/dto/pagination.dto';
 import { Paginated } from 'src/common/interfaces/paginated.interface';
 import { BaseService } from 'src/common/services/base.service';
