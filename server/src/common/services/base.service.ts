@@ -8,7 +8,7 @@ import { paginate } from "../helpers/paginate.helper";
 export abstract class BaseService<T> {
   constructor(private readonly repository: Repository<T>){}
 
-  async findAll(
+  async findAllBase(
     paginationDto: PaginationDto,
     formatResponse: (entity: T) => any,
     buildQueryBuilder?: (queryBuilder: SelectQueryBuilder<T>) => void
@@ -22,7 +22,7 @@ export abstract class BaseService<T> {
     }
   }
 
-  async search(
+  async searchBase(
     term: string,
     paginationDto: PaginationDto,
     formatResponse: (entity: T) => any,
