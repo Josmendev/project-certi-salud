@@ -11,53 +11,59 @@ import { UserResponse } from './interfaces/user-response.interface';
 import { Staff } from 'src/staff/entities/staff.entity';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
 import { Paginated } from '../common/interfaces/paginated.interface';
-import { paginate } from 'src/common/helpers/paginate.helper';
+import { BaseService } from 'src/common/services/base.service';
 
 @Injectable()
-export class UsersService {
+export class UsersService extends BaseService<User> {
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
     private readonly rolesService: RolesService,
     private readonly bcrypt: BcryptAdapter
-  ){}
+  ){
+    super(userRepository);
+  }
 
   // Methods for endpoints
   async findAll(paginationDto: PaginationDto): Promise<Paginated<UserResponse>> {
-    const queryBuilder = this.userRepository.createQueryBuilder('user')
-      .leftJoinAndSelect('user.staff', 'staff')
-      .innerJoinAndSelect('user.role', 'role')
-      .innerJoinAndSelect('staff.person', 'person')
-      .where('user.isActive = true')
-      .orderBy('user.createdAt', 'ASC');
-    const users = await paginate(queryBuilder, paginationDto);
-    return {
-      ...users,
-      data: users.data.map(formatUserResponse)
-    }
+    return this.findAllBase(
+      paginationDto,
+      'user',
+      formatUserResponse,
+      (queryBuilder) => {
+        queryBuilder
+          .leftJoinAndSelect('user.staff', 'staff')
+          .innerJoinAndSelect('user.role', 'role')
+          .innerJoinAndSelect('staff.person', 'person')
+          .where('user.isActive = true')
+          .orderBy('user.createdAt', 'ASC');
+      }
+    );
   }
 
   async search(term: string, paginationDto: PaginationDto): Promise<Paginated<UserResponse>> {
-    const searchTerm = `%${term}%`;
-    const queryBuilder = this.userRepository.createQueryBuilder('user')
-      .leftJoinAndSelect('user.staff', 'staff')
-      .innerJoinAndSelect('user.role', 'role')
-      .innerJoinAndSelect('staff.person', 'person')
-      .where(
-        'user.isActive = true ' +
-        'AND (user.username LIKE :searchTerm ' +
-        'OR person.name LIKE :searchTerm ' +
-        'OR person.paternalSurname LIKE :searchTerm ' +
-        'OR person.maternalSurname LIKE :searchTerm '+
-        'OR role.description LIKE :searchTerm)',
-        { searchTerm }
-      )
-      .orderBy('user.createdAt', 'ASC');
-    const users = await paginate(queryBuilder, paginationDto);
-    return {
-      ...users,
-      data: users.data.map(formatUserResponse)
-    }
+    return this.searchBase(
+      term,
+      paginationDto,
+      'user',
+      formatUserResponse,
+      (queryBuilder, searchTerm) => {
+        queryBuilder
+          .leftJoinAndSelect('user.staff', 'staff')
+          .innerJoinAndSelect('user.role', 'role')
+          .innerJoinAndSelect('staff.person', 'person')
+          .where(
+            'user.isActive = true ' +
+            'AND (user.username LIKE :searchTerm ' +
+            'OR person.name LIKE :searchTerm ' +
+            'OR person.paternalSurname LIKE :searchTerm ' +
+            'OR person.maternalSurname LIKE :searchTerm '+
+            'OR role.description LIKE :searchTerm)',
+            { searchTerm: `%${searchTerm}%` }
+          )
+          .orderBy('user.createdAt', 'ASC');
+      }
+    );
   }
 
   async update(userId: number, updateUserDto: UpdateUserDto): Promise<UserResponse> {

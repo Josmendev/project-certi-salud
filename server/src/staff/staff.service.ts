@@ -10,7 +10,6 @@ import { formatStaffResponse } from './helpers/format-staff-response.helper';
 import { StaffResponse } from './interfaces/staff-response.interface';
 import { Person } from 'src/persons/entities/person.entity';
 import { TermRelationWithPerson } from 'src/persons/enum/term-relation.enum';
-import { paginate } from 'src/common/helpers/paginate.helper';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
 import { Paginated } from '../common/interfaces/paginated.interface';
 import { BaseService } from 'src/common/services/base.service';
