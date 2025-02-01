@@ -9,14 +9,16 @@ import { formatRoleResponse } from './helpers/format-role-response.helper';
 import { paginate } from 'src/common/helpers/paginate.helper';
 import { PaginationDto } from '../common/dto/pagination.dto';
 import { Paginated } from 'src/common/interfaces/paginated.interface';
+import { BaseService } from 'src/common/services/base.service';
 
 @Injectable()
-export class RolesService {
-
+export class RolesService extends BaseService<Role> {
   constructor(
     @InjectRepository(Role)
     private readonly roleRepository: Repository<Role>
-  ){}
+  ){
+    super(roleRepository)
+  }
 
   // Methods for endopoints
   async create(createRoleDto: CreateRoleDto): Promise<RoleResponse> {
@@ -26,25 +28,29 @@ export class RolesService {
   }
 
   async findAll(paginationDto: PaginationDto): Promise<Paginated<RoleResponse>> {
-    const queryBuilder = this.roleRepository.createQueryBuilder('role')
-    .orderBy('role.createdAt', 'ASC');
-    const roles = await paginate(queryBuilder, paginationDto);
-    return {
-      ...roles,
-      data: roles.data.map(formatRoleResponse)
-    };
+    return this.findAllBase(
+      paginationDto,
+      'role',
+      formatRoleResponse,
+      (queryBuilder) => {
+        queryBuilder
+          .orderBy('role.createdAt', 'ASC');
+      }
+    );
   }
 
   async search(term: string, paginationDto: PaginationDto): Promise<Paginated<RoleResponse>> {
-    const searchTerm = `%${term.toLowerCase()}%`;
-    const queryBuilder = this.roleRepository.createQueryBuilder('role')
-      .where('description LIKE :searchTerm', {searchTerm})
-      .orderBy('role.createdAt', 'ASC');
-    const roles = await paginate(queryBuilder, paginationDto);
-    return {
-      ...roles,
-      data: roles.data.map(formatRoleResponse)
-    };
+    return this.searchBase(
+      term,
+      paginationDto,
+      'role',
+      formatRoleResponse,
+      (queryBuilder, searchTerm) => {
+        queryBuilder
+          .where('description LIKE :searchTerm', {searchTerm: `%${searchTerm}%`})
+          .orderBy('role.createdAt', 'ASC');
+      }
+    );
   }
 
   async update(roleId: number, updateRoleDto: UpdateRoleDto): Promise<RoleResponse> {
