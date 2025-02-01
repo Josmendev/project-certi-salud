@@ -78,7 +78,7 @@ export class PatientsService extends BaseService<Patient> {
             'OR person.paternalSurname LIKE :searchTerm ' +
             'OR person.maternalSurname LIKE :searchTerm ' +
             'OR patient.age LIKE :searchTerm)',
-            { searchTerm })
+            { searchTerm: `%${searchTerm}%` })
           .orderBy('patient.createdAt', 'ASC');
       }
     )
