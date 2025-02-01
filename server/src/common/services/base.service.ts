@@ -10,10 +10,11 @@ export abstract class BaseService<T> {
 
   async findAllBase(
     paginationDto: PaginationDto,
+    alias: string,
     formatResponse: (entity: T) => any,
     buildQueryBuilder?: (queryBuilder: SelectQueryBuilder<T>) => void
   ): Promise<Paginated<any>> {
-    const queryBuilder = this.repository.createQueryBuilder();
+    const queryBuilder = this.repository.createQueryBuilder(alias);
     if(buildQueryBuilder) buildQueryBuilder(queryBuilder);
     const result = await paginate(queryBuilder, paginationDto);
     return {
@@ -25,10 +26,11 @@ export abstract class BaseService<T> {
   async searchBase(
     term: string,
     paginationDto: PaginationDto,
+    alias: string,
     formatResponse: (entity: T) => any,
     buildQueryBuilder?: (queryBuilder: SelectQueryBuilder<T>, searchTerm: string) => void
   ): Promise<Paginated<any>> {
-    const queryBuilder = this.repository.createQueryBuilder();
+    const queryBuilder = this.repository.createQueryBuilder(alias);
     buildQueryBuilder(queryBuilder, term);
     const result = await paginate(queryBuilder, paginationDto);
     return {

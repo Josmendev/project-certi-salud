@@ -1,9 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Disease } from './entities/disease.entity';
-import { Repository, SelectQueryBuilder } from 'typeorm';
+import { Repository } from 'typeorm';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
-import { paginate } from 'src/common/helpers/paginate.helper';
 import { formatDiseaseResponse } from './helpers/format-disease-response.helper';
 import { DiseaseResponse } from './interfaces/disease-response.interface';
 import { Paginated } from 'src/common/interfaces/paginated.interface';
@@ -22,11 +21,12 @@ export class DiseasesService extends BaseService<Disease> {
   async findAll(paginationDto: PaginationDto): Promise<Paginated<DiseaseResponse>> {
     return this.findAllBase(
       paginationDto,
+      'disease',
       formatDiseaseResponse,
       (queryBuilder) => {
         queryBuilder
           .where('isActive = true')
-          .orderBy('disease.created_at', 'ASC');
+          .orderBy('disease.createdAt', 'ASC');
       }
     );
   }
@@ -35,12 +35,13 @@ export class DiseasesService extends BaseService<Disease> {
     return this.searchBase(
       term,
       paginationDto,
+      'disease',
       formatDiseaseResponse,
       (queryBuilder, searchTerm) => {
         queryBuilder
           .where('isActive = true')
           .andWhere('disease.description LIKE :searchTerm', {searchTerm: `%${searchTerm}%`})
-          .orderBy('disease.created_at', 'ASC');
+          .orderBy('disease.createdAt', 'ASC');
       }
     )
   }
