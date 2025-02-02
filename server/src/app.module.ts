@@ -10,6 +10,7 @@ import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { CertificateTypesModule } from './certificate-types/certificate-types.module';
 import { DiseasesModule } from './diseases/diseases.module';
+import { CertificatesModule } from './certificates/certificates.module';
 
 @Module({
   imports: [
@@ -25,7 +26,7 @@ import { DiseasesModule } from './diseases/diseases.module';
       synchronize: true
     }),
     RolesModule, 
-    CommonModule, PersonsModule, StaffModule, PatientsModule, UsersModule, AuthModule, CertificateTypesModule, DiseasesModule],
+    CommonModule, PersonsModule, StaffModule, PatientsModule, UsersModule, AuthModule, CertificateTypesModule, DiseasesModule, CertificatesModule],
   controllers: [],
   providers: [],
 })
