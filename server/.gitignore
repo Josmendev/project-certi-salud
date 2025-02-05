@@ -4,6 +4,7 @@
 /build
 
 /mysql
+/ngrok.exe
 
 # Logs
 logs
