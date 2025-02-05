@@ -2,8 +2,11 @@ import { Controller, Get, Body, Patch, Param, Delete, Query } from '@nestjs/comm
 import { UsersService } from './users.service';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
+import { Auth } from 'src/auth/decorators/auth.decorator';
+import { Role } from 'src/auth/enums/role.enum';
 
 @Controller('users')
+@Auth(Role.admin)
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 

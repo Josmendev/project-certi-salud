@@ -10,11 +10,11 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   // PassportStrategy: check if the JWT is based on the secret key and has not expired
   // Strategy: indicate if the token is valid
   constructor(
-    private readonly AuthService: AuthService,
+    private readonly authService: AuthService,
     configService: ConfigService
   ){
     super({
-      secretOrKey: configService.get('JWT_SECRET'),
+      secretOrKey: configService.get<string>('jwt.secret'),
       // where I expect to send that token -> Bearer Token
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken()
     })
@@ -23,6 +23,6 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   async validate(payload: JwtPayload): Promise<any> {
     // validate: validate the payload with the issued data once the token has been approved
     const { id } = payload;
-    return await this.AuthService.validateUser(id);
+    return await this.authService.validateUser(id);
   }
 }

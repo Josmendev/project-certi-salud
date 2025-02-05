@@ -3,8 +3,11 @@ import { CertificateTypesService } from './certificate-types.service';
 import { CreateCertificateTypeDto } from './dto/create-certificate-type.dto';
 import { UpdateCertificateTypeDto } from './dto/update-certificate-type.dto';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
+import { Auth } from 'src/auth/decorators/auth.decorator';
+import { Role } from 'src/auth/enums/role.enum';
 
 @Controller('certificate-types')
+@Auth(Role.admin)
 export class CertificateTypesController {
   constructor(private readonly certificateTypesService: CertificateTypesService) {}
 

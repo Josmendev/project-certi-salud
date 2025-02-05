@@ -3,8 +3,11 @@ import { StaffService } from './staff.service';
 import { CreateStaffDto } from './dto/create-staff.dto';
 import { UpdateStaffDto } from './dto/update-staff.dto';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
+import { Auth } from 'src/auth/decorators/auth.decorator';
+import { Role } from 'src/auth/enums/role.enum';
 
 @Controller('staff')
+@Auth(Role.admin)
 export class StaffController {
   constructor(private readonly staffService: StaffService) {}
 
