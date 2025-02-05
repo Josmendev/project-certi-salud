@@ -1,4 +1,5 @@
-import { PersonReniec } from "src/common/entities/person-reniec.entity";
+import { PersonReniec } from "../entities/person-reniec.entity";
+
 
 export const formatPersonByDniResponse = (person: PersonReniec) => {
   const { numero, nombres, apellido_paterno, apellido_materno } = person.data;

@@ -4,7 +4,7 @@ import { HttpException, Injectable } from '@nestjs/common';
 
 @Injectable()
 export class ApiFetchAdapter implements HttpAdapter {
-  constructor(private readonly configService: ConfigService) {}
+  constructor() {}
 
   async post<T>(url: string, body: any, apiKey?: string): Promise<T> {
     const headers = this.getHeaders(url, apiKey);
@@ -13,9 +13,8 @@ export class ApiFetchAdapter implements HttpAdapter {
   }
 
   private getHeaders(url: string, apiKey?: string): HeadersInit {
-    const key = apiKey || this.getApiKeyForUrl(url);
     const headers: HeadersInit = { 'Content-Type': 'application/json' };
-    if (key) headers['Authorization'] = `Bearer ${key}`;
+    if (apiKey) headers['Authorization'] = `Bearer ${apiKey}`;
     return headers;
   }
 
@@ -25,10 +24,5 @@ export class ApiFetchAdapter implements HttpAdapter {
         { message: [data.message || 'Error en la API externa'], error: 'HttpException', statusCode: res.status }, res.status
       );
     return data;
-  }
-
-  private getApiKeyForUrl(url: string): string {
-    if (url.includes('https://apiperu.dev/api/dni')) return this.configService.get<string>('API_KEY_RENIEC');
-    return null;
   }
 }

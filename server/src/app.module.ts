@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { RolesModule } from './roles/roles.module';
 import { CommonModule } from './common/common.module';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { PersonsModule } from './persons/persons.module';
 import { StaffModule } from './staff/staff.module';
@@ -11,22 +11,31 @@ import { AuthModule } from './auth/auth.module';
 import { CertificateTypesModule } from './certificate-types/certificate-types.module';
 import { DiseasesModule } from './diseases/diseases.module';
 import { CertificatesModule } from './certificates/certificates.module';
+import { ExternalApisModule } from './external-apis/external-apis.module';
+import config from './config/config';
 
 @Module({
   imports: [
-    ConfigModule.forRoot(),
-    TypeOrmModule.forRoot({
-      type: 'mysql',
-      host: process.env.DB_HOST,
-      port: +process.env.DB_PORT,
-      username: process.env.DB_USERNAME,
-      password: process.env.DB_PASSWORD,
-      database: process.env.DB_NAME,
-      autoLoadEntities: true,
-      synchronize: true
+    ConfigModule.forRoot({
+      load: [config],
+      isGlobal: true
+    }),
+    TypeOrmModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => ({
+        type: 'mysql',
+        host: configService.get<string>('db.host'),
+        port: configService.get<number>('db.port'),
+        username: configService.get<string>('db.username'),
+        password: configService.get<string>('db.password'),
+        database: configService.get<string>('db.database'),
+        autoLoadEntities: true,
+        synchronize: true
+      })
     }),
     RolesModule, 
-    CommonModule, PersonsModule, StaffModule, PatientsModule, UsersModule, AuthModule, CertificateTypesModule, DiseasesModule, CertificatesModule],
+    CommonModule, PersonsModule, StaffModule, PatientsModule, UsersModule, AuthModule, CertificateTypesModule, DiseasesModule, CertificatesModule, ExternalApisModule],
   controllers: [],
   providers: [],
 })

@@ -1,8 +1,7 @@
-import { BcryptAdapter } from "src/common/adapters/bcrypt.adapter";
 import { Timestamped } from "src/common/entities/timestamped.entity";
 import { Role } from "src/roles/entities/role.entity";
 import { Staff } from "src/staff/entities/staff.entity";
-import { BeforeInsert, Column, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity({name: 'user'})
 export class User extends Timestamped {
@@ -65,11 +64,5 @@ export class User extends Timestamped {
     }
   })
   role: Role[]
-
-  @BeforeInsert()
-  async hashPassword() {
-    const bcrypt = new BcryptAdapter();
-    this.password = await bcrypt.hash(this.password);
-  }
 
 }

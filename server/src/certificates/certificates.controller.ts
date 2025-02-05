@@ -1,6 +1,6 @@
 import { Body, Controller, Post } from '@nestjs/common';
 import { CertificatesService } from './certificates.service';
-import { GetPersonByDniDto } from './dto/get-person-by-dni.dto';
+import { GetPersonByDniDto } from 'src/common/dto/get-person-by-dni.dto';
 
 @Controller('certificates')
 export class CertificatesController {

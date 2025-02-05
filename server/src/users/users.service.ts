@@ -83,7 +83,7 @@ export class UsersService extends BaseService<User> {
     const repository = queryRunner? queryRunner.manager.getRepository(User) : this.userRepository;
     const user = repository.create({
       username: identityDocumentNumber,
-      password: identityDocumentNumber,
+      password: this.bcrypt.hashSync(identityDocumentNumber),
       staff
     });
     user.role = await this.rolesService.assignRolesToUser(role, queryRunner);
