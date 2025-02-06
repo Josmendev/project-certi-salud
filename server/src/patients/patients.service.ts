@@ -9,18 +9,20 @@ import { PersonService } from 'src/persons/person.service';
 import { Person } from 'src/persons/entities/person.entity';
 import { formatPatientResponse } from './helpers/format-patient-response.helper';
 import { PatientResponse } from './interfaces/patient-response.interface';
-import { paginate } from 'src/common/helpers/paginate.helper';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
 import { Paginated } from 'src/common/interfaces/paginated.interface';
+import { BaseService } from 'src/common/services/base.service';
 
 @Injectable()
-export class PatientsService {
+export class PatientsService extends BaseService<Patient> {
   constructor(
     @InjectRepository(Patient)
     private readonly patientRepository: Repository<Patient>,
     private readonly personService: PersonService,
     private readonly dataSource: DataSource
-  ){}
+  ){
+    super(patientRepository)
+  }
 
   // Methods for endpoints
   async create(createPatientDto: CreatePatientDto): Promise<PatientResponse> {
@@ -47,37 +49,39 @@ export class PatientsService {
   }
 
   async findAll(paginationDto: PaginationDto): Promise<Paginated<PatientResponse>> {
-    const queryBuilder = this.patientRepository.createQueryBuilder('patient');
-    queryBuilder
-      .leftJoinAndSelect('patient.person', 'person')
-      .where('isActive = true')
-      .orderBy('patient.createdAt', 'ASC');
-    const patients = await paginate(queryBuilder, paginationDto);
-    return {
-      ...patients,
-      data: patients.data.map(formatPatientResponse)
-    };
+    return this.findAllBase(
+      paginationDto,
+      'patient',
+      formatPatientResponse,
+      (queryBuilder) => {
+        queryBuilder
+          .leftJoinAndSelect('patient.person', 'person')
+          .where('patient.isActive = true')
+          .orderBy('patient.createdAt', 'ASC');
+      }
+    )
   }
 
   async search(term: string, paginationDto: PaginationDto): Promise<Paginated<PatientResponse>> {
-    const searchTerm = `%${term}%`;
-    const queryBuilder = this.patientRepository.createQueryBuilder('patient');
-    queryBuilder
-      .leftJoinAndSelect('patient.person', 'person')
-      .where(
-        'patient.isActive = true ' +
-        'AND (person.identityDocumentNumber LIKE :searchTerm ' +
-        'OR person.name LIKE :searchTerm ' +
-        'OR person.paternalSurname LIKE :searchTerm ' +
-        'OR person.maternalSurname LIKE :searchTerm ' +
-        'OR patient.age LIKE :searchTerm)',
-        { searchTerm })
-      .orderBy('patient.createdAt', 'ASC');
-    const patients = await paginate(queryBuilder, paginationDto);
-    return {
-      ...patients,
-      data: patients.data.map(formatPatientResponse)
-    };
+    return this.searchBase(
+      term,
+      paginationDto,
+      'patient',
+      formatPatientResponse,
+      (queryBuilder, searchTerm) => {
+        queryBuilder
+          .leftJoinAndSelect('patient.person', 'person')
+          .where(
+            'patient.isActive = true ' +
+            'AND (person.identityDocumentNumber LIKE :searchTerm ' +
+            'OR person.name LIKE :searchTerm ' +
+            'OR person.paternalSurname LIKE :searchTerm ' +
+            'OR person.maternalSurname LIKE :searchTerm ' +
+            'OR patient.age LIKE :searchTerm)',
+            { searchTerm: `%${searchTerm}%` })
+          .orderBy('patient.createdAt', 'ASC');
+      }
+    )
   }
 
   async update(patientId: number, updatePatientDto: UpdatePatientDto): Promise<PatientResponse> {

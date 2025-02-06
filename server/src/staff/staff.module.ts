@@ -6,13 +6,15 @@ import { Staff } from './entities/staff.entity';
 import { PersonsModule } from 'src/persons/persons.module';
 import { UsersModule } from 'src/users/users.module';
 import { CommonModule } from 'src/common/common.module';
+import { AuthModule } from 'src/auth/auth.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([Staff]),
     PersonsModule,
     UsersModule,
-    CommonModule
+    CommonModule,
+    AuthModule
   ],
   controllers: [StaffController],
   providers: [StaffService],

@@ -3,8 +3,11 @@ import { PatientsService } from './patients.service';
 import { CreatePatientDto } from './dto/create-patient.dto';
 import { UpdatePatientDto } from './dto/update-patient.dto';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
+import { Auth } from 'src/auth/decorators/auth.decorator';
+import { Role } from 'src/auth/enums/role.enum';
 
 @Controller('patients')
+@Auth(Role.admin)
 export class PatientsController {
   constructor(private readonly patientsService: PatientsService) {}
 

@@ -2,7 +2,7 @@ import { BadRequestException, CanActivate, ExecutionContext, Injectable } from '
 import { Reflector } from '@nestjs/core';
 import { Observable } from 'rxjs';
 import { ROLES_KEY } from 'src/auth/decorators/roles.decorator';
-import { User } from 'src/users/entities/user.entity';
+import { ValidateUserResponse } from '../interfaces/validate-user-response.interface';
 
 @Injectable()
 export class UserRoleGuard implements CanActivate {
@@ -12,15 +12,17 @@ export class UserRoleGuard implements CanActivate {
   canActivate(
     context: ExecutionContext,
   ): boolean | Promise<boolean> | Observable<boolean> {
-    const requiredRoles: string[] = this.reflector.get(ROLES_KEY, context.getHandler());
+    let requiredRoles: string[] = this.reflector.get(ROLES_KEY, context.getHandler());
+    // methods level
+    if (!requiredRoles || requiredRoles.length === 0) requiredRoles = this.reflector.get(ROLES_KEY, context.getClass());
+    // class level
     if (!requiredRoles || requiredRoles.length === 0) return true;
-
     const req = context.switchToHttp().getRequest();
-    const user = req.user as User;
+    const user = req.user as ValidateUserResponse;
     if(!user) throw new BadRequestException('No se encuentra registrado el usuario');
-    const confirmationRole = requiredRoles.some(role => role?.includes(role));
+    const confirmationRole = requiredRoles.some(role => user.role?.includes(role));
     if(confirmationRole) return true;
 
-    throw new BadRequestException(`El usuario con el DNI ${user.username} no posee el rol de: [${requiredRoles}]`);
+    throw new BadRequestException(`El usuario con el DNI ${user.person.identityDocumentNumber} no posee el rol de: [${requiredRoles}]`);
   }
 }

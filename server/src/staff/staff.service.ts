@@ -10,19 +10,21 @@ import { formatStaffResponse } from './helpers/format-staff-response.helper';
 import { StaffResponse } from './interfaces/staff-response.interface';
 import { Person } from 'src/persons/entities/person.entity';
 import { TermRelationWithPerson } from 'src/persons/enum/term-relation.enum';
-import { paginate } from 'src/common/helpers/paginate.helper';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
 import { Paginated } from '../common/interfaces/paginated.interface';
+import { BaseService } from 'src/common/services/base.service';
 
 @Injectable()
-export class StaffService {
+export class StaffService extends BaseService<Staff> {
   constructor(
     @InjectRepository(Staff)
     private readonly staffRepository: Repository<Staff>,
     private readonly userService : UsersService,
     private readonly personService: PersonService,
     private readonly dataSource: DataSource
-  ){}
+  ){
+    super(staffRepository);
+  }
   
   // Methods for endpoints
   async create(createStaffDto: CreateStaffDto): Promise<StaffResponse> {
@@ -52,37 +54,39 @@ export class StaffService {
   }
 
   async findAll(paginationDto: PaginationDto): Promise<Paginated<StaffResponse>> {
-    const queryBuilder = this.staffRepository.createQueryBuilder('staff');
-    queryBuilder
-      .leftJoinAndSelect('staff.person', 'person')
-      .where('isActive = true')
-      .orderBy('staff.createdAt', 'ASC');
-    const staff = await paginate(queryBuilder, paginationDto);
-    return {
-      ...staff,
-      data: staff.data.map(formatStaffResponse)
-    };
+    return this.findAllBase(
+      paginationDto,
+      'staff',
+      formatStaffResponse,
+      (queryBuilder) => {
+        queryBuilder
+          .leftJoinAndSelect('staff.person', 'person')
+          .where('staff.isActive = true')
+          .orderBy('staff.createdAt', 'ASC');
+      }
+    );
   }
 
   async search(term: string, paginationDto: PaginationDto): Promise<Paginated<StaffResponse>> {
-    const searchTerm = `%${term}%`;
-    const queryBuilder = this.staffRepository.createQueryBuilder('staff');
-    queryBuilder
-      .leftJoinAndSelect('staff.person', 'person')
-      .where(
-        'staff.isActive = true ' +
-        'AND (person.identityDocumentNumber LIKE :searchTerm ' +
-        'OR person.name LIKE :searchTerm ' +
-        'OR person.paternalSurname LIKE :searchTerm ' +
-        'OR person.maternalSurname LIKE :searchTerm)',
-        { searchTerm }
-      )
-      .orderBy('staff.createdAt', 'ASC');
-    const staff = await paginate(queryBuilder, paginationDto);
-    return {
-      ...staff,
-      data: staff.data.map(formatStaffResponse)
-    };
+    return this.searchBase(
+      term,
+      paginationDto,
+      'staff',
+      formatStaffResponse,
+      (queryBuilder, searchTerm) => {
+        queryBuilder
+          .leftJoinAndSelect('staff.person', 'person')
+          .where(
+            'staff.isActive = true ' +
+            'AND (person.identityDocumentNumber LIKE :searchTerm ' +
+            'OR person.name LIKE :searchTerm ' +
+            'OR person.paternalSurname LIKE :searchTerm ' +
+            'OR person.maternalSurname LIKE :searchTerm)',
+            { searchTerm: `%${searchTerm}%` }
+          )
+          .orderBy('staff.createdAt', 'ASC');
+      }
+    );
   }
 
   async update(staffId: number, updateStaffDto: UpdateStaffDto): Promise<StaffResponse> {

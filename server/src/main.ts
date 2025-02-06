@@ -13,6 +13,7 @@ async function bootstrap() {
     })
   );
   app.useGlobalFilters(new AllExceptionsFilter());
+  app.enableCors();
   await app.listen(process.env.PORT ?? 3001);
 }
 bootstrap();

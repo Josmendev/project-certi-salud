@@ -24,7 +24,7 @@ import { JwtAdapter } from 'src/common/adapters/jwt.adapter';
       inject: [ConfigService],
       // useFactory: when attempting to asynchronously call the module
       useFactory: (configService: ConfigService) => ({
-        secret: configService.get('JWT_SECRET'),
+        secret: configService.get<string>('jwt.secret'),
         signOptions: {
           expiresIn: '2h'
         }
