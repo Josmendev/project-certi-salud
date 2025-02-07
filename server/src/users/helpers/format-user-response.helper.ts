@@ -1,9 +1,15 @@
-import { User } from "../entities/user.entity";
+import { User } from '../entities/user.entity';
 
 export const formatUserResponse = (user: User) => {
   const { userId, username, isConfirm, isActive, staff, role } = user;
   const { person } = staff;
-  const { personId, identityDocumentNumber, name, paternalSurname, maternalSurname } = person;
+  const {
+    personId,
+    identityDocumentNumber,
+    name,
+    paternalSurname,
+    maternalSurname,
+  } = person;
   return {
     userId,
     username,
@@ -14,8 +20,8 @@ export const formatUserResponse = (user: User) => {
       identityDocumentNumber,
       name,
       paternalSurname,
-      maternalSurname
+      maternalSurname,
     },
-    role: role.map(role => role.description)
+    role: role.map((role) => role.description),
   };
-}
+};

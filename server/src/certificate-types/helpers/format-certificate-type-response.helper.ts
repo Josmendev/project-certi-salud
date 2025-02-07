@@ -1,6 +1,8 @@
-import { CertificateType } from "../entities/certificate-type.entity";
+import { CertificateType } from '../entities/certificate-type.entity';
 
-export const formatCertificateTypeResponse = (certificateType: CertificateType) => {
+export const formatCertificateTypeResponse = (
+  certificateType: CertificateType,
+) => {
   const { createdAt, updatedAt, ...certificateTypeData } = certificateType;
   return certificateTypeData;
-}
+};

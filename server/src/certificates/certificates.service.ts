@@ -5,11 +5,11 @@ import { GetPersonByDniDto } from 'src/common/dto/get-person-by-dni.dto';
 
 @Injectable()
 export class CertificatesService {
-  constructor(
-    private readonly reniecApiService: ReniecApiService
-  ) {}
+  constructor(private readonly reniecApiService: ReniecApiService) {}
 
-  async getPersonByDni(getPersonByDniDto: GetPersonByDniDto): Promise<PersonByDniResponse> {
+  async getPersonByDni(
+    getPersonByDniDto: GetPersonByDniDto,
+  ): Promise<PersonByDniResponse> {
     return await this.reniecApiService.getPersonByDni(getPersonByDniDto);
   }
 }

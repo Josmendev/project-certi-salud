@@ -1,4 +1,4 @@
-import  * as bcrypt  from 'bcrypt';
+import * as bcrypt from 'bcrypt';
 import { EncryptionService } from '../interfaces/encryption-service.interface';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
@@ -6,10 +6,8 @@ import { ConfigService } from '@nestjs/config';
 @Injectable()
 export class BcryptAdapter implements EncryptionService {
   private readonly hashSalt: number;
-  constructor(
-    private readonly configService: ConfigService
-  ){
-    this.hashSalt = configService.get<number>('hashSalt')
+  constructor(private readonly configService: ConfigService) {
+    this.hashSalt = configService.get<number>('hashSalt');
   }
 
   async hash(data: string): Promise<string> {
@@ -23,5 +21,4 @@ export class BcryptAdapter implements EncryptionService {
   async compare(data: string, hash: string): Promise<boolean> {
     return bcrypt.compare(data, hash);
   }
-  
 }

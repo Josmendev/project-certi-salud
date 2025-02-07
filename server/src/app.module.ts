@@ -20,7 +20,7 @@ import { redisStore } from 'cache-manager-redis-store';
   imports: [
     ConfigModule.forRoot({
       load: [config],
-      isGlobal: true
+      isGlobal: true,
     }),
     CacheModule.registerAsync({
       isGlobal: true,
@@ -36,7 +36,7 @@ import { redisStore } from 'cache-manager-redis-store';
           store: () => store,
         };
       },
-      inject: [ConfigService]
+      inject: [ConfigService],
     }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
@@ -49,11 +49,21 @@ import { redisStore } from 'cache-manager-redis-store';
         password: configService.get<string>('db.password'),
         database: configService.get<string>('db.database'),
         autoLoadEntities: true,
-        synchronize: true
-      })
+        synchronize: true,
+      }),
     }),
-    RolesModule, 
-    CommonModule, PersonsModule, StaffModule, PatientsModule, UsersModule, AuthModule, CertificateTypesModule, DiseasesModule, CertificatesModule, ExternalApisModule],
+    RolesModule,
+    CommonModule,
+    PersonsModule,
+    StaffModule,
+    PatientsModule,
+    UsersModule,
+    AuthModule,
+    CertificateTypesModule,
+    DiseasesModule,
+    CertificatesModule,
+    ExternalApisModule,
+  ],
   controllers: [],
   providers: [],
 })

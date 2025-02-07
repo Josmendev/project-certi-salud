@@ -6,10 +6,7 @@ import { Disease } from './entities/disease.entity';
 import { AuthModule } from 'src/auth/auth.module';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([Disease]),
-    AuthModule
-  ],
+  imports: [TypeOrmModule.forFeature([Disease]), AuthModule],
   controllers: [DiseasesController],
   providers: [DiseasesService],
 })

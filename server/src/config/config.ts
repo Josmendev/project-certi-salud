@@ -10,12 +10,12 @@ export default () => ({
     secret: process.env.JWT_SECRET,
   },
   reniecApi: {
-    url: process.env.RENIEC_API_URL,   
+    url: process.env.RENIEC_API_URL,
     apiKey: process.env.RENIEC_API_KEY,
   },
   hashSalt: process.env.HASH_SALT,
   redis: {
     host: process.env.REDIS_HOST,
-    port: process.env.REDIS_PORT
-  }
+    port: process.env.REDIS_PORT,
+  },
 });

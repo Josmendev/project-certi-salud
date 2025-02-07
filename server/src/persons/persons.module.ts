@@ -4,13 +4,8 @@ import { Person } from './entities/person.entity';
 import { PersonService } from './person.service';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([Person])
-  ],
+  imports: [TypeOrmModule.forFeature([Person])],
   exports: [PersonService],
-  providers: [PersonService]
+  providers: [PersonService],
 })
 export class PersonsModule {}
-
-
-

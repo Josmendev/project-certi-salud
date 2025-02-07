@@ -1,11 +1,10 @@
-import { Timestamped } from "src/common/entities/timestamped.entity";
-import { Patient } from "src/patients/entities/patient.entity";
-import { Staff } from "src/staff/entities/staff.entity";
-import { Column, Entity, OneToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Timestamped } from 'src/common/entities/timestamped.entity';
+import { Patient } from 'src/patients/entities/patient.entity';
+import { Staff } from 'src/staff/entities/staff.entity';
+import { Column, Entity, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
 
-@Entity({name: 'person'})
+@Entity({ name: 'person' })
 export class Person extends Timestamped {
-
   @PrimaryGeneratedColumn({
     name: 'person_id',
   })
@@ -16,7 +15,7 @@ export class Person extends Timestamped {
     type: 'varchar',
     length: 8,
     unique: true,
-    nullable: false
+    nullable: false,
   })
   identityDocumentNumber: string;
 
@@ -24,7 +23,7 @@ export class Person extends Timestamped {
     name: 'name',
     type: 'varchar',
     length: 50,
-    nullable: false
+    nullable: false,
   })
   name: string;
 
@@ -32,7 +31,7 @@ export class Person extends Timestamped {
     name: 'paternal_surname',
     type: 'varchar',
     length: 25,
-    nullable: false
+    nullable: false,
   })
   paternalSurname: string;
 
@@ -40,20 +39,13 @@ export class Person extends Timestamped {
     name: 'maternal_surname',
     type: 'varchar',
     length: 25,
-    nullable: false
+    nullable: false,
   })
   maternalSurname: string;
 
-  @OneToOne(
-    () => Staff, 
-    staff => staff.person
-  )
+  @OneToOne(() => Staff, (staff) => staff.person)
   staff: Staff;
 
-  @OneToOne(
-    () => Patient,
-    patient => patient.person
-  )
+  @OneToOne(() => Patient, (patient) => patient.person)
   patient: Patient;
-
 }

@@ -1,8 +1,14 @@
 import { Patient } from '../entities/patient.entity';
 
 export const formatPatientResponse = (patient: Patient) => {
-  const {patientId, age, isActive, person} = patient;
-  const {identityDocumentNumber, name, paternalSurname, maternalSurname, personId} = person;
+  const { patientId, age, isActive, person } = patient;
+  const {
+    identityDocumentNumber,
+    name,
+    paternalSurname,
+    maternalSurname,
+    personId,
+  } = person;
   return {
     patientId,
     isActive,
@@ -15,4 +21,4 @@ export const formatPatientResponse = (patient: Patient) => {
       personId,
     },
   };
-} 
+};

@@ -6,10 +6,7 @@ import { CertificateType } from './entities/certificate-type.entity';
 import { AuthModule } from 'src/auth/auth.module';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([CertificateType]),
-    AuthModule
-  ],
+  imports: [TypeOrmModule.forFeature([CertificateType]), AuthModule],
   controllers: [CertificateTypesController],
   providers: [CertificateTypesService],
 })

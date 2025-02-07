@@ -1,4 +1,4 @@
-import { PersonResponse } from "src/persons/interfaces/person-response.interface";
+import { PersonResponse } from 'src/persons/interfaces/person-response.interface';
 
 export class UserResponse {
   userId: number;

@@ -9,7 +9,19 @@ import { CacheManagerAdapter } from './adapters/cache-manager.adapter';
 
 @Module({
   imports: [JwtModule, ConfigModule],
-  exports: [UuidAdapter, BcryptAdapter, JwtAdapter, ApiFetchAdapter, CacheManagerAdapter],
-  providers: [UuidAdapter, BcryptAdapter, JwtAdapter, ApiFetchAdapter, CacheManagerAdapter]
+  exports: [
+    UuidAdapter,
+    BcryptAdapter,
+    JwtAdapter,
+    ApiFetchAdapter,
+    CacheManagerAdapter,
+  ],
+  providers: [
+    UuidAdapter,
+    BcryptAdapter,
+    JwtAdapter,
+    ApiFetchAdapter,
+    CacheManagerAdapter,
+  ],
 })
 export class CommonModule {}

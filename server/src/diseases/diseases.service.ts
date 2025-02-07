@@ -12,13 +12,15 @@ import { BaseService } from 'src/common/services/base.service';
 export class DiseasesService extends BaseService<Disease> {
   constructor(
     @InjectRepository(Disease)
-    private readonly diseaseRepository: Repository<Disease>
-  ){
-    super(diseaseRepository)
+    private readonly diseaseRepository: Repository<Disease>,
+  ) {
+    super(diseaseRepository);
   }
 
   // Methods for endpoints
-  async findAll(paginationDto: PaginationDto): Promise<Paginated<DiseaseResponse>> {
+  async findAll(
+    paginationDto: PaginationDto,
+  ): Promise<Paginated<DiseaseResponse>> {
     return this.findAllBase(
       paginationDto,
       'disease',
@@ -27,11 +29,14 @@ export class DiseasesService extends BaseService<Disease> {
         queryBuilder
           .where('isActive = true')
           .orderBy('disease.createdAt', 'ASC');
-      }
+      },
     );
   }
 
-  async search(term: string, paginationDto: PaginationDto): Promise<Paginated<DiseaseResponse>> {
+  async search(
+    term: string,
+    paginationDto: PaginationDto,
+  ): Promise<Paginated<DiseaseResponse>> {
     return this.searchBase(
       term,
       paginationDto,
@@ -40,9 +45,11 @@ export class DiseasesService extends BaseService<Disease> {
       (queryBuilder, searchTerm) => {
         queryBuilder
           .where('isActive = true')
-          .andWhere('disease.description LIKE :searchTerm', {searchTerm: `%${searchTerm}%`})
+          .andWhere('disease.description LIKE :searchTerm', {
+            searchTerm: `%${searchTerm}%`,
+          })
           .orderBy('disease.createdAt', 'ASC');
-      }
-    )
+      },
+    );
   }
 }
