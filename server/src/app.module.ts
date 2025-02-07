@@ -14,6 +14,7 @@ import { CertificatesModule } from './certificates/certificates.module';
 import { ExternalApisModule } from './external-apis/external-apis.module';
 import config from './config/config';
 import { CacheModule } from '@nestjs/cache-manager';
+import { redisStore } from 'cache-manager-redis-store';
 
 @Module({
   imports: [
@@ -21,7 +22,22 @@ import { CacheModule } from '@nestjs/cache-manager';
       load: [config],
       isGlobal: true
     }),
-    CacheModule.register({isGlobal: true}),
+    CacheModule.registerAsync({
+      isGlobal: true,
+      imports: [ConfigModule],
+      useFactory: async (configService: ConfigService) => {
+        const store = await redisStore({
+          socket: {
+            host: configService.get<string>('redis.host'),
+            port: +configService.get<number>('redis.port'),
+          },
+        });
+        return {
+          store: () => store,
+        };
+      },
+      inject: [ConfigService]
+    }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],

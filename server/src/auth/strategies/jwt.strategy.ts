@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, UnauthorizedException } from "@nestjs/common";
 import { PassportStrategy } from "@nestjs/passport";
 import { ExtractJwt, Strategy } from "passport-jwt";
 import { JwtPayload } from "../interfaces/jwt-payload.interface";
@@ -16,12 +16,15 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     super({
       secretOrKey: configService.get<string>('jwt.secret'),
       // where I expect to send that token -> Bearer Token
-      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken()
+      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+      passReqToCallback: true,
     })
   }
   
-  async validate(payload: JwtPayload): Promise<any> {
+  async validate(req: any, payload: JwtPayload): Promise<any> {
     // validate: validate the payload with the issued data once the token has been approved
+    const token = req.headers.authorization?.split(' ')[1];
+    if (await this.authService.isBlacklisted(token)) throw new UnauthorizedException('Token no válido o sesión expirada');
     const { id } = payload;
     return await this.authService.validateUser(id);
   }

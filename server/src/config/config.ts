@@ -14,4 +14,8 @@ export default () => ({
     apiKey: process.env.RENIEC_API_KEY,
   },
   hashSalt: process.env.HASH_SALT,
+  redis: {
+    host: process.env.REDIS_HOST,
+    port: process.env.REDIS_PORT
+  }
 });
