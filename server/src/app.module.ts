@@ -13,6 +13,7 @@ import { DiseasesModule } from './diseases/diseases.module';
 import { CertificatesModule } from './certificates/certificates.module';
 import { ExternalApisModule } from './external-apis/external-apis.module';
 import config from './config/config';
+import { CacheModule } from '@nestjs/cache-manager';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import config from './config/config';
       load: [config],
       isGlobal: true
     }),
+    CacheModule.register({isGlobal: true}),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
