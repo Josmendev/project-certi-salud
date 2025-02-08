@@ -8,6 +8,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { JwtAdapter } from 'src/common/adapters/jwt.adapter';
+import { RedisModule } from 'src/redis/redis.module';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { JwtAdapter } from 'src/common/adapters/jwt.adapter';
         },
       }),
     }),
+    RedisModule,
   ],
   exports: [JwtStrategy, PassportModule, JwtModule],
   providers: [AuthService, JwtStrategy, JwtAdapter],

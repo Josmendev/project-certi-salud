@@ -2,12 +2,14 @@
 import { Module, Global } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { createClient } from 'redis';
+import { REDIST_CLIENT } from './constants/contants';
+import { RedisService } from './redis.service';
 
 @Global()
 @Module({
   providers: [
     {
-      provide: 'REDIS_CLIENT',
+      provide: REDIST_CLIENT,
       useFactory: async (configService: ConfigService) => {
         const client = createClient({
           url: configService.get<string>('redis.url'),
@@ -17,7 +19,8 @@ import { createClient } from 'redis';
       },
       inject: [ConfigService],
     },
+    RedisService,
   ],
-  exports: ['REDIS_CLIENT'],
+  exports: [RedisService],
 })
 export class RedisModule {}

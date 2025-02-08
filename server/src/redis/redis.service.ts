@@ -1,14 +1,13 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { CacheManager } from '../interfaces/cache-manager.interface';
 import { RedisClientType } from 'redis';
+import { REDIST_CLIENT } from './constants/contants';
 
 @Injectable()
-export class CacheManagerAdapter implements CacheManager {
+export class RedisService {
   constructor(
-    @Inject('REDIS_CLIENT')
+    @Inject(REDIST_CLIENT)
     private redisClient: RedisClientType,
   ) {}
-
   async set<T>(key: string, value: T, ttl?: number): Promise<void> {
     await this.redisClient.set(key, JSON.stringify(value), {
       EX: ttl ? ttl : 60000,
