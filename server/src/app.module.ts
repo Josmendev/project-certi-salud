@@ -13,30 +13,13 @@ import { DiseasesModule } from './diseases/diseases.module';
 import { CertificatesModule } from './certificates/certificates.module';
 import { ExternalApisModule } from './external-apis/external-apis.module';
 import config from './config/config';
-import { CacheModule } from '@nestjs/cache-manager';
-import { redisStore } from 'cache-manager-redis-store';
+import { RedisModule } from './redis/redis.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       load: [config],
       isGlobal: true,
-    }),
-    CacheModule.registerAsync({
-      isGlobal: true,
-      imports: [ConfigModule],
-      useFactory: async (configService: ConfigService) => {
-        const store = await redisStore({
-          socket: {
-            host: configService.get<string>('redis.host'),
-            port: +configService.get<number>('redis.port'),
-          },
-        });
-        return {
-          store: () => store,
-        };
-      },
-      inject: [ConfigService],
     }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
@@ -52,6 +35,7 @@ import { redisStore } from 'cache-manager-redis-store';
         synchronize: true,
       }),
     }),
+    RedisModule,
     RolesModule,
     CommonModule,
     PersonsModule,

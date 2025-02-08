@@ -1,19 +1,22 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { CacheManager } from '../interfaces/cache-manager.interface';
-import { Cache } from 'cache-manager';
-import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { RedisClientType } from 'redis';
 
 @Injectable()
 export class CacheManagerAdapter implements CacheManager {
   constructor(
-    @Inject(CACHE_MANAGER)
-    private cacheManager: Cache,
+    @Inject('REDIS_CLIENT')
+    private redisClient: RedisClientType,
   ) {}
 
   async set<T>(key: string, value: T, ttl?: number): Promise<void> {
-    await this.cacheManager.set(key, value, ttl ? ttl : undefined);
+    await this.redisClient.set(key, JSON.stringify(value), {
+      EX: ttl ? ttl : 60000,
+    });
   }
+
   async get<T>(key: string): Promise<T | null> {
-    return (await this.cacheManager.get<T>(key)) || null;
+    const value = await this.redisClient.get(key);
+    return value ? JSON.parse(value) : null;
   }
 }
