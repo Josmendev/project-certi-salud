@@ -1,0 +1,14 @@
+const Loader = () => {
+  return (
+    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-65 z-50">
+      <div className="flex flex-col gap-4 items-center">
+        <div className="w-28 h-28 border-4 border-transparent text-primary-600 text-4xl animate-spin flex items-center justify-center border-t-primary-600 rounded-full">
+          <div className="w-24 h-24 border-4 border-transparent text-red-500 text-2xl animate-spin flex items-center justify-center border-t-red-500 rounded-full"></div>
+        </div>
+        <p className="text-white text-h5-s-semibold">Cargando...</p>
+      </div>
+    </div>
+  );
+};
+
+export default Loader;
