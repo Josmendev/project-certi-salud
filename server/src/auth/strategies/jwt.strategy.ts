@@ -4,6 +4,7 @@ import { ExtractJwt, Strategy } from 'passport-jwt';
 import { JwtPayload } from '../interfaces/jwt-payload.interface';
 import { ConfigService } from '@nestjs/config';
 import { AuthService } from '../auth.service';
+import { Request } from 'express';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
@@ -21,9 +22,9 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     });
   }
 
-  async validate(req: any, payload: JwtPayload): Promise<any> {
+  async validate(req: Request, payload: JwtPayload): Promise<any> {
     // validate: validate the payload with the issued data once the token has been approved
-    const token = req.headers.authorization?.split(' ')[1];
+    const token = req.get('Authorization').replace('Bearer ', '').trim();
     if (await this.authService.isBlacklisted(token))
       throw new UnauthorizedException('Token no válido o sesión expirada');
     const { id } = payload;

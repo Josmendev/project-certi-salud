@@ -1,4 +1,4 @@
-import { IsArray, IsNumberString, IsString, Length } from 'class-validator';
+import { IsArray, IsNumberString, Length } from 'class-validator';
 import { Role } from 'src/roles/entities/role.entity';
 import { Staff } from 'src/staff/entities/staff.entity';
 
