@@ -1,6 +1,22 @@
-@import "./shared/components/UI/styles/textInput.css";
-@import "./shared/components/UI/styles/button.css";
+@import "./shared/components/TextInput/TextInput.module.css";
+@import "./shared/components/Button/Button.module.css";
+@import "./shared/components/Sidebar/Sidebar.module.css";
+@import "./shared/components/Header/Header.module.css";
+@import "./shared/components/Checkbox/Checkbox.module.css";
+@import "./shared/components/Modal/Modal.module.css";
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer utilities {
+  /* Hide scrollbar for Chrome, Safari and Opera */
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  /* Hide scrollbar for IE, Edge and Firefox */
+  .no-scrollbar {
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
+  }
+}

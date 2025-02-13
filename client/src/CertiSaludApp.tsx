@@ -1,9 +1,22 @@
+import { useEffect, useState } from "react";
+import { useLocation } from "react-router";
 import "./CertiSaludApp.css";
-import { LoginPage } from "./features/auth/pages/LoginPage";
-
+import { AppRouter } from "./router/AppRouter";
+import Loader from "./shared/components/Loader";
 
 function CertiSaludApp() {
-  return <LoginPage />;
-}
+  const [loading, setLoading] = useState<boolean>(true);
+  const { pathname } = useLocation();
 
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setLoading(false), 500);
+    return () => clearTimeout(timer);
+  }, []);
+
+  return loading ? <Loader /> : <AppRouter />;
+}
 export default CertiSaludApp;
