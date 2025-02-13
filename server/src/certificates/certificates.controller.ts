@@ -10,5 +10,4 @@ export class CertificatesController {
   getPersonByDni(@Body() getPersonByDniDto: GetPersonByDniDto) {
     return this.certificatesService.getPersonByDni(getPersonByDniDto);
   }
-
 }

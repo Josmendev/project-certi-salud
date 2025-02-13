@@ -1,4 +1,7 @@
 export default () => ({
+  server: {
+    port: process.env.SERVER_PORT,
+  },
   db: {
     host: process.env.DB_HOST,
     port: process.env.DB_PORT,
@@ -10,8 +13,11 @@ export default () => ({
     secret: process.env.JWT_SECRET,
   },
   reniecApi: {
-    url: process.env.RENIEC_API_URL,   
+    url: process.env.RENIEC_API_URL,
     apiKey: process.env.RENIEC_API_KEY,
   },
   hashSalt: process.env.HASH_SALT,
+  redis: {
+    url: process.env.REDIS_URL,
+  },
 });

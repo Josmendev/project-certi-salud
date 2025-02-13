@@ -1,7 +1,6 @@
-import { IsNumberString, IsString, Length } from "class-validator";
+import { IsNumberString, IsString, Length } from 'class-validator';
 
 export class LoginDto {
-
   @IsNumberString()
   @Length(8, 8)
   username: string;

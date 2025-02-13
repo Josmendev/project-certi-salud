@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Req } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { GetUser } from './decorators/get-user.decorator';
 import { User } from 'src/users/entities/user.entity';
@@ -8,7 +8,7 @@ import { ConfirmAccountDto } from './dto/confirm-acount.dto';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService){}
+  constructor(private readonly authService: AuthService) {}
 
   @Post('login')
   login(@Body() loginDto: LoginDto) {
@@ -16,13 +16,22 @@ export class AuthController {
   }
 
   @Post('confirm-account/:id')
-  confirmAcount(@Param('id') id: number, @Body() confirmAccountDto: ConfirmAccountDto) {
+  confirmAcount(
+    @Param('id') id: number,
+    @Body() confirmAccountDto: ConfirmAccountDto,
+  ) {
     return this.authService.confirmAccount(id, confirmAccountDto);
   }
 
-  @Auth()
   @Get('user-profile')
+  @Auth()
   userProfile(@GetUser() user: User) {
     return user;
+  }
+
+  @Post('logout')
+  @Auth()
+  logout(@Req() req: Request) {
+    return this.authService.logout(req);
   }
 }

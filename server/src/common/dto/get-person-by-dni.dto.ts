@@ -1,4 +1,4 @@
-import { IsNumberString, Length } from "class-validator";
+import { IsNumberString, Length } from 'class-validator';
 
 export class GetPersonByDniDto {
   @IsNumberString()

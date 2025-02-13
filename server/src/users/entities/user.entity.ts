@@ -1,12 +1,20 @@
-import { Timestamped } from "src/common/entities/timestamped.entity";
-import { Role } from "src/roles/entities/role.entity";
-import { Staff } from "src/staff/entities/staff.entity";
-import { Column, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Timestamped } from 'src/common/entities/timestamped.entity';
+import { Role } from 'src/roles/entities/role.entity';
+import { Staff } from 'src/staff/entities/staff.entity';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  JoinTable,
+  ManyToMany,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 
-@Entity({name: 'user'})
+@Entity({ name: 'user' })
 export class User extends Timestamped {
   @PrimaryGeneratedColumn({
-    name: 'user_id'
+    name: 'user_id',
   })
   userId: number;
 
@@ -14,55 +22,48 @@ export class User extends Timestamped {
     name: 'username',
     type: 'varchar',
     length: 8,
-    unique: true
+    unique: true,
   })
   username: string;
 
   @Column({
     name: 'password',
     type: 'varchar',
-    length: 100
+    length: 100,
   })
   password: string;
 
   @Column({
     name: 'isConfirm',
     type: 'boolean',
-    default: false
+    default: false,
   })
   isConfirm: boolean;
 
   @Column({
     name: 'isActive',
     type: 'boolean',
-    default: true
+    default: true,
   })
   isActive: boolean;
 
-  @ManyToOne(
-    ()=> Staff,
-    staff => staff.users
-  )
+  @ManyToOne(() => Staff, (staff) => staff.users)
   @JoinColumn({
-    name: 'staff_id'
+    name: 'staff_id',
   })
   staff: Staff;
-  
-  @ManyToMany(
-    () => Role,
-    {eager:true}
-  )
+
+  @ManyToMany(() => Role, { eager: true })
   @JoinTable({
     name: 'user_has_roles',
     joinColumn: {
       name: 'user_id',
-      referencedColumnName: 'userId'
+      referencedColumnName: 'userId',
     },
     inverseJoinColumn: {
       name: 'role_id',
-      referencedColumnName: 'roleId'
-    }
+      referencedColumnName: 'roleId',
+    },
   })
-  role: Role[]
-
+  role: Role[];
 }

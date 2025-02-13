@@ -10,3 +10,9 @@ services:
     container_name: certi-salud-db
     volumes:
       - ./mysql:/var/lib/mysql
+  
+  redis:
+    image: redis
+    restart: always
+    ports:
+      - "6379:6379"
