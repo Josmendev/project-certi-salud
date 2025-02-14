@@ -7,7 +7,7 @@ import { CreateStaffDto } from './dto/create-staff.dto';
 import { UpdateStaffDto } from './dto/update-staff.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Staff } from './entities/staff.entity';
-import { DataSource, QueryRunner, Repository } from 'typeorm';
+import { QueryRunner, Repository } from 'typeorm';
 import { PersonService } from 'src/persons/person.service';
 import { UsersService } from 'src/users/users.service';
 import { formatStaffResponse } from './helpers/format-staff-response.helper';
@@ -18,6 +18,7 @@ import { PaginationDto } from 'src/common/dto/pagination.dto';
 import { Paginated } from '../common/interfaces/paginated.interface';
 import { BaseService } from 'src/common/services/base.service';
 import { AssignStaffDto } from './dto/assing-staff.dto';
+import { TransactionService } from 'src/common/services/transaction.service';
 
 @Injectable()
 export class StaffService extends BaseService<Staff> {
@@ -26,7 +27,7 @@ export class StaffService extends BaseService<Staff> {
     private readonly staffRepository: Repository<Staff>,
     private readonly userService: UsersService,
     private readonly personService: PersonService,
-    private readonly dataSource: DataSource,
+    private readonly transactionService: TransactionService,
   ) {
     super(staffRepository);
   }
@@ -40,10 +41,7 @@ export class StaffService extends BaseService<Staff> {
       termRelation,
     });
     if (person) await this.isStaffRegistered(person, identityDocumentNumber);
-    const queryRunner = this.dataSource.createQueryRunner();
-    await queryRunner.connect();
-    await queryRunner.startTransaction();
-    try {
+    return this.transactionService.runInTrasaction(async (queryRunner) => {
       const newPerson = await this.personService.create(
         { ...createStaffDto },
         queryRunner,
@@ -53,14 +51,8 @@ export class StaffService extends BaseService<Staff> {
         { identityDocumentNumber, staff },
         queryRunner,
       );
-      await queryRunner.commitTransaction();
       return formatStaffResponse(staff);
-    } catch (error) {
-      await queryRunner.rollbackTransaction();
-      throw error;
-    } finally {
-      await queryRunner.release();
-    }
+    });
   }
 
   async assignStaff(assignStaffDto: AssignStaffDto): Promise<StaffResponse> {
@@ -78,23 +70,14 @@ export class StaffService extends BaseService<Staff> {
       throw new NotFoundException(
         `La persona con DNI ${identityDocumentNumber} ya es un personal`,
       );
-    const queryRunner = this.dataSource.createQueryRunner();
-    await queryRunner.connect();
-    await queryRunner.startTransaction();
-    try {
+    return this.transactionService.runInTrasaction(async (queryRunner) => {
       const staff = await this.createStaff(person, queryRunner);
       await this.userService.create(
         { identityDocumentNumber, staff },
         queryRunner,
       );
-      await queryRunner.commitTransaction();
       return formatStaffResponse(staff);
-    } catch (error) {
-      await queryRunner.rollbackTransaction();
-      throw error;
-    } finally {
-      await queryRunner.release();
-    }
+    });
   }
 
   async findAll(
@@ -153,42 +136,24 @@ export class StaffService extends BaseService<Staff> {
 
   async activate(staffId: number): Promise<void> {
     const staff = await this.findOne(staffId);
-    const queryRunner = this.dataSource.createQueryRunner();
-    await queryRunner.connect();
-    await queryRunner.startTransaction();
-    try {
+    this.transactionService.runInTrasaction(async (queryRunner) => {
       staff.isActive = true;
       await Promise.all([
         queryRunner.manager.save(staff),
         this.userService.activate(staff, queryRunner),
       ]);
-      await queryRunner.commitTransaction();
-    } catch (error) {
-      await queryRunner.rollbackTransaction();
-      throw error;
-    } finally {
-      await queryRunner.release();
-    }
+    });
   }
 
   async remove(staffId: number): Promise<void> {
     const staff = await this.findOne(staffId);
-    const queryRunner = this.dataSource.createQueryRunner();
-    await queryRunner.connect();
-    await queryRunner.startTransaction();
-    try {
+    this.transactionService.runInTrasaction(async (queryRunner) => {
       staff.isActive = false;
       await Promise.all([
         queryRunner.manager.save(staff),
         this.userService.remove(staff, queryRunner),
       ]);
-      await queryRunner.commitTransaction();
-    } catch (error) {
-      await queryRunner.rollbackTransaction();
-      throw error;
-    } finally {
-      await queryRunner.release();
-    }
+    });
   }
 
   // Internal helper methods
