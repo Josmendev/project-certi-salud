@@ -19,6 +19,7 @@ interface AuthProviderProps {
 const init = () => {
   const userFromLocalStorage = localStorage.getItem("user");
   const parsedUser = userFromLocalStorage ? JSON.parse(userFromLocalStorage) : {};
+  if (parsedUser.token) parsedUser.isActive = true;
 
   return {
     ...initialStateAuthUser,

@@ -1,10 +1,10 @@
+import type { IPerson } from "../../../shared/types/Person";
+
 export interface IUser {
   userId: number | null;
-  username?: string;
-  password?: string;
-  staffId?: number | null;
-  token?: string;
-  isConfirm?: boolean;
-  isActive?: boolean;
-  role?: Array<string>;
+  username: string;
+  isConfirm: boolean;
+  isActive: boolean;
+  person: IPerson;
+  role: Array<string>;
 }
