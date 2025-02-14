@@ -1,4 +1,4 @@
-import type { DataOfUser } from "../types/userTypes";
+import type { DataOfUsers } from "../types/userTypes";
 
 // Creo el estado inicial del reducer
-export const initialStateUser: Array<DataOfUser> = [];
+export const initialStateUser: Array<DataOfUsers> = [];

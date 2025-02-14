@@ -1,10 +1,11 @@
 import { createContext } from "react";
+import type { DataResponseFromAPI } from "../../../../shared/types/DataResponse";
 import type { ErrorResponse } from "../../../../shared/types/ErrorResponse";
-import type { EditUser, ResponseDataUser } from "../types/userTypes";
+import type { EditUser } from "../types/userTypes";
 
 // Creo el contexto para almacenar valores del usuario
 export interface AuthContextProps {
-  list: () => Promise<ResponseDataUser | ErrorResponse>;
+  list: () => Promise<DataResponseFromAPI | ErrorResponse>;
   modifyUser: (user: EditUser) => Promise<EditUser | ErrorResponse>;
 }
 
