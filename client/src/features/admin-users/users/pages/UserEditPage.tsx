@@ -65,7 +65,7 @@ export const UserEditPage = () => {
               classButton="btn-primary w-auto text-paragraph-regular py-2"
               type="button"
               iconLeft={<Icon.Back />}
-              onClick={() => navigate(-1)}
+              onClick={() => navigate(ROUTE_INITIAL, { replace: true })}
             >
               Regresar
             </Button>

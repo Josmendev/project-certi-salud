@@ -8,7 +8,7 @@ interface Props {
 export const Card: React.FC<Props> = ({ headerCard, btnBack, children, footerCard }) => {
   return (
     <>
-      <header className="flex items-center justify-between border px-6 py-2.5 border-neutral-100 bg-shades-light">
+      <header className="flex items-center justify-between border px-6 py-4 border-neutral-100 bg-shades-light">
         <p className="text-paragraph-semibold text-left">{headerCard}</p>
         {btnBack && <>{btnBack}</>}
       </header>

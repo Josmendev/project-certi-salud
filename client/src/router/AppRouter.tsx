@@ -1,10 +1,10 @@
 import { Navigate, Route, Routes } from "react-router";
-import { ReportRoutes } from "../features/admin-reports/report-certificate/routes/ReportRoutes";
 import { AdminRouter } from "../features/admin-users/router/AdminRouter";
 import { ConfirmUserPage } from "../features/auth/pages/ConfirmUserPage";
 import { LoginPage } from "../features/auth/pages/LoginPage";
 import { InfoRequiredRouter } from "../features/info-required/router/InfoRequiredRouter";
 import { RegisterCertificateRouter } from "../features/register-certificates/router/RegisterCertificateRouter";
+import { ReportRoutes } from "../features/reports/report-certificate/routes/ReportRoutes";
 import { DashBoardPage } from "../shared/pages/DashBoardPage";
 import { BASE_ROUTES } from "../shared/utils/constants";
 import { PrivateRoute } from "./PrivateRoute";
