@@ -6,6 +6,6 @@ import { ConfigModule } from '@nestjs/config';
 @Module({
   imports: [ConfigModule, CommonModule],
   exports: [ReniecApiService],
-  providers: [ReniecApiService]
+  providers: [ReniecApiService],
 })
 export class ReniecApiModule {}

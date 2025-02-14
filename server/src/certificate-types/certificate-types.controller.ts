@@ -1,4 +1,13 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  Query,
+} from '@nestjs/common';
 import { CertificateTypesService } from './certificate-types.service';
 import { CreateCertificateTypeDto } from './dto/create-certificate-type.dto';
 import { UpdateCertificateTypeDto } from './dto/update-certificate-type.dto';
@@ -9,7 +18,9 @@ import { Role } from 'src/auth/enums/role.enum';
 @Controller('certificate-types')
 @Auth(Role.admin)
 export class CertificateTypesController {
-  constructor(private readonly certificateTypesService: CertificateTypesService) {}
+  constructor(
+    private readonly certificateTypesService: CertificateTypesService,
+  ) {}
 
   @Post()
   create(@Body() createCertificateTypeDto: CreateCertificateTypeDto) {
@@ -27,7 +38,10 @@ export class CertificateTypesController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateCertificateTypeDto: UpdateCertificateTypeDto) {
+  update(
+    @Param('id') id: string,
+    @Body() updateCertificateTypeDto: UpdateCertificateTypeDto,
+  ) {
     return this.certificateTypesService.update(+id, updateCertificateTypeDto);
   }
 

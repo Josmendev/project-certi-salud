@@ -7,6 +7,6 @@ import { UserRoleGuard } from '../guards/user-role.guard';
 export function Auth(...roles: Role[]) {
   return applyDecorators(
     SetMetadata(ROLES_KEY, roles),
-    UseGuards(AuthGuard(), UserRoleGuard)
+    UseGuards(AuthGuard(), UserRoleGuard),
   );
 }

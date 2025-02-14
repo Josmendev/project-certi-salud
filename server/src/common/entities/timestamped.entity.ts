@@ -1,13 +1,13 @@
-import { CreateDateColumn, UpdateDateColumn } from "typeorm";
+import { CreateDateColumn, UpdateDateColumn } from 'typeorm';
 
 export abstract class Timestamped {
-  @CreateDateColumn({ 
+  @CreateDateColumn({
     name: 'created_at',
-    type: 'timestamp' 
+    type: 'timestamp',
   })
   createdAt: Date;
 
-  @UpdateDateColumn({ 
+  @UpdateDateColumn({
     name: 'updated_at',
     type: 'timestamp',
   })

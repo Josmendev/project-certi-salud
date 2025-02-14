@@ -1,4 +1,4 @@
-import { User } from "src/users/entities/user.entity";
+import { User } from 'src/users/entities/user.entity';
 
 export const formatValidateUserResponse = (user: User) => ({
   userId: user.userId,
@@ -11,5 +11,5 @@ export const formatValidateUserResponse = (user: User) => ({
     paternalSurname: user.staff.person.paternalSurname,
     maternalSurname: user.staff.person.maternalSurname,
   },
-  role: user.role.map( role => role.description)
+  role: user.role.map((role) => role.description),
 });

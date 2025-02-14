@@ -1,5 +1,4 @@
-import { PersonReniec } from "../entities/person-reniec.entity";
-
+import { PersonReniec } from '../entities/person-reniec.entity';
 
 export const formatPersonByDniResponse = (person: PersonReniec) => {
   const { numero, nombres, apellido_paterno, apellido_materno } = person.data;
@@ -7,6 +6,6 @@ export const formatPersonByDniResponse = (person: PersonReniec) => {
     identityDocumentNumber: numero,
     name: nombres,
     paternalSurname: apellido_paterno,
-    maternalSurname: apellido_materno
+    maternalSurname: apellido_materno,
   };
-}
+};

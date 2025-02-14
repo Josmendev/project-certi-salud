@@ -14,31 +14,39 @@ import { BaseService } from 'src/common/services/base.service';
 export class CertificateTypesService extends BaseService<CertificateType> {
   constructor(
     @InjectRepository(CertificateType)
-    private readonly certificateTypeRepository: Repository<CertificateType>
-  ){
+    private readonly certificateTypeRepository: Repository<CertificateType>,
+  ) {
     super(certificateTypeRepository);
   }
 
   // Methods for endopoints
-  async create(createCertificateTypeDto: CreateCertificateTypeDto): Promise<CertificateTypeResponse> {
-    const certificateType = this.certificateTypeRepository.create(createCertificateTypeDto);
+  async create(
+    createCertificateTypeDto: CreateCertificateTypeDto,
+  ): Promise<CertificateTypeResponse> {
+    const certificateType = this.certificateTypeRepository.create(
+      createCertificateTypeDto,
+    );
     await this.certificateTypeRepository.save(certificateType);
     return formatCertificateTypeResponse(certificateType);
   }
 
-  async findAll(paginationDto: PaginationDto): Promise<Paginated<CertificateTypeResponse>> {
+  async findAll(
+    paginationDto: PaginationDto,
+  ): Promise<Paginated<CertificateTypeResponse>> {
     return this.findAllBase(
       paginationDto,
       'certificateType',
       formatCertificateTypeResponse,
       (queryBuilder) => {
-        queryBuilder 
-          .orderBy('certificateType.createdAt', 'ASC')
-      }
-    )
+        queryBuilder.orderBy('certificateType.createdAt', 'ASC');
+      },
+    );
   }
 
-  async search(term: string, paginationDto: PaginationDto): Promise<Paginated<CertificateTypeResponse>> {
+  async search(
+    term: string,
+    paginationDto: PaginationDto,
+  ): Promise<Paginated<CertificateTypeResponse>> {
     return this.searchBase(
       term,
       paginationDto,
@@ -46,30 +54,49 @@ export class CertificateTypesService extends BaseService<CertificateType> {
       formatCertificateTypeResponse,
       (queryBuilder, searchTerm) => {
         queryBuilder
-          .where('certificateType.description LIKE :searchTerm', {searchTerm: `%${searchTerm}%`})
+          .where('certificateType.description LIKE :searchTerm', {
+            searchTerm: `%${searchTerm}%`,
+          })
           .orderBy('certificateType.createdAt', 'ASC');
-      }
-    )
+      },
+    );
   }
 
-  async update(certificateTypeId: number, updateCertificateTypeDto: UpdateCertificateTypeDto) {
+  async update(
+    certificateTypeId: number,
+    updateCertificateTypeDto: UpdateCertificateTypeDto,
+  ) {
     const certificateType = await this.certificateTypeRepository.preload({
       certificateTypeId,
-      ...updateCertificateTypeDto
+      ...updateCertificateTypeDto,
     });
-    if(!certificateType || !certificateType.isActive) throw new NotFoundException(`Tipo de certificado con el ID ${certificateTypeId} no fue encontrado`);
+    if (!certificateType || !certificateType.isActive)
+      throw new NotFoundException(
+        `Tipo de certificado con el ID ${certificateTypeId} no fue encontrado`,
+      );
     await this.certificateTypeRepository.save(certificateType);
     return formatCertificateTypeResponse(certificateType);
   }
 
   async active(certificateTypeId: number): Promise<void> {
-    const certificateType = await this.certificateTypeRepository.update({certificateTypeId},{isActive: true});
-    if(certificateType.affected === 0) throw new NotFoundException(`Tipo de certificado con el ID ${certificateTypeId} no fue encontrado`);
+    const certificateType = await this.certificateTypeRepository.update(
+      { certificateTypeId },
+      { isActive: true },
+    );
+    if (certificateType.affected === 0)
+      throw new NotFoundException(
+        `Tipo de certificado con el ID ${certificateTypeId} no fue encontrado`,
+      );
   }
 
   async remove(certificateTypeId: number): Promise<void> {
-    const certificateType = await this.certificateTypeRepository.update({certificateTypeId},{isActive: false});
-    if(certificateType.affected === 0) throw new NotFoundException(`Tipo de certificado con el ID ${certificateTypeId} no fue encontrado`);
+    const certificateType = await this.certificateTypeRepository.update(
+      { certificateTypeId },
+      { isActive: false },
+    );
+    if (certificateType.affected === 0)
+      throw new NotFoundException(
+        `Tipo de certificado con el ID ${certificateTypeId} no fue encontrado`,
+      );
   }
-
 }

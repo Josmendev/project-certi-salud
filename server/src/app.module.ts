@@ -13,12 +13,13 @@ import { DiseasesModule } from './diseases/diseases.module';
 import { CertificatesModule } from './certificates/certificates.module';
 import { ExternalApisModule } from './external-apis/external-apis.module';
 import config from './config/config';
+import { RedisModule } from './redis/redis.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       load: [config],
-      isGlobal: true
+      isGlobal: true,
     }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
@@ -31,11 +32,22 @@ import config from './config/config';
         password: configService.get<string>('db.password'),
         database: configService.get<string>('db.database'),
         autoLoadEntities: true,
-        synchronize: true
-      })
+        synchronize: true,
+      }),
     }),
-    RolesModule, 
-    CommonModule, PersonsModule, StaffModule, PatientsModule, UsersModule, AuthModule, CertificateTypesModule, DiseasesModule, CertificatesModule, ExternalApisModule],
+    RedisModule,
+    RolesModule,
+    CommonModule,
+    PersonsModule,
+    StaffModule,
+    PatientsModule,
+    UsersModule,
+    AuthModule,
+    CertificateTypesModule,
+    DiseasesModule,
+    CertificatesModule,
+    ExternalApisModule,
+  ],
   controllers: [],
   providers: [],
 })

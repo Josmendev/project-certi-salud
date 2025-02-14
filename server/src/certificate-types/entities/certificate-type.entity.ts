@@ -1,10 +1,10 @@
-import { Timestamped } from "src/common/entities/timestamped.entity";
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { Timestamped } from 'src/common/entities/timestamped.entity';
+import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
-@Entity({name: 'certificate_type'})
+@Entity({ name: 'certificate_type' })
 export class CertificateType extends Timestamped {
   @PrimaryGeneratedColumn({
-    name: 'certificate_type_id'
+    name: 'certificate_type_id',
   })
   certificateTypeId: number;
 
@@ -13,14 +13,14 @@ export class CertificateType extends Timestamped {
     type: 'varchar',
     length: 20,
     unique: true,
-    nullable: false
+    nullable: false,
   })
   description: string;
 
   @Column({
     name: 'isActive',
     type: 'boolean',
-    default: true
+    default: true,
   })
   isActive: boolean;
 }

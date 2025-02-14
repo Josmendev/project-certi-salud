@@ -14,7 +14,7 @@ import { AuthModule } from 'src/auth/auth.module';
     PersonsModule,
     UsersModule,
     CommonModule,
-    AuthModule
+    AuthModule,
   ],
   controllers: [StaffController],
   providers: [StaffService],

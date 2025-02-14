@@ -12,14 +12,20 @@ export class ReniecApiService {
   private readonly reniecApiKey: string;
   constructor(
     private readonly apiFetchAdapter: ApiFetchAdapter,
-    private configService: ConfigService
-  ){
+    private configService: ConfigService,
+  ) {
     this.reniecApiUrl = configService.get<string>('reniecApi.url');
     this.reniecApiKey = configService.get<string>('reniecApi.apiKey');
   }
 
-  async getPersonByDni(getPersonByDniDto: GetPersonByDniDto): Promise<PersonByDniResponse> {
-    const person: PersonReniec = await this.apiFetchAdapter.post(this.reniecApiUrl, getPersonByDniDto, this.reniecApiKey);
+  async getPersonByDni(
+    getPersonByDniDto: GetPersonByDniDto,
+  ): Promise<PersonByDniResponse> {
+    const person: PersonReniec = await this.apiFetchAdapter.post(
+      this.reniecApiUrl,
+      getPersonByDniDto,
+      this.reniecApiKey,
+    );
     return formatPersonByDniResponse(person);
   }
 }

@@ -1,5 +1,12 @@
-import { ArgumentsHost, Catch, ExceptionFilter, HttpException, HttpStatus, Logger } from "@nestjs/common";
-import { Response } from "express";
+import {
+  ArgumentsHost,
+  Catch,
+  ExceptionFilter,
+  HttpException,
+  HttpStatus,
+  Logger,
+} from '@nestjs/common';
+import { Response } from 'express';
 
 @Catch()
 export class AllExceptionsFilter implements ExceptionFilter {
@@ -23,20 +30,21 @@ export class AllExceptionsFilter implements ExceptionFilter {
     }
 
     const { errno, sqlMessage } = exception as any;
-    if (errno === 1062) {  // Error de duplicado de entrada (clave única)
+    if (errno === 1062) {
+      // Error de duplicado de entrada (clave única)
       status = HttpStatus.BAD_REQUEST;
       const match = sqlMessage.match(/Duplicate entry '(.+?)'/);
       const duplicateValue = match ? match[1] : 'valor duplicado';
       // Mensaje de error para duplicado de clave
-      message = [`El valor ingresado '${duplicateValue}' ya se encuentra registrado`];
+      message = [
+        `El valor ingresado '${duplicateValue}' ya se encuentra registrado`,
+      ];
       error = 'Duplicate Record';
     }
 
     console.log(exception);
 
-    this.logger.error(
-      `HTTP ${status} Error: ${JSON.stringify(message)}`,
-    );
+    this.logger.error(`HTTP ${status} Error: ${JSON.stringify(message)}`);
 
     response.status(status).json({
       message,
@@ -44,5 +52,4 @@ export class AllExceptionsFilter implements ExceptionFilter {
       statusCode: status,
     });
   }
-
 }

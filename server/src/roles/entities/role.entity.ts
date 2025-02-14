@@ -1,11 +1,16 @@
-import { Timestamped } from "src/common/entities/timestamped.entity";
-import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Timestamped } from 'src/common/entities/timestamped.entity';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 
-@Entity({name: 'role'})
+@Entity({ name: 'role' })
 export class Role extends Timestamped {
-  
   @PrimaryGeneratedColumn({
-    name: 'role_id'
+    name: 'role_id',
   })
   roleId: number;
 
@@ -14,16 +19,14 @@ export class Role extends Timestamped {
     type: 'varchar',
     length: 20,
     unique: true,
-    nullable: false
+    nullable: false,
   })
   description: string;
 
   @Column({
     name: 'isActive',
     type: 'boolean',
-    default: true
+    default: true,
   })
   isActive: boolean;
-
-  
 }

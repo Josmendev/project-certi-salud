@@ -1,5 +1,5 @@
-import { IsNumberString, Length } from "class-validator";
-import { TermRelationWithPerson } from "../enum/term-relation.enum";
+import { IsNumberString, Length } from 'class-validator';
+import { TermRelationWithPerson } from '../enum/term-relation.enum';
 
 export class IsPersonRegisterDto {
   @IsNumberString()

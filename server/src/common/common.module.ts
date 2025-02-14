@@ -9,6 +9,6 @@ import { ConfigModule } from '@nestjs/config';
 @Module({
   imports: [JwtModule, ConfigModule],
   exports: [UuidAdapter, BcryptAdapter, JwtAdapter, ApiFetchAdapter],
-  providers: [UuidAdapter, BcryptAdapter, JwtAdapter, ApiFetchAdapter]
+  providers: [UuidAdapter, BcryptAdapter, JwtAdapter, ApiFetchAdapter],
 })
 export class CommonModule {}
