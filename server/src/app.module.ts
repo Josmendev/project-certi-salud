@@ -14,6 +14,7 @@ import { CertificatesModule } from './certificates/certificates.module';
 import { ExternalApisModule } from './external-apis/external-apis.module';
 import config from './config/config';
 import { RedisModule } from './redis/redis.module';
+import { SeedModule } from './seed/seed.module';
 
 @Module({
   imports: [
@@ -47,6 +48,7 @@ import { RedisModule } from './redis/redis.module';
     DiseasesModule,
     CertificatesModule,
     ExternalApisModule,
+    SeedModule,
   ],
   controllers: [],
   providers: [],

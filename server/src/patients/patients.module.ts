@@ -14,6 +14,7 @@ import { CommonModule } from 'src/common/common.module';
     AuthModule,
     CommonModule,
   ],
+  exports: [PatientsService],
   controllers: [PatientsController],
   providers: [PatientsService],
 })

@@ -41,4 +41,8 @@ export abstract class BaseService<T> {
       data: result.data.map(formatResponse),
     };
   }
+
+  async deleteAll(): Promise<void> {
+    await this.repository.delete({});
+  }
 }

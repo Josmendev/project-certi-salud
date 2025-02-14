@@ -5,13 +5,16 @@ import { QueryRunner, Repository } from 'typeorm';
 import { CreatePersonDto } from './dto/create-person.dto';
 import { UpdatePersonDto } from './dto/update-person.dto';
 import { IsPersonRegisterDto } from './dto/is-person-register.dto';
+import { BaseService } from 'src/common/services/base.service';
 
 @Injectable()
-export class PersonService {
+export class PersonService extends BaseService<Person> {
   constructor(
     @InjectRepository(Person)
     private readonly personRepository: Repository<Person>,
-  ) {}
+  ) {
+    super(personRepository);
+  }
 
   // Internal helpers methods
   async create(

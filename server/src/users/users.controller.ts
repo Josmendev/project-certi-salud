@@ -25,8 +25,8 @@ export class UsersController {
     return this.usersService.update(+id, updateUserDto);
   }
 
-  @Patch('refresh-password/:id')
-  refreshPassword(@Param('id') id: string) {
-    return this.usersService.refreshPassword(+id);
+  @Patch('reset-password/:id')
+  resetPassword(@Param('id') id: string) {
+    return this.usersService.resetPassword(+id);
   }
 }
