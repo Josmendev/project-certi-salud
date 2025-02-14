@@ -76,12 +76,25 @@ export class UsersService extends BaseService<User> {
     updateUserDto: UpdateUserDto,
   ): Promise<UserResponse> {
     const user = await this.findOneById(userId);
+    if (!user)
+      throw new NotFoundException(`El usuario no se encuentra registrado`);
     const { role } = updateUserDto;
     if (!role || role.length === 0) return formatUserResponse(user);
     const newRolesInUser = await this.rolesService.findForUdateInUsers(role);
     user.role = newRolesInUser;
     const userUpdate = await this.userRepository.save(user);
     return formatUserResponse(userUpdate);
+  }
+
+  async refreshPassword(userId: number): Promise<void> {
+    const user = await this.findOneById(userId);
+    if (!user)
+      throw new NotFoundException(`El usuario no se encuentra registrado`);
+    const password = this.bcrypt.hashSync(user.username);
+    await this.userRepository.update(
+      { userId },
+      { password, isConfirm: false },
+    );
   }
 
   // Internal helper methods

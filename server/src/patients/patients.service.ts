@@ -8,7 +8,7 @@ import { UpdatePatientDto } from './dto/update-patient.dto';
 import { TermRelationWithPerson } from 'src/persons/enum/term-relation.enum';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Patient } from './entities/patient.entity';
-import { DataSource, QueryRunner, Repository } from 'typeorm';
+import { QueryRunner, Repository } from 'typeorm';
 import { PersonService } from 'src/persons/person.service';
 import { Person } from 'src/persons/entities/person.entity';
 import { formatPatientResponse } from './helpers/format-patient-response.helper';
@@ -16,6 +16,9 @@ import { PatientResponse } from './interfaces/patient-response.interface';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
 import { Paginated } from 'src/common/interfaces/paginated.interface';
 import { BaseService } from 'src/common/services/base.service';
+import { TransactionService } from '../common/services/transaction.service';
+import { PatientDataDto } from './dto/patient-data.dto';
+import { AssignPatientDto } from './dto/assign-patient.dto';
 
 @Injectable()
 export class PatientsService extends BaseService<Patient> {
@@ -23,14 +26,15 @@ export class PatientsService extends BaseService<Patient> {
     @InjectRepository(Patient)
     private readonly patientRepository: Repository<Patient>,
     private readonly personService: PersonService,
-    private readonly dataSource: DataSource,
+    private readonly transactionService: TransactionService,
   ) {
     super(patientRepository);
   }
 
   // Methods for endpoints
   async create(createPatientDto: CreatePatientDto): Promise<PatientResponse> {
-    const { identityDocumentNumber, age } = createPatientDto;
+    const { age, ...personData } = createPatientDto;
+    const identityDocumentNumber = personData.identityDocumentNumber;
     const termRelation = TermRelationWithPerson.patient;
     const person = await this.personService.isPersonRegistered({
       identityDocumentNumber,
@@ -38,25 +42,33 @@ export class PatientsService extends BaseService<Patient> {
     });
     if (person)
       return await this.isStaffRegistered(person, identityDocumentNumber);
-    const queryRunner = this.dataSource.createQueryRunner();
-    await queryRunner.connect();
-    await queryRunner.startTransaction();
-    let patient: Patient;
-    try {
-      patient = await this.createPatient(age, queryRunner);
-      await this.personService.create(
-        { ...createPatientDto, patient },
+    return this.transactionService.runInTrasaction(async (queryRunner) => {
+      const person = await this.personService.create(
+        { ...personData },
         queryRunner,
       );
-      await queryRunner.commitTransaction();
-    } catch (error) {
-      await queryRunner.rollbackTransaction();
-      throw error;
-    } finally {
-      await queryRunner.release();
-    }
-    const patientSaved = await this.findOne(patient.patientId);
-    return formatPatientResponse(patientSaved);
+      const patient = await this.createPatient({ age, person }, queryRunner);
+      return formatPatientResponse(patient);
+    });
+  }
+
+  async assignPatient(assignPatientDto: AssignPatientDto) {
+    const { identityDocumentNumber, age } = assignPatientDto;
+    const termRelation = TermRelationWithPerson.patient;
+    const person = await this.personService.isPersonRegistered({
+      identityDocumentNumber,
+      termRelation,
+    });
+    if (!person)
+      throw new NotFoundException(
+        `La persona con DNI ${identityDocumentNumber} no está registrada`,
+      );
+    if (person.patient)
+      throw new NotFoundException(
+        `La persona con DNI ${identityDocumentNumber} ya es un paciente`,
+      );
+    const patient = await this.createPatient({ age, person });
+    return formatPatientResponse(patient);
   }
 
   async findAll(
@@ -107,11 +119,8 @@ export class PatientsService extends BaseService<Patient> {
   ): Promise<PatientResponse> {
     const patient = await this.findOne(patientId);
     const { age, ...updateDataPerson } = updatePatientDto;
-    const queryRunner = this.dataSource.createQueryRunner();
-    await queryRunner.connect();
-    await queryRunner.startTransaction();
-    try {
-      patient.age = age ? age : patient.age;
+    patient.age = age ? age : patient.age;
+    return this.transactionService.runInTrasaction(async (queryRunner) => {
       await queryRunner.manager.save(patient);
       const person = await this.personService.update(
         patient.person.personId,
@@ -119,14 +128,8 @@ export class PatientsService extends BaseService<Patient> {
         queryRunner,
       );
       patient.person = person;
-      await queryRunner.commitTransaction();
-    } catch (error) {
-      await queryRunner.rollbackTransaction();
-      throw error;
-    } finally {
-      await queryRunner.release();
-    }
-    return formatPatientResponse(patient);
+      return formatPatientResponse(patient);
+    });
   }
 
   async activate(patientId: number): Promise<void> {
@@ -149,13 +152,13 @@ export class PatientsService extends BaseService<Patient> {
 
   // Internal helpers methods
   private async createPatient(
-    age: number,
+    patientDataDto: PatientDataDto,
     queryRunner?: QueryRunner,
   ): Promise<Patient> {
     const repository = queryRunner
       ? queryRunner.manager.getRepository(Patient)
       : this.patientRepository;
-    const patient = repository.create({ age });
+    const patient = repository.create(patientDataDto);
     return await repository.save(patient);
   }
 

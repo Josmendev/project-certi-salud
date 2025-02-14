@@ -14,6 +14,7 @@ import { UpdatePatientDto } from './dto/update-patient.dto';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
 import { Auth } from 'src/auth/decorators/auth.decorator';
 import { Role } from 'src/auth/enums/role.enum';
+import { AssignPatientDto } from './dto/assign-patient.dto';
 
 @Controller('patients')
 @Auth(Role.admin)
@@ -23,6 +24,11 @@ export class PatientsController {
   @Post()
   create(@Body() createPatientDto: CreatePatientDto) {
     return this.patientsService.create(createPatientDto);
+  }
+
+  @Post('assign')
+  assignPatient(@Body() assignPatientDto: AssignPatientDto) {
+    return this.patientsService.assignPatient(assignPatientDto);
   }
 
   @Get()
