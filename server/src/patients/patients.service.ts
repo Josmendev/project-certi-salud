@@ -18,6 +18,7 @@ import { Paginated } from 'src/common/interfaces/paginated.interface';
 import { BaseService } from 'src/common/services/base.service';
 import { TransactionService } from '../common/services/transaction.service';
 import { PatientDataDto } from './dto/patient-data.dto';
+import { AssignPatientDto } from './dto/assign-patient.dto';
 
 @Injectable()
 export class PatientsService extends BaseService<Patient> {
@@ -49,6 +50,25 @@ export class PatientsService extends BaseService<Patient> {
       const patient = await this.createPatient({ age, person }, queryRunner);
       return formatPatientResponse(patient);
     });
+  }
+
+  async assignPatient(assignPatientDto: AssignPatientDto) {
+    const { identityDocumentNumber, age } = assignPatientDto;
+    const termRelation = TermRelationWithPerson.patient;
+    const person = await this.personService.isPersonRegistered({
+      identityDocumentNumber,
+      termRelation,
+    });
+    if (!person)
+      throw new NotFoundException(
+        `La persona con DNI ${identityDocumentNumber} no está registrada`,
+      );
+    if (person.patient)
+      throw new NotFoundException(
+        `La persona con DNI ${identityDocumentNumber} ya es un paciente`,
+      );
+    const patient = await this.createPatient({ age, person });
+    return formatPatientResponse(patient);
   }
 
   async findAll(
