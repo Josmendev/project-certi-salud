@@ -12,11 +12,11 @@ import { RolesService } from './roles.service';
 import { CreateRoleDto } from './dto/create-role.dto';
 import { UpdateRoleDto } from './dto/update-role.dto';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
-// import { Auth } from 'src/auth/decorators/auth.decorator';
-// import { Role } from 'src/auth/enums/role.enum';
+import { Auth } from 'src/auth/decorators/auth.decorator';
+import { Role } from 'src/auth/enums/role.enum';
 
 @Controller('roles')
-// @Auth(Role.admin)
+@Auth(Role.admin)
 export class RolesController {
   constructor(private readonly rolesService: RolesService) {}
 
