@@ -17,6 +17,7 @@ import { TermRelationWithPerson } from 'src/persons/enum/term-relation.enum';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
 import { Paginated } from '../common/interfaces/paginated.interface';
 import { BaseService } from 'src/common/services/base.service';
+import { AssignStaffDto } from './dto/assing-staff.dto';
 
 @Injectable()
 export class StaffService extends BaseService<Staff> {
@@ -42,22 +43,58 @@ export class StaffService extends BaseService<Staff> {
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
-    let staff: Staff;
     try {
-      staff = await this.createStaff(queryRunner);
-      await Promise.all([
-        this.personService.create({ ...createStaffDto, staff }, queryRunner),
-        this.userService.create({ identityDocumentNumber, staff }, queryRunner),
-      ]);
+      const newPerson = await this.personService.create(
+        { ...createStaffDto },
+        queryRunner,
+      );
+      const staff = await this.createStaff(newPerson, queryRunner);
+      await this.userService.create(
+        { identityDocumentNumber, staff },
+        queryRunner,
+      );
       await queryRunner.commitTransaction();
+      return formatStaffResponse(staff);
     } catch (error) {
       await queryRunner.rollbackTransaction();
       throw error;
     } finally {
       await queryRunner.release();
     }
-    const staffSaved = await this.findOne(staff.staffId);
-    return formatStaffResponse(staffSaved);
+  }
+
+  async assignStaff(assignStaffDto: AssignStaffDto): Promise<StaffResponse> {
+    const { identityDocumentNumber } = assignStaffDto;
+    const termRelation = TermRelationWithPerson.staff;
+    const person = await this.personService.isPersonRegistered({
+      identityDocumentNumber,
+      termRelation,
+    });
+    if (!person)
+      throw new NotFoundException(
+        `La persona con DNI ${identityDocumentNumber} no está registrada`,
+      );
+    if (person.staff)
+      throw new NotFoundException(
+        `La persona con DNI ${identityDocumentNumber} ya es un personal`,
+      );
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+    try {
+      const staff = await this.createStaff(person, queryRunner);
+      await this.userService.create(
+        { identityDocumentNumber, staff },
+        queryRunner,
+      );
+      await queryRunner.commitTransaction();
+      return formatStaffResponse(staff);
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      throw error;
+    } finally {
+      await queryRunner.release();
+    }
   }
 
   async findAll(
@@ -117,8 +154,8 @@ export class StaffService extends BaseService<Staff> {
   async activate(staffId: number): Promise<void> {
     const staff = await this.findOne(staffId);
     const queryRunner = this.dataSource.createQueryRunner();
-    queryRunner.connect();
-    queryRunner.startTransaction();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
     try {
       staff.isActive = true;
       await Promise.all([
@@ -137,8 +174,8 @@ export class StaffService extends BaseService<Staff> {
   async remove(staffId: number): Promise<void> {
     const staff = await this.findOne(staffId);
     const queryRunner = this.dataSource.createQueryRunner();
-    queryRunner.connect();
-    queryRunner.startTransaction();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
     try {
       staff.isActive = false;
       await Promise.all([
@@ -155,11 +192,16 @@ export class StaffService extends BaseService<Staff> {
   }
 
   // Internal helper methods
-  private async createStaff(queryRunner?: QueryRunner): Promise<Staff> {
+  private async createStaff(
+    person: Person,
+    queryRunner?: QueryRunner,
+  ): Promise<Staff> {
     const repository = queryRunner
       ? queryRunner.manager.getRepository(Staff)
       : this.staffRepository;
-    const staff = repository.create({});
+    const staff = repository.create({
+      person,
+    });
     return repository.save(staff);
   }
 

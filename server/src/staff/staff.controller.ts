@@ -14,6 +14,7 @@ import { UpdateStaffDto } from './dto/update-staff.dto';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
 import { Auth } from 'src/auth/decorators/auth.decorator';
 import { Role } from 'src/auth/enums/role.enum';
+import { AssignStaffDto } from './dto/assing-staff.dto';
 
 @Controller('staff')
 @Auth(Role.admin)
@@ -23,6 +24,11 @@ export class StaffController {
   @Post()
   create(@Body() createStaffDto: CreateStaffDto) {
     return this.staffService.create(createStaffDto);
+  }
+
+  @Post('assign')
+  assignStaff(@Body() assignStaffDto: AssignStaffDto) {
+    return this.staffService.assignStaff(assignStaffDto);
   }
 
   @Get()
