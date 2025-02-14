@@ -86,7 +86,7 @@ export class UsersService extends BaseService<User> {
     return formatUserResponse(userUpdate);
   }
 
-  async refreshPassword(userId: number): Promise<void> {
+  async resetPassword(userId: number): Promise<void> {
     const user = await this.findOneById(userId);
     if (!user)
       throw new NotFoundException(`El usuario no se encuentra registrado`);
