@@ -16,6 +16,7 @@ import { AuthModule } from 'src/auth/auth.module';
     CommonModule,
     AuthModule,
   ],
+  exports: [StaffService],
   controllers: [StaffController],
   providers: [StaffService],
 })

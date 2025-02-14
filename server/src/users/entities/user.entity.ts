@@ -53,7 +53,7 @@ export class User extends Timestamped {
   })
   staff: Staff;
 
-  @ManyToMany(() => Role, { eager: true })
+  @ManyToMany(() => Role, { eager: true, cascade: true })
   @JoinTable({
     name: 'user_has_roles',
     joinColumn: {
