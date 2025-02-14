@@ -64,3 +64,12 @@ Este es el servidor (Backend) del proyecto **Certi Salud**. Está construido con
    pnpm start:dev
    ```
 
+6. Ejecutar el proceso de seed para poblar la base de datos con registros iniciales
+
+   ```sh
+   http://localhost:3002/api/v1/seed
+   ```
+
+   - Usuario de acceso: **70125834**
+   - Contraseña: **70125834**
+
