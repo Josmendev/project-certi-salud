@@ -17,7 +17,7 @@ import { Role } from 'src/auth/enums/role.enum';
 import { AssignPatientDto } from './dto/assign-patient.dto';
 
 @Controller('patients')
-@Auth(Role.admin)
+@Auth(Role.Admin)
 export class PatientsController {
   constructor(private readonly patientsService: PatientsService) {}
 
