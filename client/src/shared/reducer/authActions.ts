@@ -17,4 +17,5 @@ interface ActionWithoutPayload<Type> {
 export type AuthAction =
   | ActionWithPayload<typeof AUTH_TYPES.login, AuthResponseUser | ErrorResponse>
   | ActionWithPayload<typeof AUTH_TYPES.confirmUser, AuthResponseUser | ErrorResponse>
+  | ActionWithPayload<typeof AUTH_TYPES.profile, AuthResponseUser | ErrorResponse>
   | ActionWithoutPayload<typeof AUTH_TYPES.logout>;
