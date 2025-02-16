@@ -30,22 +30,31 @@ export const LoginForm = () => {
     // Luego validar con el backend
     const userData = await login(data);
     if (isErrorResponse(userData)) {
-      showToast({
+      return showToast({
         type: "error",
         title: "Error en el login",
         description: "No se pudo iniciar sesión",
       });
-      return;
     }
 
     const { token, isConfirm } = userData;
 
     if (!isConfirm) {
+      showToast({
+        title: "Confirmación de cuenta",
+        description: "Ahora debes confirmar tu cuenta",
+        type: "info",
+      });
       navigate("/" + BASE_ROUTES.PUBLIC.CONFIRM_ACCOUNT);
       return;
     }
 
     if (token && token.length > 0 && isConfirm) {
+      showToast({
+        title: "Inicio de sesión",
+        description: "Has iniciado sesión satisfactoriamente",
+        type: "success",
+      });
       navigate("/" + BASE_ROUTES.PRIVATE.DASHBOARD);
       return;
     }
