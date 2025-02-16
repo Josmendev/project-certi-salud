@@ -6,9 +6,10 @@ import { ErrorResponse } from "./../../../../shared/types/ErrorResponse";
 import { handleError } from "./../../../../shared/utils/handleError";
 
 // Creo la funcion login que se conecta a la API del backend
-export const ListOfUsersService = async (
+export const SearchUsersService = async (
   limit: number = LIMIT_PAGE,
-  page: number = INITIAL_PAGE
+  page: number = INITIAL_PAGE,
+  query: string
 ): Promise<DataResponseFromAPI<DataOfUsers> | ErrorResponse> => {
   try {
     const user = JSON.parse(localStorage.getItem("user") as string);
@@ -17,13 +18,16 @@ export const ListOfUsersService = async (
     const { token } = user;
     if (!token) throw new Error("Token inválido");
 
-    const response = await fetch(`${ENDPOINTS_USER.LIST_OF_USERS}?limit=${limit}&page=${page}`, {
-      method: "GET",
-      headers: {
-        "Content-type": "application/json",
-        "Authorization": `Bearer ${token}`,
-      },
-    });
+    const response = await fetch(
+      `${ENDPOINTS_USER.SEARCH_USERS}/${query}?limit=${limit}&page=${page}`,
+      {
+        method: "GET",
+        headers: {
+          "Content-type": "application/json",
+          "Authorization": `Bearer ${token}`,
+        },
+      }
+    );
 
     // Respuesta no exitosa, lanzo excepcion con (message, status, details)
     if (!response.ok) {
