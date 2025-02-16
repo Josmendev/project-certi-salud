@@ -21,7 +21,7 @@ const Header = (props: {
           >
             <Icon.Menu color="#1C2434" strokeWidth={2} />
           </button>
-          <Link className="block flex-shrink-0 lg:hidden" to="dashboard">
+          <Link className="block flex-shrink-0 lg:hidden" to="/dashboard">
             <Image src="/logo-certisalud.webp" alt="Logo" className="w-[120px] h-[72px]" />
           </Link>
         </div>

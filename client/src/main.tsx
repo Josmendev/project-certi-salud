@@ -1,4 +1,5 @@
 import "@fontsource-variable/montserrat";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { BrowserRouter } from "react-router";
@@ -6,6 +7,8 @@ import { Toaster } from "sonner";
 import CertiSaludApp from "./CertiSaludApp.tsx";
 import "./index.css";
 import { AuthProvider } from "./shared/providers/AuthProvider.tsx";
+
+const queryClient = new QueryClient();
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
@@ -19,9 +22,11 @@ createRoot(document.getElementById("root")!).render(
       toastOptions={{ style: { gap: "1.25rem" } }}
     />
     <BrowserRouter>
-      <AuthProvider>
-        <CertiSaludApp />
-      </AuthProvider>
+      <QueryClientProvider client={queryClient}>
+        <AuthProvider>
+          <CertiSaludApp />
+        </AuthProvider>
+      </QueryClientProvider>
     </BrowserRouter>
   </StrictMode>
 );

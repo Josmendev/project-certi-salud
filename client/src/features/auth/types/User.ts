@@ -1,7 +1,7 @@
 import type { IPerson } from "../../../shared/types/Person";
 
 export interface IUser {
-  userId: number | null;
+  userId: number;
   username: string;
   isConfirm: boolean;
   isActive: boolean;

@@ -21,3 +21,6 @@ export const CRUD_ROUTES = {
   DETAIL: ":id",
   EDIT: ":id/edit",
 };
+
+export const LIMIT_PAGE = 8;
+export const INITIAL_PAGE = 1;
