@@ -1,7 +1,7 @@
-export const initialStateUsers = {
+export const initialDataOfUsers = {
   data: [],
-  total: 0,
+  total: 1,
   page: 1,
-  limit: 5,
-  totalPages: 0,
+  limit: 8,
+  totalPages: 1,
 };
