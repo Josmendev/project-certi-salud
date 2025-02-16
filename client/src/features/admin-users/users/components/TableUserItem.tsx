@@ -21,8 +21,8 @@ export const TableUserItem: React.FC<TableUserItemProps> = ({ listOfUsers, editR
 
   const textIsActive = (rowActive: boolean) =>
     rowActive
-      ? textDataStatus("Activo", stateClassSuccess + " w-20")
-      : textDataStatus("Inactivo", stateClassDanger + " w-20");
+      ? textDataStatus("Activo", stateClassSuccess + " w-[74px]")
+      : textDataStatus("Inactivo", stateClassDanger + " w-[74px]");
 
   return (
     <>
@@ -30,7 +30,9 @@ export const TableUserItem: React.FC<TableUserItemProps> = ({ listOfUsers, editR
         <tr key={row?.userId} className="border-b border-neutral-100 text-center">
           <td className="p-2">{row.userId}</td>
           <td className="p-2">{row.username}</td>
-          <td className="p-2">{row.person.name}</td>
+          <td className="p-2">
+            {row.person.name} {row.person.paternalSurname} {row.person.maternalSurname}
+          </td>
           <td className="p-2">{row.role.join(", ")}</td>
           <td className="p-2">{textIsConfirm(row.isConfirm)}</td>
           <td className="p-2">{textIsActive(row.isActive)}</td>
