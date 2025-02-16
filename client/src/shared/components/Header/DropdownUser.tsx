@@ -1,7 +1,8 @@
 import { useContext, useState } from "react";
-import { Link } from "react-router";
-import { ADMIN_USERS_ROUTES } from "../../../features/admin-users/utils/constants";
+import { Link, useNavigate } from "react-router";
 import { AuthContext } from "../../contexts/AuthContext";
+import { getUserDetail } from "../../helpers/getUserInformation";
+import { showToast } from "../../hooks/useToast";
 import { BASE_ROUTES } from "../../utils/constants";
 import { Button } from "../Button/Button";
 import ClickOutside from "../ClickOutside";
@@ -10,12 +11,22 @@ import { Image } from "../Image";
 
 const DropdownUser = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const { user } = useContext(AuthContext);
+  const { user, logout } = useContext(AuthContext);
+  const navigate = useNavigate();
 
-  if (!user) return null;
+  if (!user) throw new Error("User is not defined");
 
-  const URL_PROFILE =
-    "/" + BASE_ROUTES.PRIVATE.ADMIN + "/" + ADMIN_USERS_ROUTES.USERS + "/" + user?.userId;
+  const { userInformation } = getUserDetail(user);
+
+  const handleLogout = async () => {
+    await logout();
+    showToast({
+      title: "Sesión cerrada",
+      description: "Se cerró la sesión de forma exitosa",
+      type: "success",
+    });
+    navigate(BASE_ROUTES.PUBLIC.HOME);
+  };
 
   return (
     <ClickOutside onClick={() => setDropdownOpen(false)} className="relative">
@@ -25,8 +36,8 @@ const DropdownUser = () => {
         to="#"
       >
         <span className="hidden text-right lg:block">
-          <span className="block text-sm font-medium text-black">Fernando Minchola</span>
-          <span className="block text-xs">UX/UI Designer</span>
+          <span className="block text-sm font-medium text-black">{userInformation}</span>
+          <span className="block text-xs">{user?.role.join(", ")}</span>
         </span>
 
         <span className="header-profile-img">
@@ -49,7 +60,7 @@ const DropdownUser = () => {
         <div className={`shadow-default header-dropdown-user`}>
           <ul className="header-dropdown-menu">
             <li>
-              <Link to={URL_PROFILE} className="group header-dropdown-menu-item">
+              <Link to="/dashboard" className="group header-dropdown-menu-item">
                 <Icon.User
                   color="#1C2434"
                   strokeWidth={1.5}
@@ -73,6 +84,7 @@ const DropdownUser = () => {
                 className="header-dropdown-menu-icon"
               />
             }
+            onClick={handleLogout}
           >
             <p className="header-dropdown-menu-paragraph">Cerrar sesión</p>
           </Button>
