@@ -12,7 +12,8 @@ export interface AuthContextProps {
   loading: boolean;
   login: (credentials: AuthLoginUser) => Promise<AuthResponseUser | ErrorResponse>;
   confirmUser: (credentials: AuthConfirmUser) => Promise<AuthResponseUser | ErrorResponse>;
-  logout: () => void;
+  profileUser: (token: string) => Promise<AuthResponseUser | ErrorResponse>;
+  logout: () => Promise<void | ErrorResponse>;
 }
 
 // Creo el contexto con los valores por defecto
@@ -20,12 +21,15 @@ export const AuthContext = createContext<AuthContextProps>({
   user: null,
   loading: false,
   login: async () => {
-    throw new Error("LOGIN NO IMPLEMENTADO");
+    throw new Error("EL LOGIN NO SE ENCUENTRA IMPLEMENTADO");
   },
   confirmUser: async () => {
-    throw new Error("CONFIRM_USER NO IMPLEMENTADO");
+    throw new Error("LA CONFIRMACION DE USUARIO NO SE ENCUENTRA IMPLEMENTADA");
+  },
+  profileUser: async () => {
+    throw new Error("EL PROFILE NO SE ENCUENTRA IMPLEMENTADO");
   },
   logout: async () => {
-    throw new Error("LOGOUT NO IMPLEMENTADO");
+    throw new Error("EL LOGOUT NO SE ENCUENTRA IMPLEMENTADO");
   },
 });
