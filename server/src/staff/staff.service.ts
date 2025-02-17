@@ -170,7 +170,7 @@ export class StaffService extends BaseService<Staff> {
     return repository.save(staff);
   }
 
-  private async findOne(staffId: number): Promise<Staff | null> {
+  async findOne(staffId: number): Promise<Staff | null> {
     const staff = await this.staffRepository.findOne({
       where: { staffId },
       relations: { person: true },

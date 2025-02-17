@@ -99,4 +99,16 @@ export class CertificateTypesService extends BaseService<CertificateType> {
         `Tipo de certificado con el ID ${certificateTypeId} no fue encontrado`,
       );
   }
+
+  // Methods for internal helpers
+  async findOne(certificateTypeId: number): Promise<CertificateType> {
+    const certificateType = await this.certificateTypeRepository.findOne({
+      where: { certificateTypeId },
+    });
+    if (!certificateType)
+      throw new NotFoundException(
+        `Tipo de certificado con el ID ${certificateTypeId} no fue encontrado`,
+      );
+    return certificateType;
+  }
 }

@@ -1,7 +1,7 @@
 import { CertificateType } from 'src/certificate-types/entities/certificate-type.entity';
 import { Patient } from 'src/patients/entities/patient.entity';
 import { Staff } from 'src/staff/entities/staff.entity';
-import { StatusCertificate } from '../enum/status-certificate.enum';
+import { StatusCertificate } from '../enums/status-certificate.enum';
 import {
   Column,
   Entity,

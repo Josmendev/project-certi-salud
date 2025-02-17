@@ -162,7 +162,7 @@ export class PatientsService extends BaseService<Patient> {
     return await repository.save(patient);
   }
 
-  private async findOne(patientId: number): Promise<Patient | null> {
+  async findOne(patientId: number): Promise<Patient | null> {
     const patient = await this.patientRepository.findOne({
       where: { patientId },
       relations: { person: true },

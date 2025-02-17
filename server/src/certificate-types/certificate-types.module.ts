@@ -7,6 +7,7 @@ import { AuthModule } from 'src/auth/auth.module';
 
 @Module({
   imports: [TypeOrmModule.forFeature([CertificateType]), AuthModule],
+  exports: [CertificateTypesService],
   controllers: [CertificateTypesController],
   providers: [CertificateTypesService],
 })
