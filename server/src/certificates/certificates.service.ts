@@ -13,6 +13,11 @@ import { ValidateUserResponse } from 'src/auth/interfaces/validate-user-response
 import { StaffService } from 'src/staff/staff.service';
 import { DiseasesService } from 'src/diseases/diseases.service';
 import { Disease } from 'src/diseases/entities/disease.entity';
+import { CertificateType } from 'src/certificate-types/entities/certificate-type.entity';
+import { Patient } from 'src/patients/entities/patient.entity';
+import { Staff } from 'src/staff/entities/staff.entity';
+import { formatCertificateResponse } from './helpers/format-certificate-response.helper';
+import { CertificateResponse } from './interfaces/certificate-response.interface';
 
 @Injectable()
 export class CertificatesService {
@@ -29,32 +34,28 @@ export class CertificatesService {
   async create(
     createCertificateDto: CreateCertificateDto,
     user: ValidateUserResponse,
-  ): Promise<any> {
+  ): Promise<CertificateResponse> {
     const { certificateTypeId, patientId, diseases, ...dataCertificate } =
       createCertificateDto;
-    const [certificateType, patient, staff] = await Promise.all([
-      this.certificateTypesService.findOne(certificateTypeId),
-      this.patientsService.findOne(patientId),
-      this.staffService.findOne(user.staffId),
-    ]);
+    const [certificateType, patient, staff] =
+      await this.getRelationsForCertificate(
+        certificateTypeId,
+        patientId,
+        user.staffId,
+      );
     let diseasesForCertificate: Disease[] = [];
     if (
       certificateType.description === CertificateTypesDescription.MedicalRest
     ) {
-      this.validateDataForCertificateTyoe(dataCertificate.restDays, diseases);
-      diseasesForCertificate = await Promise.all(
-        diseases.map(async (diseaseId) =>
-          this.diseasesService.findOne(+diseaseId),
-        ),
-      );
+      this.validateMedicalRestCertificate(dataCertificate.restDays, diseases);
+      diseasesForCertificate = await this.getDiseasesForCertificate(diseases);
     }
     if (
       certificateType.description === CertificateTypesDescription.GoodHealth
     ) {
-      dataCertificate.restDays = undefined;
-      diseasesForCertificate = undefined;
+      delete dataCertificate.restDays;
+      diseasesForCertificate = [];
     }
-    console.log(diseasesForCertificate);
     const certificate = this.certificateRepository.create({
       ...dataCertificate,
       certificateType,
@@ -63,7 +64,7 @@ export class CertificatesService {
       diseases: diseasesForCertificate,
     });
     await this.certificateRepository.save(certificate);
-    return certificate;
+    return formatCertificateResponse(certificate);
   }
 
   async getPersonByDni(
@@ -78,7 +79,28 @@ export class CertificatesService {
     return certificateCode;
   }
 
-  private validateDataForCertificateTyoe(
+  // Internal helper methods
+  private async getRelationsForCertificate(
+    certificateTypeId: number,
+    patientId: number,
+    staffId: number,
+  ): Promise<[CertificateType, Patient, Staff]> {
+    return await Promise.all([
+      this.certificateTypesService.findOne(certificateTypeId),
+      this.patientsService.findOne(patientId),
+      this.staffService.findOne(staffId),
+    ]);
+  }
+
+  private async getDiseasesForCertificate(
+    diseases: number[],
+  ): Promise<Disease[]> {
+    return await Promise.all(
+      diseases.map(async (id) => this.diseasesService.findOne(+id)),
+    );
+  }
+
+  private validateMedicalRestCertificate(
     restDays: number,
     diseases: number[],
   ): void {
