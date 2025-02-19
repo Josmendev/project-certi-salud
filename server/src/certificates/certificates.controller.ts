@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
 import { CertificatesService } from './certificates.service';
 import { GetPersonByDniDto } from 'src/common/dto/get-person-by-dni.dto';
 import { CreateCertificateDto } from './dto/create-certificate.dto';
@@ -28,5 +28,10 @@ export class CertificatesController {
   @Get('certificate-code')
   getCertificateCode() {
     return this.certificatesService.getCertificateByCode();
+  }
+
+  @Delete(':id')
+  remove(@Param('id') id: string) {
+    return this.certificatesService.remove(id);
   }
 }

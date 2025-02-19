@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { ReniecApiService } from '../external-apis/reniec-api/reniec-api.service';
 import { PersonByDniResponse } from 'src/common/interfaces/person-by-dni-response.interface';
 import { GetPersonByDniDto } from 'src/common/dto/get-person-by-dni.dto';
@@ -18,6 +22,7 @@ import { Patient } from 'src/patients/entities/patient.entity';
 import { Staff } from 'src/staff/entities/staff.entity';
 import { formatCertificateResponse } from './helpers/format-certificate-response.helper';
 import { CertificateResponse } from './interfaces/certificate-response.interface';
+import { StatusCertificate } from './enums/status-certificate.enum';
 
 @Injectable()
 export class CertificatesService {
@@ -31,6 +36,7 @@ export class CertificatesService {
     private readonly reniecApiService: ReniecApiService,
   ) {}
 
+  // Methods for endpoints
   async create(
     createCertificateDto: CreateCertificateDto,
     user: ValidateUserResponse,
@@ -77,6 +83,17 @@ export class CertificatesService {
     const [[{ certificate_code: certificateCode }]] =
       await this.certificateRepository.query('CALL GenerateCertificateCode()');
     return certificateCode;
+  }
+
+  async remove(certificateId: string): Promise<void> {
+    const certificate = await this.certificateRepository.update(
+      { certificateId },
+      { status: StatusCertificate.Canceled },
+    );
+    if (certificate.affected === 0)
+      throw new NotFoundException(
+        `El certificado con el ID ${certificateId} no se encuentra registrado`,
+      );
   }
 
   // Internal helper methods
