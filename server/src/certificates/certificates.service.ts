@@ -11,6 +11,8 @@ import { PatientsService } from 'src/patients/patients.service';
 import { CertificateTypesDescription } from './enums/certicate-types-description.enum';
 import { ValidateUserResponse } from 'src/auth/interfaces/validate-user-response.interface';
 import { StaffService } from 'src/staff/staff.service';
+import { DiseasesService } from 'src/diseases/diseases.service';
+import { Disease } from 'src/diseases/entities/disease.entity';
 
 @Injectable()
 export class CertificatesService {
@@ -19,6 +21,7 @@ export class CertificatesService {
     private readonly certificateRepository: Repository<Certificate>,
     private readonly certificateTypesService: CertificateTypesService,
     private readonly patientsService: PatientsService,
+    private readonly diseasesService: DiseasesService,
     private readonly staffService: StaffService,
     private readonly reniecApiService: ReniecApiService,
   ) {}
@@ -27,26 +30,37 @@ export class CertificatesService {
     createCertificateDto: CreateCertificateDto,
     user: ValidateUserResponse,
   ): Promise<any> {
-    const { certificateTypeId, patientId, ...dataCertificate } =
+    const { certificateTypeId, patientId, diseases, ...dataCertificate } =
       createCertificateDto;
     const [certificateType, patient, staff] = await Promise.all([
       this.certificateTypesService.findOne(certificateTypeId),
       this.patientsService.findOne(patientId),
       this.staffService.findOne(user.staffId),
     ]);
+    let diseasesForCertificate: Disease[] = [];
     if (
-      certificateType.description === CertificateTypesDescription.MedicalRest &&
-      !dataCertificate.restDays
-    )
-      throw new BadRequestException(
-        'Debe especificar el número de días de descanso',
+      certificateType.description === CertificateTypesDescription.MedicalRest
+    ) {
+      this.validateDataForCertificateTyoe(dataCertificate.restDays, diseases);
+      diseasesForCertificate = await Promise.all(
+        diseases.map(async (diseaseId) =>
+          this.diseasesService.findOne(+diseaseId),
+        ),
       );
-    console.log(user);
+    }
+    if (
+      certificateType.description === CertificateTypesDescription.GoodHealth
+    ) {
+      dataCertificate.restDays = undefined;
+      diseasesForCertificate = undefined;
+    }
+    console.log(diseasesForCertificate);
     const certificate = this.certificateRepository.create({
       ...dataCertificate,
       certificateType,
       patient,
       staff,
+      diseases: diseasesForCertificate,
     });
     await this.certificateRepository.save(certificate);
     return certificate;
@@ -62,5 +76,19 @@ export class CertificatesService {
     const [[{ certificate_code: certificateCode }]] =
       await this.certificateRepository.query('CALL GenerateCertificateCode()');
     return certificateCode;
+  }
+
+  private validateDataForCertificateTyoe(
+    restDays: number,
+    diseases: number[],
+  ): void {
+    if (!restDays)
+      throw new BadRequestException(
+        'Debe especificar el número de días de descanso',
+      );
+    if (!diseases || diseases.length === 0)
+      throw new BadRequestException(
+        'Debe ingresar las enfermedades para establecer el diagnóstico',
+      );
   }
 }

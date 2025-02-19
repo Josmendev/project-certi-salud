@@ -9,6 +9,7 @@ import { CertificateTypesModule } from 'src/certificate-types/certificate-types.
 import { PatientsModule } from 'src/patients/patients.module';
 import { AuthModule } from 'src/auth/auth.module';
 import { StaffModule } from 'src/staff/staff.module';
+import { DiseasesModule } from 'src/diseases/diseases.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { StaffModule } from 'src/staff/staff.module';
     CertificateTypesModule,
     PatientsModule,
     StaffModule,
+    DiseasesModule,
     AuthModule,
   ],
   controllers: [CertificatesController],

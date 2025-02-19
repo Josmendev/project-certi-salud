@@ -1,5 +1,6 @@
 import { Transform } from 'class-transformer';
 import {
+  IsArray,
   IsDate,
   IsInt,
   IsOptional,
@@ -24,4 +25,8 @@ export class CreateCertificateDto {
   @IsInt()
   @IsOptional()
   restDays?: number;
+
+  @IsArray()
+  @IsOptional()
+  diseases?: number[];
 }

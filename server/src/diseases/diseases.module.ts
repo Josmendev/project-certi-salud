@@ -7,6 +7,7 @@ import { AuthModule } from 'src/auth/auth.module';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Disease]), AuthModule],
+  exports: [DiseasesService],
   controllers: [DiseasesController],
   providers: [DiseasesService],
 })

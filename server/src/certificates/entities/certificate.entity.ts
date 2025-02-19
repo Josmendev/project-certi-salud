@@ -6,10 +6,13 @@ import {
   Column,
   Entity,
   JoinColumn,
+  JoinTable,
+  ManyToMany,
   ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Timestamped } from 'src/common/entities/timestamped.entity';
+import { Disease } from 'src/diseases/entities/disease.entity';
 
 @Entity({ name: 'certificate' })
 export class Certificate extends Timestamped {
@@ -65,4 +68,18 @@ export class Certificate extends Timestamped {
     default: StatusCertificate.Completed,
   })
   status: StatusCertificate;
+
+  @ManyToMany(() => Disease, { eager: true, cascade: true })
+  @JoinTable({
+    name: 'certificate_diagnosis',
+    joinColumn: {
+      name: 'certificate_id',
+      referencedColumnName: 'certificateId',
+    },
+    inverseJoinColumn: {
+      name: 'disease_id',
+      referencedColumnName: 'diseaseId',
+    },
+  })
+  diseases?: Disease[];
 }
