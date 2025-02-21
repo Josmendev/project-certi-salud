@@ -7,15 +7,14 @@ import { Icon } from "../../../shared/components/Icon";
 import Loader from "../../../shared/components/Loader";
 import { TextInput } from "../../../shared/components/TextInput/TextInput";
 import { AuthContext } from "../../../shared/contexts/AuthContext";
-import { showToast } from "../../../shared/hooks/useToast";
 import { BASE_ROUTES } from "../../../shared/utils/constants";
-import { isErrorResponse } from "../../../shared/utils/iSErrorResponse";
+import { handleApiError } from "../../../shared/utils/handleApiError";
 import { ConfirmUserSchema } from "../schemas/ConfirmUserSchema";
 import type { AuthConfirmUser } from "../types/authTypes";
 
 export const ConfirmUserForm = () => {
   const navigate = useNavigate();
-  const { loading, confirmUser, user } = useContext(AuthContext);
+  const { loading, user, confirmUser, profileUser } = useContext(AuthContext);
 
   const {
     register,
@@ -27,18 +26,16 @@ export const ConfirmUserForm = () => {
   });
 
   const onSubmit: SubmitHandler<AuthConfirmUser> = async (data) => {
-    // Luego validar con el backend
-    const userData = await confirmUser(data);
-    if (isErrorResponse(userData)) {
-      showToast({
-        type: "error",
-        title: "Error en confirmación",
-        description: "No se pudo confirmar el usuario",
-      });
-      return;
-    }
+    try {
+      const response = await confirmUser(data);
 
-    navigate("/" + BASE_ROUTES.PRIVATE.DASHBOARD);
+      if (response?.token) {
+        await profileUser(response?.token);
+        navigate("/" + BASE_ROUTES.PRIVATE.DASHBOARD, { replace: true });
+      }
+    } catch (error) {
+      handleApiError(error);
+    }
   };
 
   return (
