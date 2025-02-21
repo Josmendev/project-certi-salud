@@ -7,15 +7,16 @@ import { Icon } from "../../../shared/components/Icon";
 import Loader from "../../../shared/components/Loader";
 import { TextInput } from "../../../shared/components/TextInput/TextInput";
 import { AuthContext } from "../../../shared/contexts/AuthContext";
-import { showToast } from "../../../shared/hooks/useToast";
 import { BASE_ROUTES } from "../../../shared/utils/constants";
-import { isErrorResponse } from "../../../shared/utils/iSErrorResponse";
+import { handleApiError } from "../../../shared/utils/handleApiError";
+import { showToast } from "../../../shared/utils/toast";
 import { getLoginSchema } from "../schemas/LoginSchema";
 import type { AuthLoginUser } from "../types/authTypes";
 
 export const LoginForm = () => {
   const navigate = useNavigate();
   const { loading, login, user } = useContext(AuthContext);
+  const { profileUser } = useContext(AuthContext);
 
   const {
     register,
@@ -27,36 +28,31 @@ export const LoginForm = () => {
   });
 
   const onSubmit: SubmitHandler<AuthLoginUser> = async (data) => {
-    // Luego validar con el backend
-    const userData = await login(data);
-    if (isErrorResponse(userData)) {
-      return showToast({
-        type: "error",
-        title: "Error en el login",
-        description: "No se pudo iniciar sesión",
-      });
-    }
+    try {
+      const userData = await login(data);
+      const { token, isConfirm } = userData;
 
-    const { token, isConfirm } = userData;
+      if (!isConfirm) {
+        showToast({
+          title: "Confirmación de cuenta",
+          description: `Procede a confirmar tu cuenta para iniciar sesión.`,
+          type: "info",
+        });
+        navigate("/" + BASE_ROUTES.PUBLIC.CONFIRM_ACCOUNT);
+        return;
+      }
 
-    if (!isConfirm) {
-      showToast({
-        title: "Confirmación de cuenta",
-        description: "Ahora debes confirmar tu cuenta",
-        type: "info",
-      });
-      navigate("/" + BASE_ROUTES.PUBLIC.CONFIRM_ACCOUNT);
-      return;
-    }
-
-    if (token && token.length > 0 && isConfirm) {
-      showToast({
-        title: "Inicio de sesión",
-        description: "Has iniciado sesión satisfactoriamente",
-        type: "success",
-      });
-      navigate("/" + BASE_ROUTES.PRIVATE.DASHBOARD);
-      return;
+      if (token && token.length > 0 && isConfirm) {
+        showToast({
+          title: "Inicio de sesión",
+          description: `Has iniciado sesión satisfactoriamente!`,
+          type: "success",
+        });
+        navigate("/" + BASE_ROUTES.PRIVATE.DASHBOARD);
+        await profileUser(token);
+      }
+    } catch (error) {
+      handleApiError(error);
     }
   };
 
