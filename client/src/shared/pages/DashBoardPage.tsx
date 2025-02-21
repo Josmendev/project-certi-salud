@@ -1,6 +1,6 @@
 import { useContext } from "react";
 import { AuthContext } from "../contexts/AuthContext";
-import { getUserDetail } from "../helpers/getUserInformation";
+import { getUserInformation } from "../helpers/getUserInformation";
 import DefaultLayout from "../layouts/DefaultLayout";
 import { SectionLayout } from "../layouts/SectionLayout";
 
@@ -9,7 +9,7 @@ export const DashBoardPage: React.FC = () => {
 
   if (!user) throw new Error("User is not defined");
 
-  const { userInformation } = getUserDetail(user);
+  const { userInformation } = getUserInformation(user);
 
   return (
     <DefaultLayout>
