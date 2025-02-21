@@ -1,10 +1,9 @@
-import { ErrorResponse } from "../../../../shared/types/ErrorResponse";
-import { handleError } from "../../../../shared/utils/handleError";
+import { parseErrorResponse } from "../../../../shared/utils/parseErrorResponse";
 import { type EditUser } from "../types/userTypes";
 import { ENDPOINTS_USER } from "../utils/endpoints";
 
-// Creo la funcion login que se conecta a la API del backend
-export const ResetPasswordUserService = async (user: EditUser): Promise<void | ErrorResponse> => {
+// Creo la funcion Resetpassword que se conecta a la API del backend
+export const ResetPasswordUserService = async (user: EditUser): Promise<void> => {
   try {
     const { token } = JSON.parse(sessionStorage.getItem("user") as string);
     if (!token) throw new Error("Token inválido");
@@ -17,12 +16,9 @@ export const ResetPasswordUserService = async (user: EditUser): Promise<void | E
       },
     });
 
-    // Respuesta no exitosa, lanzo excepcion con (message, status, details)
-    if (!response.ok) {
-      const errorResponse = await response.json();
-      return handleError(errorResponse);
-    }
+    // Respuesta no exitosa, lanzo excepcion del backend
+    if (!response.ok) throw await response.json();
   } catch (error: unknown) {
-    return handleError(error);
+    throw parseErrorResponse(error);
   }
 };
