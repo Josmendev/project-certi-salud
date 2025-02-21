@@ -10,12 +10,12 @@ import type {
   AuthResponseUser,
 } from "../../features/auth/types/authTypes";
 import { AuthContext } from "../contexts/AuthContext";
-import { showToast } from "../hooks/useToast";
 import useTokenExpiration from "../hooks/useTokenExpiration";
 import { authReducer } from "../reducer/authReducer";
 import { initialStateAuthUser } from "../reducer/authStates";
 import { AUTH_TYPES } from "../reducer/authTypes";
-import type { ErrorResponse } from "../types/ErrorResponse";
+import { handleApiError } from "../utils/handleApiError";
+import { showToast } from "../utils/toast";
 
 interface AuthProviderProps {
   children: React.ReactNode;
@@ -40,64 +40,60 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [loading, setLoading] = useState(false);
 
   // Gestiono el estado con el reducer (Consumo del servicio)
-  const login = async (credentials: AuthLoginUser): Promise<AuthResponseUser | ErrorResponse> => {
+  const login = async (credentials: AuthLoginUser): Promise<AuthResponseUser> => {
     try {
       setLoading(true);
       const responseUser = await LoginService(credentials);
+      const { token } = responseUser;
 
-      if ("statusCode" in responseUser && responseUser.statusCode >= 400) return responseUser;
-
-      const { token } = responseUser as AuthResponseUser;
       dispatch({ type: AUTH_TYPES.login, payload: { ...responseUser, token } });
       sessionStorage.setItem("user", JSON.stringify(responseUser));
-
-      await profileUser(token);
       return responseUser;
+    } catch (error) {
+      handleApiError(error);
+      throw error;
     } finally {
       setLoading(false);
     }
   };
 
-  const confirmUser = async (
-    credentials: AuthConfirmUser
-  ): Promise<AuthResponseUser | ErrorResponse> => {
+  const confirmUser = async (credentials: AuthConfirmUser): Promise<AuthResponseUser> => {
     try {
       setLoading(true);
       const { userId } = authStateUser;
       if (!userId) throw new Error("User ID is missing");
-
       const responseUser = await ConfirmUserService(credentials, userId);
 
-      if ("statusCode" in responseUser && responseUser.statusCode >= 400) return responseUser;
+      const { token } = responseUser;
+      if (!token) throw new Error("No token received after confirmation");
 
-      const { token } = responseUser as AuthResponseUser;
       const responsePrevUser = JSON.parse(sessionStorage.getItem("user") || "{}");
       const responseUserUpdated = { ...responsePrevUser, ...responseUser, token };
-
       sessionStorage.setItem("user", JSON.stringify(responseUserUpdated));
-      dispatch({ type: AUTH_TYPES.confirmUser, payload: responseUser });
 
-      await profileUser(responseUserUpdated?.token);
-      return responseUser;
+      dispatch({ type: AUTH_TYPES.confirmUser, payload: responseUserUpdated });
+      return responseUserUpdated;
+    } catch (error) {
+      handleApiError(error);
+      throw error;
     } finally {
       setLoading(false);
     }
   };
 
-  const profileUser = async (token: string): Promise<AuthResponseUser | ErrorResponse> => {
+  const profileUser = async (token: string): Promise<AuthResponseUser> => {
     try {
       setLoading(true);
-
       const responseUser = await ProfileUserService(token);
-
-      if ("statusCode" in responseUser && responseUser.statusCode >= 400) return responseUser;
-
       const responsePrevUser = JSON.parse(sessionStorage.getItem("user") || "{}");
       const responseUserUpdated = { ...responsePrevUser, ...responseUser };
-
       sessionStorage.setItem("user", JSON.stringify(responseUserUpdated));
-      dispatch({ type: AUTH_TYPES.profile, payload: responseUser });
-      return responseUser;
+
+      dispatch({ type: AUTH_TYPES.profile, payload: responseUserUpdated });
+      return responseUserUpdated;
+    } catch (error) {
+      handleApiError(error);
+      throw error;
     } finally {
       setLoading(false);
     }
@@ -106,12 +102,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const logout = async (): Promise<void> => {
     try {
       setLoading(true);
-
       if (!authStateUser?.token) throw new Error("Token is missing");
       await LogoutService(authStateUser?.token);
-
       sessionStorage.removeItem("user");
+
       dispatch({ type: AUTH_TYPES.logout });
+    } catch (error) {
+      handleApiError(error);
+      throw error;
     } finally {
       setLoading(false);
     }
