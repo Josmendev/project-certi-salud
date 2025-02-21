@@ -1,6 +1,6 @@
 import type { DataResponseFromAPI } from "../../../../shared/types/DataResponse";
 import { INITIAL_PAGE, LIMIT_PAGE } from "../../../../shared/utils/constants";
-import type { DataOfUsers } from "../types/userTypes";
+import type { DataOfUser } from "../types/userTypes";
 import { ENDPOINTS_USER } from "../utils/endpoints";
 import { ErrorResponse } from "./../../../../shared/types/ErrorResponse";
 import { handleError } from "./../../../../shared/utils/handleError";
@@ -10,12 +10,9 @@ export const SearchUsersService = async (
   limit: number = LIMIT_PAGE,
   page: number = INITIAL_PAGE,
   query: string
-): Promise<DataResponseFromAPI<DataOfUsers> | ErrorResponse> => {
+): Promise<DataResponseFromAPI<DataOfUser> | ErrorResponse> => {
   try {
-    const user = JSON.parse(localStorage.getItem("user") as string);
-    if (!user) throw new Error("Usuario no autenticado");
-
-    const { token } = user;
+    const { token } = JSON.parse(sessionStorage.getItem("user") as string);
     if (!token) throw new Error("Token inválido");
 
     const response = await fetch(
@@ -36,7 +33,7 @@ export const SearchUsersService = async (
     }
 
     // Respuesta exitosa, parseo el JSON y devuelvo el objeto AuthResponseUser
-    const data: DataResponseFromAPI<DataOfUsers> = await response.json();
+    const data: DataResponseFromAPI<DataOfUser> = await response.json();
     return data;
   } catch (error: unknown) {
     return handleError(error);

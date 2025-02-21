@@ -15,12 +15,12 @@ export const UserListPage = () => {
     isLoading,
     isError,
     error,
-    handleEditRow,
     handlePageChange,
+    handleEditRow,
     handleSearch,
   } = useUsers();
 
-  const headersTable = ["ID", "Trabajador", "Usuario", "Rol", "Confirmado", "Estado"];
+  const headersTable = ["N°", "Trabajador", "Usuario", "Rol", "Confirmado", "Estado"];
 
   return (
     <DefaultLayout>
@@ -47,7 +47,11 @@ export const UserListPage = () => {
 
           {
             <Table headersTable={headersTable} response={data}>
-              <TableUserItem listOfUsers={data?.data ?? []} editRow={handleEditRow} />
+              <TableUserItem
+                listOfUsers={data?.data ?? []}
+                currentPage={currentPage}
+                editRow={handleEditRow}
+              />
             </Table>
           }
         </Card>

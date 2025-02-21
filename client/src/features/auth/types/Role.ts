@@ -1,10 +1,10 @@
 export interface IRole {
-  role_id: number;
+  roleId: number;
   description: string;
   isActive: boolean;
 }
 
 export interface UserHasRoles {
-  user_id: number;
-  role_id: number;
+  userId: number;
+  roleId: number;
 }
