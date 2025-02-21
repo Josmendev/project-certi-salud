@@ -1,45 +1,43 @@
-import { useQuery } from "@tanstack/react-query";
-import { useCallback, useState } from "react";
-import { useNavigate } from "react-router";
+import { useState } from "react";
+import { useNavigate, useSearchParams } from "react-router";
 import { BASE_ROUTES } from "../../../../shared/utils/constants";
 import { ADMIN_USERS_ROUTES } from "../../utils/constants";
-import { getUsers } from "../helpers/getUsers";
-import { searchUsers } from "../helpers/searchUsers";
-import { initialDataOfUsers } from "../utils/constants";
+import type { DataOfUser } from "../types/userTypes";
+import { useQueriesUsers } from "./useQueriesUser";
 
 export const useUsers = () => {
   const navigate = useNavigate();
-  const [currentPage, setCurrentPage] = useState(1);
+  const [searchParams, setSearchParams] = useSearchParams();
   const [searchQuery, setSearchQuery] = useState("");
+  const currentPage = Number(searchParams.get("page")) || 1;
 
   const {
-    data = initialDataOfUsers,
+    data,
     isLoading,
     isError,
     error,
-  } = useQuery({
-    queryKey: ["users", currentPage, searchQuery],
-    queryFn: () =>
-      searchQuery
-        ? searchUsers({ query: searchQuery, page: currentPage })
-        : getUsers({ page: currentPage }),
-    placeholderData: (previousData) => previousData ?? initialDataOfUsers,
+    handleUpdateUserMutation,
+    handleResetPasswordUserMutation,
+  } = useQueriesUsers({
+    currentPage,
+    searchQuery,
   });
 
-  const handleEditRow = useCallback(
-    (idRow: number) => {
-      navigate(`/${BASE_ROUTES.PRIVATE.ADMIN}/${ADMIN_USERS_ROUTES.USERS}/${idRow}/edit`);
-    },
-    [navigate]
-  );
+  const handleEditRow = (data: DataOfUser) => {
+    navigate(`/${BASE_ROUTES.PRIVATE.ADMIN}/${ADMIN_USERS_ROUTES.USERS}/${data.userId}/edit`, {
+      state: { user: data, page: currentPage },
+    });
+  };
 
   const handlePageChange = (page: number) => {
-    setCurrentPage(page ?? 1);
+    const newSearchParams = new URLSearchParams(searchParams);
+    newSearchParams.set("page", page.toString());
+    setSearchParams(newSearchParams);
   };
 
   const handleSearch = (query: string) => {
     setSearchQuery(query);
-    setCurrentPage(1); // Reiniciar a la página 1 en nueva búsqueda
+    setSearchParams({ page: "1" }); // Reiniciar a la página 1 en nueva búsqueda
   };
 
   return {
@@ -48,6 +46,8 @@ export const useUsers = () => {
     isLoading,
     isError,
     error,
+    handleUpdateUserMutation,
+    handleResetPasswordUserMutation,
     handleEditRow,
     handlePageChange,
     handleSearch,
