@@ -1,4 +1,5 @@
 import { createContext } from "react";
+import type { DataOfUser } from "../../features/admin-users/users/types/userTypes";
 import type {
   AuthConfirmUser,
   AuthLoginUser,
@@ -14,6 +15,7 @@ export interface AuthContextProps {
   confirmUser: (credentials: AuthConfirmUser) => Promise<AuthResponseUser | ErrorResponse>;
   profileUser: (token: string) => Promise<AuthResponseUser | ErrorResponse>;
   logout: () => Promise<void | ErrorResponse>;
+  updateUserInSession: (updatedUser: DataOfUser) => void;
 }
 
 // Creo el contexto con los valores por defecto
@@ -30,6 +32,9 @@ export const AuthContext = createContext<AuthContextProps>({
     throw new Error("EL PROFILE NO SE ENCUENTRA IMPLEMENTADO");
   },
   logout: async () => {
+    throw new Error("EL LOGOUT NO SE ENCUENTRA IMPLEMENTADO");
+  },
+  updateUserInSession: () => {
     throw new Error("EL LOGOUT NO SE ENCUENTRA IMPLEMENTADO");
   },
 });

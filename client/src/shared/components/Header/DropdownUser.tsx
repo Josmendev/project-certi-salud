@@ -15,7 +15,6 @@ const DropdownUser = () => {
   const navigate = useNavigate();
 
   if (!user) throw new Error("User is not defined");
-
   const { userInformation } = getUserDetail(user);
 
   const handleLogout = async () => {
