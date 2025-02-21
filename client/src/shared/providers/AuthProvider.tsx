@@ -1,4 +1,5 @@
 import { useReducer, useState } from "react";
+import type { DataOfUser } from "../../features/admin-users/users/types/userTypes";
 import { ConfirmUserService } from "../../features/auth/services/ConfirmUserService";
 import { LoginService } from "../../features/auth/services/LoginService";
 import { LogoutService } from "../../features/auth/services/LogoutService";
@@ -9,6 +10,8 @@ import type {
   AuthResponseUser,
 } from "../../features/auth/types/authTypes";
 import { AuthContext } from "../contexts/AuthContext";
+import { showToast } from "../hooks/useToast";
+import useTokenExpiration from "../hooks/useTokenExpiration";
 import { authReducer } from "../reducer/authReducer";
 import { initialStateAuthUser } from "../reducer/authStates";
 import { AUTH_TYPES } from "../reducer/authTypes";
@@ -19,8 +22,8 @@ interface AuthProviderProps {
 }
 
 const init = () => {
-  const userFromLocalStorage = localStorage.getItem("user");
-  const parsedUser = userFromLocalStorage ? JSON.parse(userFromLocalStorage) : {};
+  const userFromSessionStorage = sessionStorage.getItem("user");
+  const parsedUser = userFromSessionStorage ? JSON.parse(userFromSessionStorage) : {};
   if (parsedUser.token) {
     parsedUser.isActive = true;
     parsedUser.isConfirm = true;
@@ -46,7 +49,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
       const { token } = responseUser as AuthResponseUser;
       dispatch({ type: AUTH_TYPES.login, payload: { ...responseUser, token } });
-      localStorage.setItem("user", JSON.stringify(responseUser));
+      sessionStorage.setItem("user", JSON.stringify(responseUser));
 
       await profileUser(token);
       return responseUser;
@@ -68,10 +71,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       if ("statusCode" in responseUser && responseUser.statusCode >= 400) return responseUser;
 
       const { token } = responseUser as AuthResponseUser;
-      const responsePrevUser = JSON.parse(localStorage.getItem("user") || "{}");
+      const responsePrevUser = JSON.parse(sessionStorage.getItem("user") || "{}");
       const responseUserUpdated = { ...responsePrevUser, ...responseUser, token };
 
-      localStorage.setItem("user", JSON.stringify(responseUserUpdated));
+      sessionStorage.setItem("user", JSON.stringify(responseUserUpdated));
       dispatch({ type: AUTH_TYPES.confirmUser, payload: responseUser });
 
       await profileUser(responseUserUpdated?.token);
@@ -89,10 +92,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
       if ("statusCode" in responseUser && responseUser.statusCode >= 400) return responseUser;
 
-      const responsePrevUser = JSON.parse(localStorage.getItem("user") || "{}");
+      const responsePrevUser = JSON.parse(sessionStorage.getItem("user") || "{}");
       const responseUserUpdated = { ...responsePrevUser, ...responseUser };
 
-      localStorage.setItem("user", JSON.stringify(responseUserUpdated));
+      sessionStorage.setItem("user", JSON.stringify(responseUserUpdated));
       dispatch({ type: AUTH_TYPES.profile, payload: responseUser });
       return responseUser;
     } finally {
@@ -107,12 +110,35 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       if (!authStateUser?.token) throw new Error("Token is missing");
       await LogoutService(authStateUser?.token);
 
-      localStorage.removeItem("user");
+      sessionStorage.removeItem("user");
       dispatch({ type: AUTH_TYPES.logout });
     } finally {
       setLoading(false);
     }
   };
+
+  const updateUserInSession = (updatedUser: DataOfUser) => {
+    const storedUser = JSON.parse(sessionStorage.getItem("user") || "{}");
+
+    // Solo actualizar si el usuario en sesión, es el mismo que se edita
+    if (storedUser?.userId === updatedUser.userId) {
+      const updatedSessionUser = { ...storedUser, ...updatedUser };
+      sessionStorage.setItem("user", JSON.stringify(updatedSessionUser));
+      dispatch({ type: AUTH_TYPES.profile, payload: updatedSessionUser });
+    }
+  };
+
+  //Verifico la expiración del token
+  useTokenExpiration(authStateUser?.token, async () => {
+    if (authStateUser?.token) {
+      await logout();
+      showToast({
+        title: "Sesión cerrada",
+        description: "Su token de sesión ha expirado. Favor vuelve a iniciar sesión",
+        type: "success",
+      });
+    }
+  });
 
   return (
     <AuthContext.Provider
@@ -123,6 +149,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         logout,
         profileUser,
         confirmUser,
+        updateUserInSession,
       }}
     >
       {children}
