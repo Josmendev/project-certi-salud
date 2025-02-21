@@ -1,4 +1,5 @@
 import type { IPerson } from "../../../shared/types/Person";
+import { ROLES_KEYS, ROLES_VALUES } from "./../../../shared/utils/constants";
 
 export interface IUser {
   userId: number;
@@ -6,5 +7,5 @@ export interface IUser {
   isConfirm: boolean;
   isActive: boolean;
   person: IPerson;
-  role: Array<string>;
+  role: Array<ROLES_KEYS> | Array<ROLES_VALUES>;
 }
