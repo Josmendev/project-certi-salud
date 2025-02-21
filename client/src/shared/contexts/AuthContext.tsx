@@ -5,16 +5,15 @@ import type {
   AuthLoginUser,
   AuthResponseUser,
 } from "../../features/auth/types/authTypes";
-import type { ErrorResponse } from "../types/ErrorResponse";
 
 // Creo el contexto para almacenar valores globales de autenticacion
 export interface AuthContextProps {
   user: AuthResponseUser | null;
   loading: boolean;
-  login: (credentials: AuthLoginUser) => Promise<AuthResponseUser | ErrorResponse>;
-  confirmUser: (credentials: AuthConfirmUser) => Promise<AuthResponseUser | ErrorResponse>;
-  profileUser: (token: string) => Promise<AuthResponseUser | ErrorResponse>;
-  logout: () => Promise<void | ErrorResponse>;
+  login: (credentials: AuthLoginUser) => Promise<AuthResponseUser>;
+  confirmUser: (credentials: AuthConfirmUser) => Promise<AuthResponseUser>;
+  profileUser: (token: string) => Promise<AuthResponseUser>;
+  logout: () => Promise<void>;
   updateUserInSession: (updatedUser: DataOfUser) => void;
 }
 
@@ -34,7 +33,7 @@ export const AuthContext = createContext<AuthContextProps>({
   logout: async () => {
     throw new Error("EL LOGOUT NO SE ENCUENTRA IMPLEMENTADO");
   },
-  updateUserInSession: () => {
+  updateUserInSession: async () => {
     throw new Error("EL LOGOUT NO SE ENCUENTRA IMPLEMENTADO");
   },
 });

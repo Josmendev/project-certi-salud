@@ -1,16 +1,19 @@
 import type { DataResponseFromAPI } from "../../../../shared/types/DataResponse";
-import { INITIAL_PAGE, LIMIT_PAGE } from "../../../../shared/utils/constants";
+import { parseErrorResponse } from "../../../../shared/utils/parseErrorResponse";
 import type { DataOfUser } from "../types/userTypes";
 import { ENDPOINTS_USER } from "../utils/endpoints";
-import { ErrorResponse } from "./../../../../shared/types/ErrorResponse";
-import { handleError } from "./../../../../shared/utils/handleError";
+import { INITIAL_PAGE, LIMIT_PAGE } from "./../../../../shared/utils/constants";
 
-// Creo la funcion login que se conecta a la API del backend
-export const SearchUsersService = async (
-  limit: number = LIMIT_PAGE,
-  page: number = INITIAL_PAGE,
-  query: string
-): Promise<DataResponseFromAPI<DataOfUser> | ErrorResponse> => {
+// Creo la funcion searchForUsers que se conecta a la API del backend
+export const SearchUsersService = async ({
+  limit = LIMIT_PAGE,
+  page = INITIAL_PAGE,
+  query,
+}: {
+  limit?: number;
+  page: number;
+  query: string;
+}): Promise<DataResponseFromAPI<DataOfUser>> => {
   try {
     const { token } = JSON.parse(sessionStorage.getItem("user") as string);
     if (!token) throw new Error("Token inválido");
@@ -26,16 +29,13 @@ export const SearchUsersService = async (
       }
     );
 
-    // Respuesta no exitosa, lanzo excepcion con (message, status, details)
-    if (!response.ok) {
-      const errorResponse = await response.json();
-      return handleError(errorResponse);
-    }
+    // Respuesta no exitosa, lanzo excepcion del backend
+    if (!response.ok) throw await response.json();
 
-    // Respuesta exitosa, parseo el JSON y devuelvo el objeto AuthResponseUser
+    // Respuesta exitosa, parseo el JSON y devuelvo el objeto DataResponseFromAPI<DataOfUser>
     const data: DataResponseFromAPI<DataOfUser> = await response.json();
     return data;
   } catch (error: unknown) {
-    return handleError(error);
+    throw parseErrorResponse(error);
   }
 };

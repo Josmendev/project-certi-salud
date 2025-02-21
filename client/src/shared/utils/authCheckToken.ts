@@ -10,7 +10,7 @@ export const checkTokenExpiration = (token: string): Promise<string> => {
       const timer = setTimeout(() => resolve("expired"), expirationTime - now);
       if (expirationTime <= now) clearTimeout(timer);
     } catch (error) {
-      console.log(error);
+      console.log("Error in verification of token expiration, details: ", error);
       resolve("expired");
     }
   });

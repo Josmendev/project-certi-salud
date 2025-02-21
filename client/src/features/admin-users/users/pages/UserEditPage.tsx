@@ -1,98 +1,35 @@
-import { useState } from "react";
-import { Navigate, useLocation, useNavigate, useParams } from "react-router";
+import { Navigate, useNavigate } from "react-router";
 import { Button } from "../../../../shared/components/Button/Button";
 import { Card } from "../../../../shared/components/Card/Card";
 import { Checkbox } from "../../../../shared/components/Checkbox/Checkbox";
 import { Icon } from "../../../../shared/components/Icon";
 import { Modal } from "../../../../shared/components/Modal/Modal";
 import { TextInput } from "../../../../shared/components/TextInput/TextInput";
-import { getUserDetail } from "../../../../shared/helpers/getUserInformation";
-import { showToast } from "../../../../shared/hooks/useToast";
+import { getUserInformation } from "../../../../shared/helpers/getUserInformation";
 import DefaultLayout from "../../../../shared/layouts/DefaultLayout";
 import { SectionLayout } from "../../../../shared/layouts/SectionLayout";
-import { BASE_ROUTES, ROLES_MAPPING, type ROLES_KEYS } from "../../../../shared/utils/constants";
-import { ADMIN_USERS_ROUTES } from "../../utils/constants";
-import { useUsers } from "../hooks/useUsers";
-import type { DataOfUser } from "../types/userTypes";
+import { useUserManagement } from "../hooks/useUserManagement";
 
 //📌 => Orden convencional para estructura de componentes
 export const UserEditPage = () => {
-  // 📌 Hooks
-  const { id } = useParams();
-  const location = useLocation();
+  const {
+    selectedUser,
+    modalOpen,
+    roles,
+    currentPage,
+    setModalOpen,
+    handleUpdateUser,
+    handleChangeRole,
+    handleResetPasswordUser,
+    openModal,
+    shouldRedirect,
+    MAIN_ROUTE,
+  } = useUserManagement();
+
   const navigate = useNavigate();
-  const selectedUser = location.state?.user as DataOfUser;
-  const currentPage = location.state?.page as number;
-  const { handleUpdateUserMutation, handleResetPasswordUserMutation } = useUsers();
-
-  // 📌 Estado
-  const [modalOpen, setModalOpen] = useState(false);
-  const [roles, setRoles] = useState<ROLES_KEYS[]>((selectedUser?.role as ROLES_KEYS[]) || []);
-
-  // 📌 Variables y rutas
-  const ROUTE_INITIAL = `/${BASE_ROUTES.PRIVATE.ADMIN}/${ADMIN_USERS_ROUTES.USERS}?page=${currentPage}`;
-
-  // 📌 Validaciones antes del renderizado
-  if (id == undefined || isNaN(Number(id))) {
-    return <Navigate to={ROUTE_INITIAL} />;
-  }
-
-  if (location.pathname !== `/admin/users/${id}/edit`) {
-    return <Navigate to={ROUTE_INITIAL} />;
-  }
-
-  // 📌 Handlers de eventos
-  const handleUpdateUser = (e: React.FormEvent) => {
-    e.preventDefault();
-    const rolesId = roles?.map((role) => ROLES_MAPPING[role]).filter(Number.isFinite);
-
-    handleUpdateUserMutation.mutate({
-      userId: selectedUser?.userId,
-      role: rolesId,
-    });
-
-    showToast({
-      title: "Usuario actualiizado",
-      description: "Los datos del usuario han sido actualizados con éxito!",
-      type: "success",
-    });
-
-    navigate(ROUTE_INITIAL);
-  };
-
-  const handleChangeRole = (role: ROLES_KEYS) => {
-    setRoles(
-      (prevRoles) =>
-        prevRoles.includes(role)
-          ? prevRoles.filter((r) => r !== role) // Remueve el rol si ya está
-          : [...prevRoles, role] // Agrega el rol si no está
-    );
-  };
-
-  // Confirmo la acción en el modal
-  const handleResetPasswordUser = () => {
-    handleResetPasswordUserMutation.mutate({
-      userId: selectedUser?.userId,
-    });
-
-    showToast({
-      title: "Contraseña restablecida",
-      description:
-        "Se restableció la contraseña de manera exitosa. Para iniciar sesión, el usuario debe confirmar sus credenciales.",
-      type: "success",
-    });
-
-    setModalOpen(false);
-    navigate(ROUTE_INITIAL);
-  };
-
-  // Abro el modal
-  const openModal = (e: React.FormEvent) => {
-    e.preventDefault();
-    setModalOpen(true);
-  };
-
-  // funcion para roles
+  const ROUTE_INITIAL = `${MAIN_ROUTE}?page=${currentPage}`;
+  if (!selectedUser || !roles) return <Navigate to={ROUTE_INITIAL} />;
+  if (shouldRedirect) return <Navigate to={ROUTE_INITIAL} />;
 
   // 📌 Retorno de JSX
   return (
@@ -119,7 +56,7 @@ export const UserEditPage = () => {
                 label="Personal / Trabajador"
                 type="text"
                 readOnly
-                value={getUserDetail(selectedUser).userInformation}
+                value={getUserInformation(selectedUser).userInformation}
                 minLength={2}
                 maxLength={100}
                 ariaLabel="Nombres completos"
@@ -161,7 +98,10 @@ export const UserEditPage = () => {
                 type="submit"
                 classButton="btn-primary text-paragraph-medium"
                 iconLeft={<Icon.Save />}
-                onClick={handleUpdateUser}
+                onClick={(e) => {
+                  handleUpdateUser(e);
+                  navigate(ROUTE_INITIAL);
+                }}
               >
                 Guardar
               </Button>
@@ -181,10 +121,13 @@ export const UserEditPage = () => {
 
           <Modal
             title="Refrescar contraseña"
-            subtitle="¿Desea cambiar la contraseña?"
+            subtitle="¿Desea restaurar la contraseña a su estado inicial?"
             isOpen={modalOpen}
             onClose={() => setModalOpen(false)}
-            onClickSuccess={() => handleResetPasswordUser()}
+            onClickSuccess={() => {
+              handleResetPasswordUser();
+              navigate(ROUTE_INITIAL);
+            }}
           />
         </Card>
       </SectionLayout>

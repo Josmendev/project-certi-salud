@@ -16,7 +16,9 @@ const errorMessages: Record<number, string> = {
   504: "Tiempo de espera del servidor agotado",
 };
 
+const defaultMessage = "Ocurrió un error inesperado. Intente nuevamente.";
+
 // Me permite obtener el mensaje de error según el código de estado
 export const getErrorMessage = (statusCode: number | string) => {
-  return errorMessages[Number(statusCode)] || "Error desconocido. Intente nuevamente.";
+  return errorMessages[Number(statusCode)] ?? defaultMessage;
 };

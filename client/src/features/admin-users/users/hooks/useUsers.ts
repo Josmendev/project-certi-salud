@@ -1,26 +1,52 @@
-import { useState } from "react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useContext, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router";
+import { AuthContext } from "../../../../shared/contexts/AuthContext";
 import { BASE_ROUTES } from "../../../../shared/utils/constants";
 import { ADMIN_USERS_ROUTES } from "../../utils/constants";
-import type { DataOfUser } from "../types/userTypes";
-import { useQueriesUsers } from "./useQueriesUser";
+import { getUsers, searchUsers, updateUser } from "../repositories/userRepository";
+import { ResetPasswordUserService } from "../services/ResetPasswordUserService";
+import { initialDataOfUsers } from "../utils/constants";
+import { DataOfUser } from "./../types/userTypes";
 
 export const useUsers = () => {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const [searchQuery, setSearchQuery] = useState("");
   const currentPage = Number(searchParams.get("page")) || 1;
+  const queryClient = useQueryClient();
+  const { updateUserInSession } = useContext(AuthContext);
 
   const {
-    data,
+    data = initialDataOfUsers,
     isLoading,
     isError,
     error,
-    handleUpdateUserMutation,
-    handleResetPasswordUserMutation,
-  } = useQueriesUsers({
-    currentPage,
-    searchQuery,
+  } = useQuery({
+    queryKey: ["users", currentPage, searchQuery],
+    queryFn: () =>
+      searchQuery
+        ? searchUsers({ page: currentPage, query: searchQuery })
+        : getUsers({ page: currentPage }),
+    placeholderData: (previousData) => previousData ?? initialDataOfUsers,
+    refetchOnWindowFocus: false,
+  });
+
+  const handleUpdateUserMutation = useMutation({
+    mutationFn: updateUser,
+    onSuccess: (updatedUser) => {
+      // Recargo lista de usuarios y valido respuesta de tipo User
+      queryClient.invalidateQueries({ queryKey: ["users"] });
+      updateUserInSession(updatedUser);
+    },
+  });
+
+  const handleResetPasswordUserMutation = useMutation({
+    mutationFn: ResetPasswordUserService,
+    onSuccess: () => {
+      // Recargo lista de usuarios
+      queryClient.invalidateQueries({ queryKey: ["users"] });
+    },
   });
 
   const handleEditRow = (data: DataOfUser) => {
@@ -37,7 +63,7 @@ export const useUsers = () => {
 
   const handleSearch = (query: string) => {
     setSearchQuery(query);
-    setSearchParams({ page: "1" }); // Reiniciar a la página 1 en nueva búsqueda
+    setSearchParams({ page: "1" });
   };
 
   return {

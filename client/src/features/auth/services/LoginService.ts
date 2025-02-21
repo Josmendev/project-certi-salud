@@ -1,12 +1,9 @@
-import { ErrorResponse } from "../../../shared/types/ErrorResponse";
 import { ENDPOINTS_AUTH } from "../../../shared/utils/endpoints";
-import { handleError } from "../../../shared/utils/handleError";
+import { parseErrorResponse } from "../../../shared/utils/parseErrorResponse";
 import { type AuthLoginUser, type AuthResponseUser } from "../types/authTypes";
 
 // Creo la funcion login que se conecta a la API del backend
-export const LoginService = async (
-  user: AuthLoginUser
-): Promise<AuthResponseUser | ErrorResponse> => {
+export const LoginService = async (user: AuthLoginUser): Promise<AuthResponseUser> => {
   try {
     const response = await fetch(`${ENDPOINTS_AUTH.LOGIN}`, {
       method: "POST",
@@ -17,15 +14,12 @@ export const LoginService = async (
     });
 
     // Respuesta no exitosa, lanzo excepcion del backend
-    if (!response.ok) {
-      const errorResponse = await response.json();
-      return handleError(errorResponse);
-    }
+    if (!response.ok) throw await response.json();
 
     // Respuesta exitosa, parseo el JSON y devuelvo el objeto AuthResponseUser
     const data: AuthResponseUser = await response.json();
     return data;
   } catch (error: unknown) {
-    return handleError(error);
+    throw parseErrorResponse(error);
   }
 };

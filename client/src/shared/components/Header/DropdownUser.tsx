@@ -1,9 +1,9 @@
 import { useContext, useState } from "react";
 import { Link, useNavigate } from "react-router";
 import { AuthContext } from "../../contexts/AuthContext";
-import { getUserDetail } from "../../helpers/getUserInformation";
-import { showToast } from "../../hooks/useToast";
+import { getUserInformation } from "../../helpers/getUserInformation";
 import { BASE_ROUTES } from "../../utils/constants";
+import { showToast } from "../../utils/toast";
 import { Button } from "../Button/Button";
 import ClickOutside from "../ClickOutside";
 import { Icon } from "../Icon";
@@ -15,7 +15,7 @@ const DropdownUser = () => {
   const navigate = useNavigate();
 
   if (!user) throw new Error("User is not defined");
-  const { userInformation } = getUserDetail(user);
+  const { userInformation } = getUserInformation(user);
 
   const handleLogout = async () => {
     await logout();
