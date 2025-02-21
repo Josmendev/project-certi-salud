@@ -22,5 +22,14 @@ export const CRUD_ROUTES = {
   EDIT: ":id/edit",
 };
 
-export const LIMIT_PAGE = 8;
+// Defino un mapa de roles
+export const ROLES_MAPPING: Record<string, number> = { Administrador: 1, Registrador: 2 } as const;
+
+// Defino un tipo con las claves (Administrador, Registrador)
+export type ROLES_KEYS = keyof typeof ROLES_MAPPING;
+
+// Defino un tipo con los valores (1, 2)
+export type ROLES_VALUES = (typeof ROLES_MAPPING)[ROLES_KEYS];
+
 export const INITIAL_PAGE = 1;
+export const LIMIT_PAGE = 5;
