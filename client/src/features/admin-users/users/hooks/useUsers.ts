@@ -6,7 +6,7 @@ import { BASE_ROUTES } from "../../../../shared/utils/constants";
 import { ADMIN_USERS_ROUTES } from "../../utils/constants";
 import { getUsers, searchUsers, updateUser } from "../repositories/userRepository";
 import { ResetPasswordUserService } from "../services/ResetPasswordUserService";
-import { initialDataOfUsers } from "../utils/constants";
+import { initialListOfResponseAPI } from "./../../../../shared/utils/constants";
 import { DataOfUser } from "./../types/userTypes";
 
 export const useUsers = () => {
@@ -18,7 +18,7 @@ export const useUsers = () => {
   const { updateUserInSession } = useContext(AuthContext);
 
   const {
-    data = initialDataOfUsers,
+    data = initialListOfResponseAPI,
     isLoading,
     isError,
     error,
@@ -28,7 +28,7 @@ export const useUsers = () => {
       searchQuery
         ? searchUsers({ page: currentPage, query: searchQuery })
         : getUsers({ page: currentPage }),
-    placeholderData: (previousData) => previousData ?? initialDataOfUsers,
+    placeholderData: (previousData) => previousData ?? initialListOfResponseAPI,
     refetchOnWindowFocus: false,
   });
 
