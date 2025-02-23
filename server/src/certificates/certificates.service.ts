@@ -25,6 +25,7 @@ import { PersonService } from '../persons/person.service';
 import { PatientsService } from 'src/patients/patients.service';
 import { Patient } from 'src/patients/entities/patient.entity';
 import { CreatePatientDto } from 'src/patients/dto/create-patient.dto';
+import { Role } from 'src/auth/enums/role.enum';
 
 @Injectable()
 export class CertificatesService {
@@ -117,6 +118,23 @@ export class CertificatesService {
   }
 
   // Internal helper methods
+  async find(user: ValidateUserResponse): Promise<CertificateResponse[]> {
+    const { role, staffId } = user;
+    const isAdmin = role.some((role) => role === Role.Admin);
+    const whereCondition = isAdmin
+      ? { status: StatusCertificate.Completed }
+      : {
+          staff: { staffId },
+          status: StatusCertificate.Completed,
+          isActive: true,
+        };
+    const certificates = await this.certificateRepository.find({
+      where: whereCondition,
+      relations: { certificateType: true, patient: true },
+    });
+    return certificates.map(formatCertificateResponse);
+  }
+
   private async getRelationsForCertificate(
     certificateTypeId: number,
     createPatientDto: CreatePatientDto,
