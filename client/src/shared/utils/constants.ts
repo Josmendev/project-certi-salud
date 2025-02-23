@@ -33,3 +33,12 @@ export type ROLES_VALUES = (typeof ROLES_MAPPING)[ROLES_KEYS];
 
 export const INITIAL_PAGE = 1;
 export const LIMIT_PAGE = 5;
+
+// Defino el estado inicial para todos los listados de tablas
+export const initialListOfResponseAPI = {
+  data: [],
+  limit: 5,
+  page: 1,
+  total: 1,
+  totalPages: 1,
+};
