@@ -1,6 +1,5 @@
 import type { DataResponseFromAPI } from "../../../../shared/types/DataResponse";
 import { INITIAL_PAGE, LIMIT_PAGE } from "../../../../shared/utils/constants";
-import { handleApiError } from "../../../../shared/utils/handleApiError";
 import { ListOfUsersService } from "../services/ListOfUsersService";
 import { SearchUsersService } from "../services/SearchUsersService";
 import { UpdateUserService } from "../services/UpdateUserService";
@@ -14,13 +13,8 @@ export const getUsers = async ({
   limit?: number;
   page: number;
 }): Promise<DataResponseFromAPI<DataOfUser>> => {
-  try {
-    const users = await ListOfUsersService({ limit, page });
-    return users;
-  } catch (error: unknown) {
-    handleApiError(error);
-    throw error;
-  }
+  const users = await ListOfUsersService({ limit, page });
+  return users;
 };
 
 // Funcion para buscar usuarios
@@ -33,22 +27,12 @@ export const searchUsers = async ({
   page: number;
   query: string;
 }): Promise<DataResponseFromAPI<DataOfUser>> => {
-  try {
-    const searchUsers = await SearchUsersService({ limit, page, query });
-    return searchUsers;
-  } catch (error: unknown) {
-    handleApiError(error);
-    throw error;
-  }
+  const searchUsers = await SearchUsersService({ limit, page, query });
+  return searchUsers;
 };
 
 // Funcion para editar un usuario
 export const updateUser = async (user: EditUser): Promise<DataOfUser> => {
-  try {
-    const updateUser = await UpdateUserService(user);
-    return updateUser;
-  } catch (error: unknown) {
-    handleApiError(error);
-    throw error;
-  }
+  const updateUser = await UpdateUserService(user);
+  return updateUser;
 };
