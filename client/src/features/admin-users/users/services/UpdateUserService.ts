@@ -1,4 +1,4 @@
-import { parseErrorResponse } from "../../../../shared/utils/parseErrorResponse";
+import { handleApiError } from "../../../../shared/utils/handleApiError";
 import { type DataOfUser, type EditUser } from "../types/userTypes";
 import { ENDPOINTS_USER } from "../utils/endpoints";
 
@@ -26,6 +26,7 @@ export const UpdateUserService = async (user: EditUser): Promise<DataOfUser> => 
     const data: DataOfUser = await response.json();
     return data;
   } catch (error: unknown) {
-    throw parseErrorResponse(error);
+    handleApiError(error);
+    return Promise.reject(error);
   }
 };
