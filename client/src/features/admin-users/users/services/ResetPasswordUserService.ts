@@ -1,4 +1,4 @@
-import { parseErrorResponse } from "../../../../shared/utils/parseErrorResponse";
+import { handleApiError } from "../../../../shared/utils/handleApiError";
 import { type EditUser } from "../types/userTypes";
 import { ENDPOINTS_USER } from "../utils/endpoints";
 
@@ -19,6 +19,7 @@ export const ResetPasswordUserService = async (user: EditUser): Promise<void> =>
     // Respuesta no exitosa, lanzo excepcion del backend
     if (!response.ok) throw await response.json();
   } catch (error: unknown) {
-    throw parseErrorResponse(error);
+    handleApiError(error);
+    return Promise.reject(error);
   }
 };
