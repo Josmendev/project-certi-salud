@@ -1,6 +1,6 @@
 import type { DataResponseFromAPI } from "../../../../shared/types/DataResponse";
 import { INITIAL_PAGE, LIMIT_PAGE } from "../../../../shared/utils/constants";
-import { parseErrorResponse } from "../../../../shared/utils/parseErrorResponse";
+import { handleApiError } from "../../../../shared/utils/handleApiError";
 import type { DataOfUser } from "../types/userTypes";
 import { ENDPOINTS_USER } from "../utils/endpoints";
 
@@ -31,6 +31,7 @@ export const ListOfUsersService = async ({
     const data: DataResponseFromAPI<DataOfUser> = await response.json();
     return data;
   } catch (error: unknown) {
-    throw parseErrorResponse(error);
+    handleApiError(error);
+    return Promise.reject(error);
   }
 };
