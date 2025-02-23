@@ -5,6 +5,7 @@ import BackIcon from "./BackIcon";
 import CertificateIcon from "./CertificateIcon";
 import CheckIcon from "./CheckIcon";
 import ChevronIcon from "./ChevronIcon";
+import ClearIcon from "./ClearIcon";
 import CloseIcon from "./CloseIcon";
 import DashboardIcon from "./DashBoardIcon";
 import DiseaseIcon from "./DiseaseIcon";
@@ -56,6 +57,7 @@ export const Icon = {
   Save: SaveIcon,
   Refresh: RefreshIcon,
   Close: CloseIcon,
+  Clear: ClearIcon,
   SuccessFill: SuccessFillIcon,
   InfoFill: InfoFillIcon,
   ErrorFill: ErrorFillIcon,
