@@ -40,8 +40,7 @@ export class PatientsService extends BaseService<Patient> {
       identityDocumentNumber,
       termRelation,
     });
-    if (person)
-      return await this.isStaffRegistered(person, identityDocumentNumber);
+    if (person) return await this.isPatientRegistered(person);
     return this.transactionService.runInTrasaction(async (queryRunner) => {
       const person = await this.personService.create(
         { ...personData },
@@ -52,7 +51,9 @@ export class PatientsService extends BaseService<Patient> {
     });
   }
 
-  async assignPatient(assignPatientDto: AssignPatientDto) {
+  async assignPatient(
+    assignPatientDto: AssignPatientDto,
+  ): Promise<PatientResponse> {
     const { identityDocumentNumber, age } = assignPatientDto;
     const termRelation = TermRelationWithPerson.patient;
     const person = await this.personService.isPersonRegistered({
@@ -151,7 +152,7 @@ export class PatientsService extends BaseService<Patient> {
   }
 
   // Internal helpers methods
-  private async createPatient(
+  async createPatient(
     patientDataDto: PatientDataDto,
     queryRunner?: QueryRunner,
   ): Promise<Patient> {
@@ -162,21 +163,22 @@ export class PatientsService extends BaseService<Patient> {
     return await repository.save(patient);
   }
 
-  private async findOne(patientId: number): Promise<Patient | null> {
+  async findOne(term: number | string): Promise<Patient> {
     const patient = await this.patientRepository.findOne({
-      where: { patientId },
+      where:
+        typeof term === 'number'
+          ? { patientId: term }
+          : { person: { identityDocumentNumber: term } },
       relations: { person: true },
     });
-    if (!patient)
+    if (!patient) {
       throw new NotFoundException(`El paciente no se encuentra registrado`);
+    }
     return patient;
   }
 
-  private isStaffRegistered(
-    person: Person,
-    identityDocumentNumber: string,
-  ): Promise<any> {
-    const patient = person.patient;
+  private isPatientRegistered(person: Person): Promise<any> {
+    const { patient, identityDocumentNumber } = person;
     if (!patient)
       throw new BadRequestException(
         `Persona con DNI ${identityDocumentNumber} ya está registrada como personal`,

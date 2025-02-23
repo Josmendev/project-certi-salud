@@ -1,5 +1,6 @@
+import { Certificate } from 'src/certificates/entities/certificate.entity';
 import { Timestamped } from 'src/common/entities/timestamped.entity';
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity({ name: 'certificate_type' })
 export class CertificateType extends Timestamped {
@@ -23,4 +24,7 @@ export class CertificateType extends Timestamped {
     default: true,
   })
   isActive: boolean;
+
+  @OneToMany(() => Certificate, (certificate) => certificate.certificateType)
+  certificates: Certificate[];
 }

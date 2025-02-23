@@ -17,7 +17,7 @@ import { Role } from 'src/auth/enums/role.enum';
 import { AssignStaffDto } from './dto/assing-staff.dto';
 
 @Controller('staff')
-@Auth(Role.admin)
+@Auth(Role.Admin)
 export class StaffController {
   constructor(private readonly staffService: StaffService) {}
 

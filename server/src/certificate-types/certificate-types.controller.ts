@@ -16,7 +16,7 @@ import { Auth } from 'src/auth/decorators/auth.decorator';
 import { Role } from 'src/auth/enums/role.enum';
 
 @Controller('certificate-types')
-@Auth(Role.admin)
+@Auth(Role.Admin)
 export class CertificateTypesController {
   constructor(
     private readonly certificateTypesService: CertificateTypesService,

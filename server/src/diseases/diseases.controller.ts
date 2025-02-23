@@ -5,7 +5,7 @@ import { Auth } from 'src/auth/decorators/auth.decorator';
 import { Role } from 'src/auth/enums/role.enum';
 
 @Controller('diseases')
-@Auth(Role.admin)
+@Auth(Role.Admin)
 export class DiseasesController {
   constructor(private readonly diseasesService: DiseasesService) {}
 

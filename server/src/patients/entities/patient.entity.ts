@@ -1,9 +1,11 @@
+import { Certificate } from 'src/certificates/entities/certificate.entity';
 import { Timestamped } from 'src/common/entities/timestamped.entity';
 import { Person } from 'src/persons/entities/person.entity';
 import {
   Column,
   Entity,
   JoinColumn,
+  OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
@@ -33,4 +35,7 @@ export class Patient extends Timestamped {
     default: true,
   })
   isActive: boolean;
+
+  @OneToMany(() => Certificate, (certificate) => certificate.patient)
+  certificates: Certificate[];
 }

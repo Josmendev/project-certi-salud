@@ -1,11 +1,5 @@
 import { Timestamped } from 'src/common/entities/timestamped.entity';
-import {
-  Column,
-  CreateDateColumn,
-  Entity,
-  PrimaryGeneratedColumn,
-  UpdateDateColumn,
-} from 'typeorm';
+import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity({ name: 'role' })
 export class Role extends Timestamped {

@@ -1,3 +1,4 @@
+import { Certificate } from 'src/certificates/entities/certificate.entity';
 import { Timestamped } from 'src/common/entities/timestamped.entity';
 import { Person } from 'src/persons/entities/person.entity';
 import { User } from 'src/users/entities/user.entity';
@@ -32,4 +33,7 @@ export class Staff extends Timestamped {
 
   @OneToMany(() => User, (user) => user.staff)
   users: User[];
+
+  @OneToMany(() => Certificate, (certificate) => certificate.staff)
+  certificates: Certificate[];
 }
