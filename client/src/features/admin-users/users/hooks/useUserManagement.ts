@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useLocation } from "react-router";
+import { useModal } from "../../../../shared/hooks/useModal";
 import { BASE_ROUTES, ROLES_MAPPING, type ROLES_KEYS } from "../../../../shared/utils/constants";
 import { showToast } from "../../../../shared/utils/toast";
 import { ADMIN_USERS_ROUTES } from "../../utils/constants";
@@ -13,9 +14,9 @@ export const useUserManagement = () => {
   const selectedUser = location.state?.user as DataOfUser;
   const currentPage = location.state?.page as number;
   const { handleUpdateUserMutation, handleResetPasswordUserMutation } = useUsers();
+  const { modalType, openModal, closeModal } = useModal();
 
   // 📌 Estado
-  const [modalOpen, setModalOpen] = useState(false);
   const [roles, setRoles] = useState<ROLES_KEYS[]>((selectedUser?.role as ROLES_KEYS[]) || []);
 
   // 📌 Variables y rutas con validaciones antes del renderizado
@@ -61,26 +62,18 @@ export const useUserManagement = () => {
         "Se restableció la contraseña de manera exitosa. Para iniciar sesión, el usuario debe confirmar sus credenciales.",
       type: "success",
     });
-
-    setModalOpen(false);
-  };
-
-  // Abro el modal
-  const openModal = (e: React.FormEvent) => {
-    e.preventDefault();
-    setModalOpen(true);
   };
 
   return {
     selectedUser,
     currentPage,
-    modalOpen,
+    modalType,
     roles,
-    setModalOpen,
+    openModal,
+    closeModal,
     handleUpdateUser,
     handleChangeRole,
     handleResetPasswordUser,
-    openModal,
     shouldRedirect: false,
     MAIN_ROUTE,
   };

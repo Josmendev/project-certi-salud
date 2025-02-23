@@ -1,7 +1,7 @@
 import type { IPerson } from "../../../shared/types/Person";
 import { ROLES_KEYS, ROLES_VALUES } from "./../../../shared/utils/constants";
 
-export interface IUser {
+export interface User {
   userId: number;
   username: string;
   isConfirm: boolean;

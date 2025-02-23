@@ -1,5 +1,5 @@
-import type { IUser } from "../../../auth/types/User";
+import type { User } from "../../../auth/types/User";
 
 // Creo la entrada para users
-export type DataOfUser = IUser;
+export type DataOfUser = User;
 export type EditUser = Partial<DataOfUser>;

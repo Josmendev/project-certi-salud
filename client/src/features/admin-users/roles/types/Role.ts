@@ -1,7 +1,7 @@
-export interface IRole {
+export interface Role {
   roleId: number;
   description: string;
-  isActive: boolean;
+  isActive?: boolean;
 }
 
 export interface UserHasRoles {

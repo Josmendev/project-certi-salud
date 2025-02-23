@@ -1,22 +1,22 @@
 import type { DataResponseFromAPI } from "../../../../shared/types/DataResponse";
 import { INITIAL_PAGE, LIMIT_PAGE } from "../../../../shared/utils/constants";
 import { handleApiError } from "../../../../shared/utils/handleApiError";
-import type { DataOfUser } from "../types/userTypes";
-import { ENDPOINTS_USER } from "../utils/endpoints";
+import type { ResponseRole } from "../types/roleTypes";
+import { ENDPOINT_MAIN_ROLE } from "../utils/endpoints";
 
-// Creo la funcion listOfUsers que se conecta a la API del backend
-export const ListOfUsersService = async ({
+// Creo la funcion listRoles que se conecta a la API del backend
+export const ListRolesService = async ({
   limit = LIMIT_PAGE,
   page = INITIAL_PAGE,
 }: {
   limit?: number;
   page: number;
-}): Promise<DataResponseFromAPI<DataOfUser>> => {
+}): Promise<DataResponseFromAPI<ResponseRole>> => {
   try {
     const { token } = JSON.parse(sessionStorage.getItem("user") as string);
     if (!token) throw new Error("Token inválido");
 
-    const response = await fetch(`${ENDPOINTS_USER.LIST_OF_USERS}?limit=${limit}&page=${page}`, {
+    const response = await fetch(`${ENDPOINT_MAIN_ROLE}?limit=${limit}&page=${page}`, {
       method: "GET",
       headers: {
         "Content-type": "application/json",
@@ -27,8 +27,8 @@ export const ListOfUsersService = async ({
     // Respuesta no exitosa, lanzo excepcion del backend
     if (!response.ok) throw await response.json();
 
-    // Respuesta exitosa, parseo el JSON y devuelvo el objeto DataResponseFromAPI<DataOfUser>
-    const data: DataResponseFromAPI<DataOfUser> = await response.json();
+    // Respuesta exitosa, parseo el JSON y devuelvo el objeto DataResponseFromAPI<ResponseRole>
+    const data: DataResponseFromAPI<ResponseRole> = await response.json();
     return data;
   } catch (error: unknown) {
     handleApiError(error);

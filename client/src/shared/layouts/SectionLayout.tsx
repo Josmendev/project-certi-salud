@@ -2,9 +2,15 @@ interface Props {
   title: string;
   subtitle: string;
   children: React.ReactNode;
+  classNameForChildren?: string;
 }
 
-export const SectionLayout: React.FC<Props> = ({ title, subtitle, children }) => {
+export const SectionLayout: React.FC<Props> = ({
+  title,
+  subtitle,
+  children,
+  classNameForChildren = "",
+}) => {
   return (
     <section className="mt-12 mx-14 text-shades-dark">
       <header className="flex items-center justify-between">
@@ -13,7 +19,7 @@ export const SectionLayout: React.FC<Props> = ({ title, subtitle, children }) =>
           {subtitle} / <span className="text-primary-600">{title}</span>
         </h4>
       </header>
-      <article className="card mt-8">{children}</article>
+      <div className={`card mt-8 ${classNameForChildren}`}>{children}</div>
     </section>
   );
 };
