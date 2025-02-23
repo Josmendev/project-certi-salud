@@ -14,14 +14,14 @@ import { useUserManagement } from "../hooks/useUserManagement";
 export const UserEditPage = () => {
   const {
     selectedUser,
-    modalOpen,
+    modalType,
     roles,
     currentPage,
-    setModalOpen,
     handleUpdateUser,
     handleChangeRole,
     handleResetPasswordUser,
     openModal,
+    closeModal,
     shouldRedirect,
     MAIN_ROUTE,
   } = useUserManagement();
@@ -37,7 +37,7 @@ export const UserEditPage = () => {
       <SectionLayout title="Usuarios" subtitle="Administración de usuarios">
         <Card
           headerCard="Registro"
-          btnBack={
+          headerRightContentCard={
             <Button
               id="btnBack-editUser"
               title="Regresar"
@@ -50,7 +50,7 @@ export const UserEditPage = () => {
             </Button>
           }
         >
-          <form className="grid grid-cols-1 md:grid-cols-2 gap-x-32" method="post">
+          <form className="grid grid-cols-1 md:grid-cols-2 gap-x-32">
             <div className="max-w-[580px] flex flex-col gap-5 mb-5">
               <TextInput
                 label="Personal / Trabajador"
@@ -109,10 +109,10 @@ export const UserEditPage = () => {
               <Button
                 title="Refrescar contraseña"
                 id="btnResetUser"
-                type="submit"
+                type="button"
                 classButton="btn-primary text-paragraph-medium bg-neutral-600 hover:bg-neutral-700"
                 iconLeft={<Icon.Refresh />}
-                onClick={openModal}
+                onClick={() => openModal("resetPasswordUser")}
               >
                 Refrescar contraseña
               </Button>
@@ -122,8 +122,8 @@ export const UserEditPage = () => {
           <Modal
             title="Refrescar contraseña"
             subtitle="¿Desea restaurar la contraseña a su estado inicial?"
-            isOpen={modalOpen}
-            onClose={() => setModalOpen(false)}
+            isOpen={modalType == "resetPasswordUser"}
+            onClose={closeModal}
             onClickSuccess={() => {
               handleResetPasswordUser();
               navigate(ROUTE_INITIAL);
