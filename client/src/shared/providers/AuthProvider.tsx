@@ -49,9 +49,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       dispatch({ type: AUTH_TYPES.login, payload: { ...responseUser, token } });
       sessionStorage.setItem("user", JSON.stringify(responseUser));
       return responseUser;
-    } catch (error) {
-      handleApiError(error);
-      throw error;
     } finally {
       setLoading(false);
     }
@@ -75,7 +72,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       return responseUserUpdated;
     } catch (error) {
       handleApiError(error);
-      throw error;
+      return Promise.reject(error);
     } finally {
       setLoading(false);
     }
@@ -84,6 +81,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const profileUser = async (token: string): Promise<AuthResponseUser> => {
     try {
       setLoading(true);
+
       const responseUser = await ProfileUserService(token);
       const responsePrevUser = JSON.parse(sessionStorage.getItem("user") || "{}");
       const responseUserUpdated = { ...responsePrevUser, ...responseUser };
@@ -91,9 +89,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
       dispatch({ type: AUTH_TYPES.profile, payload: responseUserUpdated });
       return responseUserUpdated;
-    } catch (error) {
-      handleApiError(error);
-      throw error;
     } finally {
       setLoading(false);
     }
@@ -109,7 +104,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       dispatch({ type: AUTH_TYPES.logout });
     } catch (error) {
       handleApiError(error);
-      throw error;
+      return Promise.reject(error);
     } finally {
       setLoading(false);
     }
