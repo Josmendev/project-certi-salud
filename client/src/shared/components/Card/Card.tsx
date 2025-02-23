@@ -1,19 +1,26 @@
 interface Props {
   headerCard: "Listado" | "Registro";
   children: React.ReactNode;
-  btnBack?: React.ReactNode;
+  headerRightContentCard?: React.ReactNode;
   footerCard?: React.ReactNode;
+  className?: string;
 }
 
-export const Card: React.FC<Props> = ({ headerCard, btnBack, children, footerCard }) => {
+export const Card: React.FC<Props> = ({
+  headerCard,
+  headerRightContentCard,
+  children,
+  footerCard,
+  className = "",
+}) => {
   return (
-    <>
-      <header className="flex items-center justify-between border px-6 py-4 border-neutral-100 bg-shades-light">
+    <article className={`shadow-lg h-max ${className}`}>
+      <header className="flex items-center justify-between border-b px-6 py-4 border-neutral-100 bg-shades-light">
         <p className="text-paragraph-semibold text-left">{headerCard}</p>
-        {btnBack && <>{btnBack}</>}
+        {headerRightContentCard && <>{headerRightContentCard}</>}
       </header>
       <div className="px-8 py-8 bg-shades-light">{children}</div>
       {footerCard && <div>{footerCard}</div>}
-    </>
+    </article>
   );
 };
