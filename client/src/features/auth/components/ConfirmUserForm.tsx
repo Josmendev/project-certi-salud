@@ -8,7 +8,6 @@ import Loader from "../../../shared/components/Loader";
 import { TextInput } from "../../../shared/components/TextInput/TextInput";
 import { AuthContext } from "../../../shared/contexts/AuthContext";
 import { BASE_ROUTES } from "../../../shared/utils/constants";
-import { handleApiError } from "../../../shared/utils/handleApiError";
 import { ConfirmUserSchema } from "../schemas/ConfirmUserSchema";
 import type { AuthConfirmUser } from "../types/authTypes";
 
@@ -26,15 +25,11 @@ export const ConfirmUserForm = () => {
   });
 
   const onSubmit: SubmitHandler<AuthConfirmUser> = async (data) => {
-    try {
-      const response = await confirmUser(data);
+    const response = await confirmUser(data);
 
-      if (response?.token) {
-        await profileUser(response?.token);
-        navigate("/" + BASE_ROUTES.PRIVATE.DASHBOARD, { replace: true });
-      }
-    } catch (error) {
-      handleApiError(error);
+    if (response?.token) {
+      await profileUser(response?.token);
+      navigate("/" + BASE_ROUTES.PRIVATE.DASHBOARD, { replace: true });
     }
   };
 
