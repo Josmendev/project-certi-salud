@@ -8,7 +8,6 @@ import Loader from "../../../shared/components/Loader";
 import { TextInput } from "../../../shared/components/TextInput/TextInput";
 import { AuthContext } from "../../../shared/contexts/AuthContext";
 import { BASE_ROUTES } from "../../../shared/utils/constants";
-import { handleApiError } from "../../../shared/utils/handleApiError";
 import { showToast } from "../../../shared/utils/toast";
 import { getLoginSchema } from "../schemas/LoginSchema";
 import type { AuthLoginUser } from "../types/authTypes";
@@ -28,31 +27,27 @@ export const LoginForm = () => {
   });
 
   const onSubmit: SubmitHandler<AuthLoginUser> = async (data) => {
-    try {
-      const userData = await login(data);
-      const { token, isConfirm } = userData;
+    const userData = await login(data);
+    const { token, isConfirm } = userData;
 
-      if (!isConfirm) {
-        showToast({
-          title: "Confirmación de cuenta",
-          description: `Procede a confirmar tu cuenta para iniciar sesión.`,
-          type: "info",
-        });
-        navigate("/" + BASE_ROUTES.PUBLIC.CONFIRM_ACCOUNT);
-        return;
-      }
+    if (!isConfirm) {
+      showToast({
+        title: "Confirmación de cuenta",
+        description: `Procede a confirmar tu cuenta para iniciar sesión.`,
+        type: "info",
+      });
+      navigate("/" + BASE_ROUTES.PUBLIC.CONFIRM_ACCOUNT);
+      return;
+    }
 
-      if (token && token.length > 0 && isConfirm) {
-        showToast({
-          title: "Inicio de sesión",
-          description: `Has iniciado sesión satisfactoriamente!`,
-          type: "success",
-        });
-        navigate("/" + BASE_ROUTES.PRIVATE.DASHBOARD);
-        await profileUser(token);
-      }
-    } catch (error) {
-      handleApiError(error);
+    if (token && token.length > 0 && isConfirm) {
+      showToast({
+        title: "Inicio de sesión",
+        description: `Has iniciado sesión satisfactoriamente!`,
+        type: "success",
+      });
+      navigate("/" + BASE_ROUTES.PRIVATE.DASHBOARD);
+      await profileUser(token);
     }
   };
 
