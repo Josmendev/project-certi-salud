@@ -126,11 +126,14 @@ export class CertificatesService {
       : {
           staff: { staffId },
           status: StatusCertificate.Completed,
-          isActive: true,
         };
     const certificates = await this.certificateRepository.find({
       where: whereCondition,
-      relations: { certificateType: true, patient: true },
+      relations: {
+        certificateType: true,
+        patient: { person: true },
+        staff: { person: true },
+      },
     });
     return certificates.map(formatCertificateResponse);
   }

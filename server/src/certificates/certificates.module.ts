@@ -24,6 +24,7 @@ import { PersonsModule } from 'src/persons/persons.module';
     PersonsModule,
     AuthModule,
   ],
+  exports: [CertificatesService],
   controllers: [CertificatesController],
   providers: [CertificatesService],
 })
