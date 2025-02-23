@@ -10,6 +10,7 @@ import { PatientsModule } from 'src/patients/patients.module';
 import { AuthModule } from 'src/auth/auth.module';
 import { StaffModule } from 'src/staff/staff.module';
 import { DiseasesModule } from 'src/diseases/diseases.module';
+import { PersonsModule } from 'src/persons/persons.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { DiseasesModule } from 'src/diseases/diseases.module';
     PatientsModule,
     StaffModule,
     DiseasesModule,
+    PersonsModule,
     AuthModule,
   ],
   controllers: [CertificatesController],

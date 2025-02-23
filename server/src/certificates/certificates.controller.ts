@@ -8,7 +8,7 @@ import { Role } from 'src/auth/enums/role.enum';
 import { ValidateUserResponse } from 'src/auth/interfaces/validate-user-response.interface';
 
 @Controller('certificates')
-@Auth(Role.Admin)
+@Auth(Role.Admin, Role.Register)
 export class CertificatesController {
   constructor(private readonly certificatesService: CertificatesService) {}
 

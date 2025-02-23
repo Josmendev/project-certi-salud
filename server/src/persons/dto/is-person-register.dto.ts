@@ -6,5 +6,5 @@ export class IsPersonRegisterDto {
   @Length(8, 8)
   identityDocumentNumber: string;
 
-  termRelation: TermRelationWithPerson;
+  termRelation?: TermRelationWithPerson;
 }

@@ -7,16 +7,14 @@ import {
   IsString,
   MinLength,
 } from 'class-validator';
-export class CreateCertificateDto {
+import { CreatePatientDto } from 'src/patients/dto/create-patient.dto';
+export class CreateCertificateDto extends CreatePatientDto {
   @IsString()
   @MinLength(1)
   certificateCode: string;
 
   @IsInt()
   certificateTypeId: number;
-
-  @IsInt()
-  patientId: number;
 
   @Transform(({ value }) => new Date(value))
   @IsDate()

@@ -6,6 +6,7 @@ import { CreatePersonDto } from './dto/create-person.dto';
 import { UpdatePersonDto } from './dto/update-person.dto';
 import { IsPersonRegisterDto } from './dto/is-person-register.dto';
 import { BaseService } from 'src/common/services/base.service';
+import { TermRelationWithPerson } from './enum/term-relation.enum';
 
 @Injectable()
 export class PersonService extends BaseService<Person> {
@@ -49,9 +50,12 @@ export class PersonService extends BaseService<Person> {
     isPersonRegisterdDto: IsPersonRegisterDto,
   ): Promise<Person> {
     const { identityDocumentNumber, termRelation } = isPersonRegisterdDto;
+    const relations = termRelation
+      ? [termRelation]
+      : [TermRelationWithPerson.staff, TermRelationWithPerson.patient];
     const person = await this.personRepository.findOne({
       where: { identityDocumentNumber },
-      relations: [termRelation],
+      relations: relations,
     });
     return person;
   }

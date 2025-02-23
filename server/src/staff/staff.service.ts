@@ -40,7 +40,7 @@ export class StaffService extends BaseService<Staff> {
       identityDocumentNumber,
       termRelation,
     });
-    if (person) await this.isStaffRegistered(person, identityDocumentNumber);
+    if (person) await this.isStaffRegistered(person);
     return this.transactionService.runInTrasaction(async (queryRunner) => {
       const newPerson = await this.personService.create(
         { ...createStaffDto },
@@ -180,11 +180,8 @@ export class StaffService extends BaseService<Staff> {
     return staff;
   }
 
-  private isStaffRegistered(
-    person: Person,
-    identityDocumentNumber: string,
-  ): Promise<any> {
-    const staff = person.staff;
+  private isStaffRegistered(person: Person): Promise<any> {
+    const { staff, identityDocumentNumber } = person;
     if (!staff)
       throw new BadRequestException(
         `Persona con DNI ${identityDocumentNumber} ya está registrada como paciente`,
