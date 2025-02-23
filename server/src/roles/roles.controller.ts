@@ -42,7 +42,7 @@ export class RolesController {
 
   @Patch(':id/activate')
   activate(@Param('id') id: string) {
-    return this.rolesService.remove(+id);
+    return this.rolesService.active(+id);
   }
 
   @Delete(':id')
