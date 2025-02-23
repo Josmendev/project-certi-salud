@@ -61,6 +61,7 @@ export class CertificatesService {
       maternalSurname,
       age,
     };
+    const certificateCode = await this.getCertificateByCode();
     const [certificateType, patient, staff] =
       await this.getRelationsForCertificate(
         certificateTypeId,
@@ -82,6 +83,7 @@ export class CertificatesService {
     }
     const certificate = this.certificateRepository.create({
       ...dataCertificate,
+      certificateCode,
       certificateType,
       patient,
       staff,
