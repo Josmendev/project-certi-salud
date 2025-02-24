@@ -8,6 +8,7 @@ import { Table } from "../../../../shared/components/Table/Table";
 import { useModal } from "../../../../shared/hooks/useModal";
 import DefaultLayout from "../../../../shared/layouts/DefaultLayout";
 import { SectionLayout } from "../../../../shared/layouts/SectionLayout";
+import { showToast } from "../../../../shared/utils/toast";
 import { TableRoleItem } from "../components/TableRoleItem";
 import { UpsertRoleForm } from "../components/UpsertRoleForm";
 import { useRoles } from "../hooks/useRoles";
@@ -37,15 +38,40 @@ export const RoleListPage = () => {
   } = useRoles();
 
   const handleEditRoleInRow = (data: Role) => {
+    if (!data) {
+      showToast({
+        title: "Advertencia",
+        description: "Debes seleccionar previamente una fila",
+        type: "warning",
+      });
+      return;
+    }
     setOnEditRoleRole((prev) => ({ ...prev, selectedRole: data }));
   };
 
   const handleDeleteRoleInRow = (data: Role) => {
+    if (!data || !data.roleId) {
+      showToast({
+        title: "Advertencia",
+        description: "Debes seleccionar previamente una fila",
+        type: "warning",
+      });
+      return;
+    }
+    setOnEditRoleRole((prev) => ({ ...prev, selectedRole: data }));
     handleDeleteRoleMutation.mutate({ roleId: data.roleId });
   };
 
   const handleActivateRoleInRow = (data: Role) => {
-    console.log("Falta implementar en el back");
+    if (!data || !data.roleId) {
+      showToast({
+        title: "Advertencia",
+        description: "Debes seleccionar previamente una fila",
+        type: "warning",
+      });
+      return;
+    }
+    setOnEditRoleRole((prev) => ({ ...prev, selectedRole: data }));
     handleActivateRoleMutation.mutate({ roleId: data.roleId });
   };
 
@@ -99,7 +125,7 @@ export const RoleListPage = () => {
           subtitle="¿Deseas eliminar el rol seleccionado?"
           isOpen={modalType === "delete"}
           onClose={closeModal}
-          onClickSuccess={() => handleDeleteRoleInRow}
+          onClickSuccess={() => handleDeleteRoleInRow(onEditRole.selectedRole!)}
         />
 
         <Modal
@@ -107,7 +133,7 @@ export const RoleListPage = () => {
           subtitle="¿Deseas activar el rol seleccionado?"
           isOpen={modalType === "activate"}
           onClose={closeModal}
-          onClickSuccess={() => handleActivateRoleInRow}
+          onClickSuccess={() => handleActivateRoleInRow(onEditRole.selectedRole!)}
         />
       </SectionLayout>
     </DefaultLayout>
