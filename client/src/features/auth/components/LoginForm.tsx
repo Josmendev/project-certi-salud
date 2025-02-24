@@ -43,7 +43,7 @@ export const LoginForm = () => {
     if (token && token.length > 0 && isConfirm) {
       showToast({
         title: "Inicio de sesión",
-        description: `Has iniciado sesión satisfactoriamente!`,
+        description: `Has iniciado sesión correctamente!`,
         type: "success",
       });
       navigate("/" + BASE_ROUTES.PRIVATE.DASHBOARD);
