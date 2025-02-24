@@ -14,6 +14,7 @@ import useTokenExpiration from "../hooks/useTokenExpiration";
 import { authReducer } from "../reducer/authReducer";
 import { initialStateAuthUser } from "../reducer/authStates";
 import { AUTH_TYPES } from "../reducer/authTypes";
+import { checkTokenExpiration } from "../utils/authCheckToken";
 import { handleApiError } from "../utils/handleApiError";
 import { showToast } from "../utils/toast";
 
@@ -97,10 +98,25 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const logout = async (): Promise<void> => {
     try {
       setLoading(true);
-      if (!authStateUser?.token) throw new Error("Token is missing");
+
+      if (!authStateUser?.token) {
+        sessionStorage.removeItem("user");
+        dispatch({ type: AUTH_TYPES.logout });
+        return;
+      }
+
+      // Verifico si el token ya expiró
+      const isExpired = checkTokenExpiration(authStateUser?.token);
+
+      if (isExpired) {
+        sessionStorage.removeItem("user");
+        dispatch({ type: AUTH_TYPES.logout });
+        return;
+      }
+
+      // Si el token sigue válido, hacemos logout en la API
       await LogoutService(authStateUser?.token);
       sessionStorage.removeItem("user");
-
       dispatch({ type: AUTH_TYPES.logout });
     } catch (error) {
       handleApiError(error);
@@ -123,14 +139,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   //Verifico la expiración del token
   useTokenExpiration(authStateUser?.token, async () => {
-    if (authStateUser?.token) {
-      await logout();
-      showToast({
-        title: "Sesión cerrada",
-        description: "Su token de sesión ha expirado. Favor vuelve a iniciar sesión",
-        type: "success",
-      });
-    }
+    if (!authStateUser?.token) return;
+
+    await logout();
+    showToast({
+      title: "Sesión cerrada",
+      description: "Su token de sesión ha expirado. Vuelve a iniciar sesión",
+      type: "warning",
+      permanent: true,
+    });
   });
 
   return (
