@@ -114,8 +114,14 @@ export const RoleListPage = () => {
               listOfRoles={data?.data ?? []}
               currentPage={currentPage}
               editRow={handleEditRoleInRow}
-              deleteRow={() => openModal("delete")}
-              activateRow={() => openModal("activate")}
+              deleteRow={(data) => {
+                openModal("delete");
+                setOnEditRoleRole((prev) => ({ ...prev, selectedRole: data }));
+              }}
+              activateRow={(data) => {
+                openModal("activate");
+                setOnEditRoleRole((prev) => ({ ...prev, selectedRole: data }));
+              }}
             />
           </Table>
         </Card>
@@ -124,16 +130,47 @@ export const RoleListPage = () => {
           title="Eliminar Rol"
           subtitle="¿Deseas eliminar el rol seleccionado?"
           isOpen={modalType === "delete"}
-          onClose={closeModal}
-          onClickSuccess={() => handleDeleteRoleInRow(onEditRole.selectedRole!)}
+          onClose={() => {
+            onEditRole.clearSelectedRole();
+            closeModal();
+          }}
+          onClickSuccess={() => {
+            console.log(onEditRole.selectedRole);
+            if (onEditRole.selectedRole) {
+              handleDeleteRoleInRow(onEditRole.selectedRole);
+              closeModal();
+              showToast({
+                title: "Rol eliminado",
+                description: `El rol ${onEditRole.selectedRole?.description} ha sido eliminado`,
+                type: "success",
+              });
+
+              onEditRole.clearSelectedRole();
+            }
+          }}
         />
 
         <Modal
           title="Activar Rol"
           subtitle="¿Deseas activar el rol seleccionado?"
           isOpen={modalType === "activate"}
-          onClose={closeModal}
-          onClickSuccess={() => handleActivateRoleInRow(onEditRole.selectedRole!)}
+          onClose={() => {
+            onEditRole.clearSelectedRole();
+            closeModal();
+          }}
+          onClickSuccess={() => {
+            if (onEditRole.selectedRole) {
+              handleActivateRoleInRow(onEditRole.selectedRole);
+              closeModal();
+              showToast({
+                title: "Rol activado",
+                description: `El rol ${onEditRole.selectedRole?.description} ha sido activado`,
+                type: "success",
+              });
+
+              onEditRole.clearSelectedRole();
+            }
+          }}
         />
       </SectionLayout>
     </DefaultLayout>
