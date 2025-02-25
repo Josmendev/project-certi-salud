@@ -4,7 +4,7 @@ import { DeleteRoleService } from "../services/DeleteRoleService";
 import { ListRolesService } from "../services/ListRolesService";
 import { SearchRolesService } from "../services/SearchRolesService";
 import { UpdateRoleService } from "../services/UpdateRoleService";
-import type { UpsertRole } from "../types/roleTypes";
+import type { UpsertRole } from "../types/Role";
 
 //Funcion para agregar rol
 export const createRole = async ({ role }: { role: UpsertRole }) => {
