@@ -105,7 +105,7 @@ export const UpsertRoleForm = ({ onEditRole }: { onEditRole: UpdateSelectedRole 
           classButton={`btn-primary text-paragraph-regular ${
             !selectedRole
               ? "bg-neutral-600 hover:bg-neutral-700"
-              : "bg-danger-500 hover:bg-danger-600"
+              : "bg-error-500 hover:bg-error-600"
           }`}
           iconLeft={
             !selectedRole ? (
