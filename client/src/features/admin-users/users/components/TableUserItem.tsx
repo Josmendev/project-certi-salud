@@ -16,7 +16,7 @@ export const TableUserItem: React.FC<TableUserItemProps> = ({
 }) => {
   const stateDefault = "text-paragraph-s-medium inline-block w-12 py-1 rounded-lg";
   const stateClassSuccess = `text-success-600 bg-success-50 ${stateDefault}`;
-  const stateClassDanger = `text-danger-600 bg-danger-50 ${stateDefault}`;
+  const stateClassDanger = `text-error-600 bg-error-50 ${stateDefault}`;
   const rowsPerPage = LIMIT_PAGE; // Límite de registros por página
   const startIndex = (currentPage - 1) * rowsPerPage; // Índice de inicio según la página
 
