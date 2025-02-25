@@ -1,11 +1,10 @@
 import { Button } from "../../../../shared/components/Button/Button";
 import { Icon } from "../../../../shared/components/Icon";
 import { LIMIT_PAGE } from "../../../../shared/utils/constants";
-import type { Role } from "../types/Role";
-import type { ResponseRole } from "../types/roleTypes";
+import type { Role, RoleResponse } from "../types/Role";
 
 export interface TableRoleItemProps {
-  listOfRoles: Array<ResponseRole>;
+  listOfRoles: Array<RoleResponse>;
   editRow?: (data: Role) => void;
   deleteRow?: (data: Role) => void;
   activateRow?: (data: Role) => void;

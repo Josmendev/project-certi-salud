@@ -1,4 +1,4 @@
-export interface IPerson {
+export interface Person {
   personId: number;
   identityDocumentNumber: string;
   name: string;

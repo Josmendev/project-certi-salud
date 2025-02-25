@@ -1,9 +1,9 @@
 import { ENDPOINTS_AUTH } from "../../../shared/utils/endpoints";
 import { handleApiError } from "../../../shared/utils/handleApiError";
-import { type TokenLogoutUser } from "../types/authTypes";
+import { type TokenUserLogout } from "../types/authTypes";
 
 // Creo la funcion logout que se conecta a la API del backend
-export const LogoutService = async (token: TokenLogoutUser): Promise<void> => {
+export const LogoutService = async (token: TokenUserLogout): Promise<void> => {
   try {
     const response = await fetch(`${ENDPOINTS_AUTH.LOGOUT}`, {
       method: "POST",

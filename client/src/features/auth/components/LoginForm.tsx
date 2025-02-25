@@ -10,7 +10,7 @@ import { AuthContext } from "../../../shared/contexts/AuthContext";
 import { BASE_ROUTES } from "../../../shared/utils/constants";
 import { showToast } from "../../../shared/utils/toast";
 import { getLoginSchema } from "../schemas/LoginSchema";
-import type { AuthLoginUser } from "../types/authTypes";
+import type { AuthUserLogin } from "../types/authTypes";
 
 export const LoginForm = () => {
   const navigate = useNavigate();
@@ -22,14 +22,14 @@ export const LoginForm = () => {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<AuthLoginUser>({
+  } = useForm<AuthUserLogin>({
     resolver: zodResolver(getLoginSchema(user?.isConfirm ?? false)),
     mode: "onChange", // Valido cuando el usuario escribe
   });
 
   const handleShowPassword = () => setShowPassword(!showPassword);
 
-  const onSubmit: SubmitHandler<AuthLoginUser> = async (data) => {
+  const onSubmit: SubmitHandler<AuthUserLogin> = async (data) => {
     const userData = await login(data);
     const { token, isConfirm } = userData;
 

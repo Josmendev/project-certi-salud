@@ -9,7 +9,7 @@ import { TextInput } from "../../../shared/components/TextInput/TextInput";
 import { AuthContext } from "../../../shared/contexts/AuthContext";
 import { BASE_ROUTES } from "../../../shared/utils/constants";
 import { ConfirmUserSchema } from "../schemas/ConfirmUserSchema";
-import type { AuthConfirmUser } from "../types/authTypes";
+import type { AuthUserConfirm } from "../types/authTypes";
 
 export const ConfirmUserForm = () => {
   const navigate = useNavigate();
@@ -21,7 +21,7 @@ export const ConfirmUserForm = () => {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<AuthConfirmUser>({
+  } = useForm<AuthUserConfirm>({
     resolver: zodResolver(ConfirmUserSchema),
     mode: "onChange", // Valido cuando el usuario escribe
   });
@@ -29,7 +29,7 @@ export const ConfirmUserForm = () => {
   const handleShowPassword = () => setShowPassword(!showPassword);
   const handleShowConfirmPassword = () => setShowConfirmPassword(!showConfirmPassword);
 
-  const onSubmit: SubmitHandler<AuthConfirmUser> = async (data) => {
+  const onSubmit: SubmitHandler<AuthUserConfirm> = async (data) => {
     const response = await confirmUser(data);
 
     if (response?.token) {

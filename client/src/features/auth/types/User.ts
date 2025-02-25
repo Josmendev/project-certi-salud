@@ -1,4 +1,4 @@
-import type { IPerson } from "../../../shared/types/Person";
+import type { Person } from "../../../shared/types/Person";
 import { ROLES_KEYS, ROLES_VALUES } from "./../../../shared/utils/constants";
 
 export interface User {
@@ -6,6 +6,6 @@ export interface User {
   username: string;
   isConfirm: boolean;
   isActive: boolean;
-  person: IPerson;
+  person: Person;
   role: Array<ROLES_KEYS> | Array<ROLES_VALUES>;
 }

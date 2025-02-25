@@ -12,11 +12,10 @@ import { showToast } from "../../../../shared/utils/toast";
 import { TableRoleItem } from "../components/TableRoleItem";
 import { UpsertRoleForm } from "../components/UpsertRoleForm";
 import { useRoles } from "../hooks/useRoles";
-import type { Role } from "../types/Role";
-import type { UpdateSelectedRole } from "../types/roleTypes";
+import type { Role, UpdateRoleSelected } from "../types/Role";
 
 export const RoleListPage = () => {
-  const [onEditRole, setOnEditRoleRole] = useState<UpdateSelectedRole>({
+  const [onEditRole, setOnEditRoleRole] = useState<UpdateRoleSelected>({
     selectedRole: null,
     clearSelectedRole: () => {
       setOnEditRoleRole((prev) => ({ ...prev, selectedRole: null }));

@@ -5,9 +5,9 @@ import { LoginService } from "../../features/auth/services/LoginService";
 import { LogoutService } from "../../features/auth/services/LogoutService";
 import { ProfileUserService } from "../../features/auth/services/ProfileUserService";
 import type {
-  AuthConfirmUser,
-  AuthLoginUser,
-  AuthResponseUser,
+  AuthUserConfirm,
+  AuthUserLogin,
+  AuthUserResponse,
 } from "../../features/auth/types/authTypes";
 import { AuthContext } from "../contexts/AuthContext";
 import useTokenExpiration from "../hooks/useTokenExpiration";
@@ -41,7 +41,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [loading, setLoading] = useState(false);
 
   // Gestiono el estado con el reducer (Consumo del servicio)
-  const login = async (credentials: AuthLoginUser): Promise<AuthResponseUser> => {
+  const login = async (credentials: AuthUserLogin): Promise<AuthUserResponse> => {
     try {
       setLoading(true);
       const responseUser = await LoginService(credentials);
@@ -55,7 +55,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
-  const confirmUser = async (credentials: AuthConfirmUser): Promise<AuthResponseUser> => {
+  const confirmUser = async (credentials: AuthUserConfirm): Promise<AuthUserResponse> => {
     try {
       setLoading(true);
       const { userId } = authStateUser;
@@ -79,7 +79,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
-  const profileUser = async (token: string): Promise<AuthResponseUser> => {
+  const profileUser = async (token: string): Promise<AuthUserResponse> => {
     try {
       setLoading(true);
 

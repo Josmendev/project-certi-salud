@@ -1,18 +1,18 @@
 import { createContext } from "react";
 import type { DataOfUser } from "../../features/admin-users/users/types/userTypes";
 import type {
-  AuthConfirmUser,
-  AuthLoginUser,
-  AuthResponseUser,
+  AuthUserConfirm,
+  AuthUserLogin,
+  AuthUserResponse,
 } from "../../features/auth/types/authTypes";
 
 // Creo el contexto para almacenar valores globales de autenticacion
 export interface AuthContextProps {
-  user: AuthResponseUser | null;
+  user: AuthUserResponse | null;
   loading: boolean;
-  login: (credentials: AuthLoginUser) => Promise<AuthResponseUser>;
-  confirmUser: (credentials: AuthConfirmUser) => Promise<AuthResponseUser>;
-  profileUser: (token: string) => Promise<AuthResponseUser>;
+  login: (credentials: AuthUserLogin) => Promise<AuthUserResponse>;
+  confirmUser: (credentials: AuthUserConfirm) => Promise<AuthUserResponse>;
+  profileUser: (token: string) => Promise<AuthUserResponse>;
   logout: () => Promise<void>;
   updateUserInSession: (updatedUser: DataOfUser) => void;
 }

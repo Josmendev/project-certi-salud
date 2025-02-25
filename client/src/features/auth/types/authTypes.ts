@@ -1,17 +1,17 @@
 import type { User } from "./User";
 
 // Defino los tipos de INPUT para el modulo de Auth
-export type AuthLoginUser = {
+export type AuthUserLogin = {
   username: string;
   password: string;
 };
 
-export type AuthConfirmUser = {
+export type AuthUserConfirm = {
   newPassword: string;
   repeatPassword: string;
 };
 
-export type TokenLogoutUser = string;
+export type TokenUserLogout = string;
 
 // Defino el tipo de OUTPUT para el modulo de Auth
-export type AuthResponseUser = User & { token: string };
+export type AuthUserResponse = User & { token: string };
