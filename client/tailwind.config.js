@@ -146,7 +146,7 @@ export default {
           800: "#5D3C04",
           900: "#3E2803",
         },
-        danger: {
+        error: {
           50: "#F6DEDE",
           100: "#ECBCBD",
           200: "#E39B9B",

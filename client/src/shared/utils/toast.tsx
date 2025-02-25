@@ -14,11 +14,22 @@ interface ToastProps {
   title: string;
   description: string | Array<string> | undefined;
   type: ToastType;
+  duration?: number;
+  permanent?: boolean;
 }
 
-export const showToast = ({ title, description, type }: ToastProps): void => {
+export const showToast = ({ title, description, type, duration, permanent }: ToastProps): void => {
   toast[type](title, {
+    id: `toast-${type}`,
     description,
     icon: TOAST_ICONS[type.toUpperCase() as keyof typeof TOAST_ICONS],
+    duration: permanent ? Infinity : duration ?? 6500,
+    className: `font-[Montserrat Variable] toaster-${type}`,
+    action: permanent
+      ? {
+          label: "Aceptar",
+          onClick: () => toast.dismiss(`toast-${type}`),
+        }
+      : undefined,
   });
 };

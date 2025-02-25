@@ -1,5 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { useNavigate } from "react-router";
 import { Button } from "../../../shared/components/Button/Button";
@@ -9,22 +9,27 @@ import { TextInput } from "../../../shared/components/TextInput/TextInput";
 import { AuthContext } from "../../../shared/contexts/AuthContext";
 import { BASE_ROUTES } from "../../../shared/utils/constants";
 import { ConfirmUserSchema } from "../schemas/ConfirmUserSchema";
-import type { AuthConfirmUser } from "../types/authTypes";
+import type { AuthUserConfirm } from "../types/authTypes";
 
 export const ConfirmUserForm = () => {
   const navigate = useNavigate();
   const { loading, user, confirmUser, profileUser } = useContext(AuthContext);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<AuthConfirmUser>({
+  } = useForm<AuthUserConfirm>({
     resolver: zodResolver(ConfirmUserSchema),
     mode: "onChange", // Valido cuando el usuario escribe
   });
 
-  const onSubmit: SubmitHandler<AuthConfirmUser> = async (data) => {
+  const handleShowPassword = () => setShowPassword(!showPassword);
+  const handleShowConfirmPassword = () => setShowConfirmPassword(!showConfirmPassword);
+
+  const onSubmit: SubmitHandler<AuthUserConfirm> = async (data) => {
     const response = await confirmUser(data);
 
     if (response?.token) {
@@ -48,25 +53,54 @@ export const ConfirmUserForm = () => {
         />
         <TextInput
           label="Nueva Contraseña"
-          type="password"
+          type={showPassword ? "text" : "password"}
           placeholder="Ingresa tu nueva contraseña"
-          required
+          classIconRight="icon-input-password"
           tabIndex={1}
           maxLength={50}
+          required
           autoFocus
-          iconRight={<Icon.Password size={28} strokeWidth={1} />}
+          iconRight={
+            <Button
+              onClick={handleShowPassword}
+              title={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
+              classButton="align-middle"
+              iconRight={
+                showPassword ? (
+                  <Icon.HiddenPassword size={28} strokeWidth={1} />
+                ) : (
+                  <Icon.View size={28} strokeWidth={1} />
+                )
+              }
+            />
+          }
           aria-label="Campo para ingresar la nueva contraseña"
           {...register("newPassword")}
           error={errors.newPassword?.message as string}
         />
+
         <TextInput
           label="Repetir Contraseña"
-          type="password"
+          type={showConfirmPassword ? "text" : "password"}
           placeholder="Repite tu contraseña"
-          required
+          classIconRight="icon-input-password"
           tabIndex={2}
           maxLength={50}
-          iconRight={<Icon.Password size={28} strokeWidth={1} />}
+          required
+          iconRight={
+            <Button
+              onClick={handleShowConfirmPassword}
+              title={showConfirmPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
+              classButton="align-middle"
+              iconRight={
+                showConfirmPassword ? (
+                  <Icon.HiddenPassword size={28} strokeWidth={1} />
+                ) : (
+                  <Icon.View size={28} strokeWidth={1} />
+                )
+              }
+            />
+          }
           aria-label="Campo para repetir tu contrasena nuevamente"
           {...register("repeatPassword")}
           error={errors.repeatPassword?.message as string}

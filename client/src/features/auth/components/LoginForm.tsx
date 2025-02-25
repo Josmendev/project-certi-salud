@@ -1,5 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { useNavigate } from "react-router";
 import { Button } from "../../../shared/components/Button/Button";
@@ -10,23 +10,26 @@ import { AuthContext } from "../../../shared/contexts/AuthContext";
 import { BASE_ROUTES } from "../../../shared/utils/constants";
 import { showToast } from "../../../shared/utils/toast";
 import { getLoginSchema } from "../schemas/LoginSchema";
-import type { AuthLoginUser } from "../types/authTypes";
+import type { AuthUserLogin } from "../types/authTypes";
 
 export const LoginForm = () => {
   const navigate = useNavigate();
   const { loading, login, user } = useContext(AuthContext);
   const { profileUser } = useContext(AuthContext);
+  const [showPassword, setShowPassword] = useState(false);
 
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<AuthLoginUser>({
+  } = useForm<AuthUserLogin>({
     resolver: zodResolver(getLoginSchema(user?.isConfirm ?? false)),
     mode: "onChange", // Valido cuando el usuario escribe
   });
 
-  const onSubmit: SubmitHandler<AuthLoginUser> = async (data) => {
+  const handleShowPassword = () => setShowPassword(!showPassword);
+
+  const onSubmit: SubmitHandler<AuthUserLogin> = async (data) => {
     const userData = await login(data);
     const { token, isConfirm } = userData;
 
@@ -43,7 +46,7 @@ export const LoginForm = () => {
     if (token && token.length > 0 && isConfirm) {
       showToast({
         title: "Inicio de sesión",
-        description: `Has iniciado sesión satisfactoriamente!`,
+        description: `Has iniciado sesión correctamente!`,
         type: "success",
       });
       navigate("/" + BASE_ROUTES.PRIVATE.DASHBOARD);
@@ -71,11 +74,25 @@ export const LoginForm = () => {
         />
         <TextInput
           label="Contraseña"
-          type="password"
+          type={showPassword ? "text" : "password"}
           placeholder="Ingresa tu contraseña"
           required
           tabIndex={2}
-          iconRight={<Icon.Password size={28} strokeWidth={1} />}
+          classIconRight="icon-input-password"
+          iconRight={
+            <Button
+              onClick={handleShowPassword}
+              title={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
+              classButton="align-middle"
+              iconRight={
+                showPassword ? (
+                  <Icon.HiddenPassword size={28} strokeWidth={1} />
+                ) : (
+                  <Icon.View size={28} strokeWidth={1} />
+                )
+              }
+            />
+          }
           aria-label="Campo para ingresar la contraseña"
           {...register("password")}
           error={errors.password?.message as string}

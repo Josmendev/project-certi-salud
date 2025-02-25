@@ -17,7 +17,26 @@ export function parseErrorResponse(error: unknown): ErrorResponse {
     };
   }
 
-  // Si uso throw Error, Aquí tomamos el mensaje lanzado
+  // Detecto error de red (API offline o no responde)
+  if (error instanceof TypeError) {
+    return {
+      statusCode: STATUS_CODE_DEFAULT,
+      error: "Error de conexión",
+      message:
+        "No se pudo conectar con el servidor. Verifica tu conexión a internet o si el servicio está disponible.",
+    };
+  }
+
+  // Detecto error al parsear JSON (JSON inválido del back)
+  if (error instanceof SyntaxError) {
+    return {
+      statusCode: STATUS_CODE_DEFAULT,
+      error: "Error en la respuesta del servidor",
+      message: "La respuesta del servidor no es válida.",
+    };
+  }
+
+  //  Detecto otros errores estándar en JavaScript
   if (error instanceof Error) {
     return {
       statusCode: STATUS_CODE_BADREQUEST,

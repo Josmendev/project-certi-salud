@@ -20,3 +20,33 @@
     scrollbar-width: none; /* Firefox */
   }
 }
+
+/* Botón de acción personalizado según el tipo de toast */
+.toaster-success,
+.toaster-error,
+.toaster-warning,
+.toaster-info {
+  font-family: "Montserrat Variable", sans-serif;
+  font-weight: 500;
+  font-size: 13px;
+}
+
+.toaster-success button {
+  background-color: #22c55e !important;
+  color: white !important;
+}
+
+.toaster-warning button {
+  background-color: #facc15 !important;
+  color: black !important;
+}
+
+.toaster-error button {
+  background-color: #ef4444 !important;
+  color: white !important;
+}
+
+.toaster-info button {
+  background-color: #3b82f6 !important;
+  color: white !important;
+}

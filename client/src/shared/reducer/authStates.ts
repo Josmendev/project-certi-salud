@@ -1,7 +1,7 @@
-import type { AuthResponseUser } from "../../features/auth/types/authTypes";
+import type { AuthUserResponse } from "../../features/auth/types/authTypes";
 
 // Creo el estado inicial del reducer
-export const initialStateAuthUser: AuthResponseUser = {
+export const initialStateAuthUser: AuthUserResponse = {
   userId: 0,
   username: "",
   token: "",

@@ -1,11 +1,10 @@
 import { Button } from "../../../../shared/components/Button/Button";
 import { Icon } from "../../../../shared/components/Icon";
 import { LIMIT_PAGE } from "../../../../shared/utils/constants";
-import type { Role } from "../types/Role";
-import type { ResponseRole } from "../types/roleTypes";
+import type { Role, RoleResponse } from "../types/Role";
 
 export interface TableRoleItemProps {
-  listOfRoles: Array<ResponseRole>;
+  listOfRoles: Array<RoleResponse>;
   editRow?: (data: Role) => void;
   deleteRow?: (data: Role) => void;
   activateRow?: (data: Role) => void;
@@ -21,7 +20,7 @@ export const TableRoleItem: React.FC<TableRoleItemProps> = ({
 }) => {
   const stateDefault = "text-paragraph-s-medium inline-block w-12 py-1 rounded-lg";
   const stateClassSuccess = `text-success-600 bg-success-50 ${stateDefault}`;
-  const stateClassDanger = `text-danger-600 bg-danger-50 ${stateDefault}`;
+  const stateClassDanger = `text-error-600 bg-error-50 ${stateDefault}`;
   const rowsPerPage = LIMIT_PAGE; // Límite de registros por página
   const startIndex = (currentPage - 1) * rowsPerPage; // Índice de inicio según la página
 

@@ -11,6 +11,7 @@ import DashboardIcon from "./DashBoardIcon";
 import DiseaseIcon from "./DiseaseIcon";
 import EditIcon from "./EditIcon";
 import ErrorFillIcon from "./ErrorFillIcon";
+import HiddenPasswordIcon from "./HiddenPasswordIcon";
 import InfoFillIcon from "./InfoFillIcon";
 import LogoutIcon from "./LogoutIcon";
 import MenuIcon from "./MenuIcon";
@@ -58,6 +59,7 @@ export const Icon = {
   Refresh: RefreshIcon,
   Close: CloseIcon,
   Clear: ClearIcon,
+  HiddenPassword: HiddenPasswordIcon,
   SuccessFill: SuccessFillIcon,
   InfoFill: InfoFillIcon,
   ErrorFill: ErrorFillIcon,

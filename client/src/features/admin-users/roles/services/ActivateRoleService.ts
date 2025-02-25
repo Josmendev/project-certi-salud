@@ -1,5 +1,5 @@
 import { handleApiError } from "../../../../shared/utils/handleApiError";
-import { ENDPOINT_MAIN_ROLE } from "../utils/endpoints";
+import { ENDPOINT_ROLE } from "../utils/endpoints";
 
 // Creo la funcion ActivateRole que se conecta a la API del backend
 export const ActivateRoleService = async ({ roleId }: { roleId: number }): Promise<void> => {
@@ -7,7 +7,7 @@ export const ActivateRoleService = async ({ roleId }: { roleId: number }): Promi
     const { token } = JSON.parse(sessionStorage.getItem("user") as string);
     if (!token) throw new Error("Token inválido");
 
-    const response = await fetch(`${ENDPOINT_MAIN_ROLE}/${roleId}/activate`, {
+    const response = await fetch(`${ENDPOINT_ROLE}/${roleId}/activate`, {
       method: "PATCH",
       headers: {
         "Content-type": "application/json",

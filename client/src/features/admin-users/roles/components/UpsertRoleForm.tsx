@@ -7,9 +7,9 @@ import { TextInput } from "../../../../shared/components/TextInput/TextInput";
 import { handleApiError } from "../../../../shared/utils/handleApiError";
 import { useRoles } from "../hooks/useRoles";
 import { getRoleSchema } from "../schemas/RoleSchema";
-import type { ResponseRole, UpdateSelectedRole } from "../types/roleTypes";
+import type { RoleResponse, UpdateRoleSelected } from "../types/Role";
 
-export const UpsertRoleForm = ({ onEditRole }: { onEditRole: UpdateSelectedRole }) => {
+export const UpsertRoleForm = ({ onEditRole }: { onEditRole: UpdateRoleSelected }) => {
   const { selectedRole, clearSelectedRole } = onEditRole;
   const {
     register,
@@ -18,7 +18,7 @@ export const UpsertRoleForm = ({ onEditRole }: { onEditRole: UpdateSelectedRole 
     setFocus,
     setValue,
     formState: { errors, isLoading },
-  } = useForm<ResponseRole>({
+  } = useForm<RoleResponse>({
     resolver: zodResolver(getRoleSchema()),
     mode: "onChange", // Valido cuando el usuario escribe
   });
@@ -31,7 +31,7 @@ export const UpsertRoleForm = ({ onEditRole }: { onEditRole: UpdateSelectedRole 
     else setValue("description", "");
   }, [selectedRole, setValue]);
 
-  const onSubmit: SubmitHandler<ResponseRole> = async (data) => {
+  const onSubmit: SubmitHandler<RoleResponse> = async (data) => {
     try {
       //Edición de rol
       if (selectedRole) {
@@ -105,7 +105,7 @@ export const UpsertRoleForm = ({ onEditRole }: { onEditRole: UpdateSelectedRole 
           classButton={`btn-primary text-paragraph-regular ${
             !selectedRole
               ? "bg-neutral-600 hover:bg-neutral-700"
-              : "bg-danger-500 hover:bg-danger-600"
+              : "bg-error-500 hover:bg-error-600"
           }`}
           iconLeft={
             !selectedRole ? (

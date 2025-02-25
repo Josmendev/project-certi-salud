@@ -1,5 +1,5 @@
 import React from "react";
-import type { TextInputType } from "../../types/TextInputType";
+import type { TextInputType } from "../../types/textInputType";
 
 interface TextInputProps {
   label: string;
@@ -11,7 +11,7 @@ interface TextInputProps {
   maxLength?: number;
   value?: string;
   classTextInput?: string;
-  classTextInputParent?: string;
+  classIconRight?: string;
   readOnly?: boolean;
   disabled?: boolean;
   required?: boolean;
@@ -43,7 +43,7 @@ export const TextInput = React.forwardRef<HTMLInputElement, TextInputProps>(
       maxLength,
       value,
       classTextInput = "",
-      classTextInputParent = "",
+      classIconRight = "",
       readOnly = false,
       disabled = false,
       required = false,
@@ -73,7 +73,7 @@ export const TextInput = React.forwardRef<HTMLInputElement, TextInputProps>(
             {required && <span className="textInput-label-required">*</span>}
           </label>
         )}
-        <div className={`flex items-center justify-center relative ${classTextInputParent}`}>
+        <div className="flex items-center relative">
           {iconLeft && <span className="icon-input-left">{iconLeft}</span>}
           <input
             ref={ref}
@@ -106,7 +106,7 @@ export const TextInput = React.forwardRef<HTMLInputElement, TextInputProps>(
             inputMode={inputMode}
             {...rest}
           />
-          {iconRight && <span className="icon-input-right">{iconRight}</span>}
+          {iconRight && <span className={`icon-input-right ${classIconRight}`}>{iconRight}</span>}
         </div>
 
         {error && (
