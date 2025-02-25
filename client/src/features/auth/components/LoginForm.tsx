@@ -1,5 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { useNavigate } from "react-router";
 import { Button } from "../../../shared/components/Button/Button";
@@ -16,6 +16,7 @@ export const LoginForm = () => {
   const navigate = useNavigate();
   const { loading, login, user } = useContext(AuthContext);
   const { profileUser } = useContext(AuthContext);
+  const [showPassword, setShowPassword] = useState(false);
 
   const {
     register,
@@ -25,6 +26,8 @@ export const LoginForm = () => {
     resolver: zodResolver(getLoginSchema(user?.isConfirm ?? false)),
     mode: "onChange", // Valido cuando el usuario escribe
   });
+
+  const handleShowPassword = () => setShowPassword(!showPassword);
 
   const onSubmit: SubmitHandler<AuthLoginUser> = async (data) => {
     const userData = await login(data);
@@ -71,11 +74,25 @@ export const LoginForm = () => {
         />
         <TextInput
           label="Contraseña"
-          type="password"
+          type={showPassword ? "text" : "password"}
           placeholder="Ingresa tu contraseña"
           required
           tabIndex={2}
-          iconRight={<Icon.Password size={28} strokeWidth={1} />}
+          classIconRight="icon-input-password"
+          iconRight={
+            <Button
+              onClick={handleShowPassword}
+              title={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
+              classButton="align-middle"
+              iconRight={
+                showPassword ? (
+                  <Icon.HiddenPassword size={28} strokeWidth={1} />
+                ) : (
+                  <Icon.View size={28} strokeWidth={1} />
+                )
+              }
+            />
+          }
           aria-label="Campo para ingresar la contraseña"
           {...register("password")}
           error={errors.password?.message as string}
