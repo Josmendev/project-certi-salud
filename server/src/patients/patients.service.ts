@@ -41,14 +41,16 @@ export class PatientsService extends BaseService<Patient> {
       termRelation,
     });
     if (person) return await this.isPatientRegistered(person);
-    return this.transactionService.runInTrasaction(async (queryRunner) => {
-      const person = await this.personService.create(
-        { ...personData },
-        queryRunner,
-      );
-      const patient = await this.createPatient({ age, person }, queryRunner);
-      return formatPatientResponse(patient);
-    });
+    return await this.transactionService.runInTrasaction(
+      async (queryRunner) => {
+        const person = await this.personService.create(
+          { ...personData },
+          queryRunner,
+        );
+        const patient = await this.createPatient({ age, person }, queryRunner);
+        return formatPatientResponse(patient);
+      },
+    );
   }
 
   async assignPatient(

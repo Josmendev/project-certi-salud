@@ -41,18 +41,20 @@ export class StaffService extends BaseService<Staff> {
       termRelation,
     });
     if (person) await this.isStaffRegistered(person);
-    return this.transactionService.runInTrasaction(async (queryRunner) => {
-      const newPerson = await this.personService.create(
-        { ...createStaffDto },
-        queryRunner,
-      );
-      const staff = await this.createStaff(newPerson, queryRunner);
-      await this.userService.create(
-        { identityDocumentNumber, staff },
-        queryRunner,
-      );
-      return formatStaffResponse(staff);
-    });
+    return await this.transactionService.runInTrasaction(
+      async (queryRunner) => {
+        const newPerson = await this.personService.create(
+          { ...createStaffDto },
+          queryRunner,
+        );
+        const staff = await this.createStaff(newPerson, queryRunner);
+        await this.userService.create(
+          { identityDocumentNumber, staff },
+          queryRunner,
+        );
+        return formatStaffResponse(staff);
+      },
+    );
   }
 
   async assignStaff(assignStaffDto: AssignStaffDto): Promise<StaffResponse> {
@@ -70,14 +72,16 @@ export class StaffService extends BaseService<Staff> {
       throw new NotFoundException(
         `La persona con DNI ${identityDocumentNumber} ya es un personal`,
       );
-    return this.transactionService.runInTrasaction(async (queryRunner) => {
-      const staff = await this.createStaff(person, queryRunner);
-      await this.userService.create(
-        { identityDocumentNumber, staff },
-        queryRunner,
-      );
-      return formatStaffResponse(staff);
-    });
+    return await this.transactionService.runInTrasaction(
+      async (queryRunner) => {
+        const staff = await this.createStaff(person, queryRunner);
+        await this.userService.create(
+          { identityDocumentNumber, staff },
+          queryRunner,
+        );
+        return formatStaffResponse(staff);
+      },
+    );
   }
 
   async findAll(
@@ -136,7 +140,7 @@ export class StaffService extends BaseService<Staff> {
 
   async activate(staffId: number): Promise<void> {
     const staff = await this.findOne(staffId);
-    this.transactionService.runInTrasaction(async (queryRunner) => {
+    await this.transactionService.runInTrasaction(async (queryRunner) => {
       staff.isActive = true;
       await Promise.all([
         queryRunner.manager.save(staff),
@@ -147,7 +151,7 @@ export class StaffService extends BaseService<Staff> {
 
   async remove(staffId: number): Promise<void> {
     const staff = await this.findOne(staffId);
-    this.transactionService.runInTrasaction(async (queryRunner) => {
+    await this.transactionService.runInTrasaction(async (queryRunner) => {
       staff.isActive = false;
       await Promise.all([
         queryRunner.manager.save(staff),
