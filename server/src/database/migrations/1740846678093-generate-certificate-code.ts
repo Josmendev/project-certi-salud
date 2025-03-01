@@ -1,6 +1,6 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
-export class CreatedGenerateCertificateCode1700000000000
+export class GenerateCertificateCode1740846678093
   implements MigrationInterface
 {
   async up(queryRunner: QueryRunner): Promise<void> {
