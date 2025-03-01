@@ -64,6 +64,12 @@ Este es el servidor (Backend) del proyecto **Certi Salud**. Está construido con
    pnpm start:dev
    ```
 
+6. Realizar la creación del procedimiento almacenado en la base de datos
+
+   ```sh
+   pnpm migration:run
+   ```
+
 6. Ejecutar el proceso de seed para poblar la base de datos con registros iniciales
 
    ```sh

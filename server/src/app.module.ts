@@ -16,6 +16,7 @@ import config from './config/config';
 import { RedisModule } from './redis/redis.module';
 import { SeedModule } from './seed/seed.module';
 import { ReportsModule } from './reports/reports.module';
+import { typeOrmConfig } from './config/typeorm.config';
 
 @Module({
   imports: [
@@ -26,16 +27,8 @@ import { ReportsModule } from './reports/reports.module';
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
-      useFactory: (configService: ConfigService) => ({
-        type: 'mysql',
-        host: configService.get<string>('db.host'),
-        port: configService.get<number>('db.port'),
-        username: configService.get<string>('db.username'),
-        password: configService.get<string>('db.password'),
-        database: configService.get<string>('db.database'),
-        autoLoadEntities: true,
-        synchronize: true,
-      }),
+      useFactory: (configService: ConfigService) =>
+        typeOrmConfig(configService),
     }),
     RedisModule,
     RolesModule,
