@@ -191,9 +191,10 @@ export class StaffService extends BaseService<Staff> {
         `Persona con DNI ${identityDocumentNumber} ya está registrada como paciente`,
       );
     if (!staff.isActive)
-      throw new BadRequestException(
+      throw new BadRequestException([
         `El personal con DNI ${identityDocumentNumber} se encuentra desactivado`,
-      );
+        staff.staffId,
+      ]);
     throw new BadRequestException(
       `El personal con DNI ${identityDocumentNumber} ya se encuentra registrado`,
     );

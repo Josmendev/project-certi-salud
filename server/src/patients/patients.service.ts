@@ -186,9 +186,10 @@ export class PatientsService extends BaseService<Patient> {
         `Persona con DNI ${identityDocumentNumber} ya está registrada como personal`,
       );
     if (!patient.isActive)
-      throw new BadRequestException(
+      throw new BadRequestException([
         `El paciente con DNI ${identityDocumentNumber} se encuentra desactivado`,
-      );
+        patient.patientId,
+      ]);
     throw new BadRequestException(
       `El paciente con DNI ${identityDocumentNumber} ya se encuentra registrado`,
     );

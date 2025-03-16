@@ -3,6 +3,7 @@ export interface CertificateResponse {
   certificateCode: string;
   issueDate: Date;
   certificateTypeDescription: string;
+  staffDni: string;
   staffName: string;
   patientDni: string;
   patientName: string;
@@ -10,7 +11,7 @@ export interface CertificateResponse {
   restDays: string;
   diseases:
     | {
-        diseaseId: number;
+        diseaseCie10: string;
         diseaseDescription: string;
       }[]
     | null;
