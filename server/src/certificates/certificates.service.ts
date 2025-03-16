@@ -138,6 +138,22 @@ export class CertificatesService {
     return certificates.map(formatCertificateResponse);
   }
 
+  async findOne(certificateId: string): Promise<CertificateResponse> {
+    const certificate = await this.certificateRepository.findOne({
+      where: { certificateId },
+      relations: {
+        certificateType: true,
+        patient: { person: true },
+        staff: { person: true },
+      },
+    });
+    if (!certificate)
+      throw new NotFoundException(
+        `El certificado con el ID ${certificateId} no se encuentra registrado`,
+      );
+    return formatCertificateResponse(certificate);
+  }
+
   private async getRelationsForCertificate(
     certificateTypeId: number,
     createPatientDto: CreatePatientDto,

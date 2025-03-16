@@ -18,6 +18,7 @@ export const formatCertificateResponse = (certificate: Certificate) => {
     certificateCode,
     issueDate,
     certificateTypeDescription: certificateType.description,
+    staffDni: staffPerson.identityDocumentNumber,
     staffName: `${staffPerson.name} ${staffPerson.paternalSurname} ${staffPerson.maternalSurname}`,
     patientDni: patientPerson.identityDocumentNumber,
     patientName: `${patientPerson.name} ${patientPerson.paternalSurname} ${patientPerson.maternalSurname}`,
@@ -25,7 +26,7 @@ export const formatCertificateResponse = (certificate: Certificate) => {
     restDays: restDays ? `${restDays} días` : `No Aplica`,
     diseases: diseases
       ? diseases.map((disease) => ({
-          diseaseId: disease.diseaseId,
+          diseaseCie10: disease.cie10,
           diseaseDescription: disease.description,
         }))
       : null,
