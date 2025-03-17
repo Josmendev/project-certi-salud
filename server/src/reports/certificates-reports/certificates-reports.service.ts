@@ -3,9 +3,10 @@ import { ValidateUserResponse } from 'src/auth/interfaces/validate-user-response
 import { CertificatesService } from 'src/certificates/certificates.service';
 import { CertificateResponse } from 'src/certificates/interfaces/certificate-response.interface';
 import { PrinterService } from '../printer/printer.service';
-import { getCertificateByIdReport } from './templates/certificate-by-id.report';
+import { getCertificateByIdReport } from './templates/certificate-by-id.template';
 import { getImageAsDataURL } from '../helpers/get-image-as-data-url.helper';
 import { PATH_LOGO_CERTI_SALUD } from './constants/constants';
+import { getCertificateAllReport } from './templates/certificate-all.template';
 
 @Injectable()
 export class CertificatesReportsService {
@@ -18,13 +19,18 @@ export class CertificatesReportsService {
     return this.certificatesService.find(user);
   }
 
-  async generateAllReport(): Promise<void> {
-    // TODO: Generar reportes
+  async generateReportAll(
+    user: ValidateUserResponse,
+  ): Promise<PDFKit.PDFDocument> {
+    const certificates = await this.certificatesService.find(user);
+    const imageUrl = await getImageAsDataURL(PATH_LOGO_CERTI_SALUD);
+    const docDefinition = getCertificateAllReport({ imageUrl, certificates });
+    const doc = this.printerService.createPdf(docDefinition);
+    return doc;
   }
 
-  async generateReportById(certificateId: string): Promise<PDFKit.PDFDocument> {
+  async generateReportOne(certificateId: string): Promise<PDFKit.PDFDocument> {
     const certificate = await this.certificatesService.findOne(certificateId);
-    console.log(certificate);
     const imageUrl = await getImageAsDataURL(PATH_LOGO_CERTI_SALUD);
     const docDefinition = getCertificateByIdReport(certificate, imageUrl);
     const doc = this.printerService.createPdf(docDefinition);
