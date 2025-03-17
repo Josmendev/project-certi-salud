@@ -129,6 +129,7 @@ export class CertificatesService {
         };
     const certificates = await this.certificateRepository.find({
       where: whereCondition,
+      order: { createdAt: 'ASC' },
       relations: {
         certificateType: true,
         patient: { person: true },

@@ -18,9 +18,22 @@ export class CertificatesReportsController {
     return this.certificatesReportsService.find(user);
   }
 
-  @Get('generate-report/:id')
+  @Get('generate-report-one/:id')
   async generateReportById(@Res() response: Response, @Param('id') id: string) {
-    const pdfDoc = await this.certificatesReportsService.generateReportById(id);
+    const pdfDoc = await this.certificatesReportsService.generateReportOne(id);
+    response.setHeader('Content-Type', 'application/pdf');
+    pdfDoc.info.Title = 'Certificados';
+    pdfDoc.pipe(response);
+    pdfDoc.end();
+  }
+
+  @Get('generate-report-all')
+  async generateReportAll(
+    @Res() response: Response,
+    @GetUser() user: ValidateUserResponse,
+  ) {
+    const pdfDoc =
+      await this.certificatesReportsService.generateReportAll(user);
     response.setHeader('Content-Type', 'application/pdf');
     pdfDoc.info.Title = 'Certificados';
     pdfDoc.pipe(response);
