@@ -12,10 +12,17 @@ export const createRole = async ({ role }: { role: UpsertRole }) => {
   return newRole;
 };
 
-// Funcion para obtener todos los roles
-export const getRoles = async ({ limit, page }: { limit?: number; page: number }) => {
-  const roles = await ListRolesService({ limit, page });
-  return roles;
+// Funcion para obtener y buscar todos los roles
+export const getRoles = async ({
+  limit,
+  page,
+  query = "",
+}: {
+  limit?: number;
+  page: number;
+  query?: string;
+}) => {
+  return query ? SearchRolesService({ limit, page, query }) : ListRolesService({ limit, page });
 };
 
 // Funcion para actualizar un rol
@@ -29,22 +36,7 @@ export const deleteRole = async ({ roleId }: { roleId: number }) => {
   await DeleteRoleService({ roleId });
 };
 
-// Funcion para buscar roles
-export const searchRoles = async ({
-  limit,
-  page,
-  query,
-}: {
-  limit?: number;
-  page: number;
-  query: string;
-}) => {
-  const roles = await SearchRolesService({ limit, page, query });
-  return roles;
-};
-
 // Funcion para activar un rol
 export const activateRole = async ({ roleId }: { roleId: number }) => {
-  console.log(roleId);
   await ActivateRoleService({ roleId });
 };
