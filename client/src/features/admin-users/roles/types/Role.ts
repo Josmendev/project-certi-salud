@@ -4,11 +4,7 @@ export interface Role {
   isActive?: boolean;
 }
 
-export interface UserHasRoles {
-  userId: number;
-  roleId: number;
-}
-
+export type RoleResponse = Role;
 export type UpsertRole = Pick<Role, "description">;
 
 export type UpdateRoleSelected = {
@@ -16,4 +12,7 @@ export type UpdateRoleSelected = {
   clearSelectedRole: () => void;
 };
 
-export type RoleResponse = Role;
+export interface UserHasRoles {
+  userId: number;
+  roleId: number;
+}
