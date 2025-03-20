@@ -48,10 +48,10 @@ export const UpsertStaffForm = () => {
     if (selectedStaff) {
       const { identityDocumentNumber, name, paternalSurname, maternalSurname } =
         selectedStaff.person;
-      setValue("identityDocumentNumber", identityDocumentNumber || "");
-      setValue("name", name || "");
-      setValue("paternalSurname", paternalSurname || "");
-      setValue("maternalSurname", maternalSurname || "");
+      setValue("identityDocumentNumber", identityDocumentNumber ?? "");
+      setValue("name", name ?? "");
+      setValue("paternalSurname", paternalSurname ?? "");
+      setValue("maternalSurname", maternalSurname ?? "");
       setFocus("identityDocumentNumber");
     }
   }, [selectedStaff, setValue, setFocus]);
@@ -74,14 +74,13 @@ export const UpsertStaffForm = () => {
     try {
       // Update
       if (selectedStaff) {
-        const updateStaff = { identityDocumentNumber, name, maternalSurname, paternalSurname };
-
+        const updateStaff = { ...data };
         await handleUpdateStaffMutation.mutateAsync({
           staff: updateStaff,
           staffId: selectedStaff.staffId,
         });
 
-        const messageToast = getMessageConfigResponse("Personal", ["update"]);
+        const messageToast = getMessageConfigResponse("Personal");
         showToast({ ...messageToast.update });
 
         return;
@@ -113,7 +112,7 @@ export const UpsertStaffForm = () => {
         });
       }
 
-      const messageToast = getMessageConfigResponse("Personal", ["create"]);
+      const messageToast = getMessageConfigResponse("Personal");
       showToast({ ...messageToast.create });
     } catch (error) {
       handleApiError(error);
@@ -185,7 +184,11 @@ export const UpsertStaffForm = () => {
                 <Icon.Save size={28} strokeWidth={1.2} />
               )
             }
-            disabled={handleUpdateStaffMutation.isPending || handleCreateStaffMutation.isPending}
+            disabled={
+              handleUpdateStaffMutation.isPending ||
+              handleCreateStaffMutation.isPending ||
+              Object.keys(errors).length > 0
+            }
           >
             <span>{handleCreateStaffMutation.isPending ? "Guardando..." : "Guardar"}</span>
           </Button>
@@ -213,12 +216,6 @@ export const UpsertStaffForm = () => {
             : handleAssignStaffMutation.isPending
         }
         entitiesInMessage={["Paciente", "Personal"]}
-        isMessagePermanent
-        messagePermanent={
-          modalType === "activate" && selectedItem && "DNI" in selectedItem && selectedItem?.DNI
-            ? `El personal ha sido habilitado satisfactoriamente! Búscalo por su DNI: ${selectedItem.DNI}`
-            : ""
-        }
         onConfirm={async () => {
           if (!selectedItem) return onErrorMessageInStaff({ message: "No hay datos del personal" });
 
@@ -226,9 +223,14 @@ export const UpsertStaffForm = () => {
             await handleAssignStaffMutation.mutateAsync({
               staff: { identityDocumentNumber: selectedItem.DNI },
             });
+            const messageToast = getMessageConfigResponse("Personal", ["Paciente", "Personal"]);
+            showToast({ ...messageToast.assign });
           }
+
           if (modalType === "activate" && "staffId" in selectedItem && selectedItem.staffId) {
             await handleActivateStaffMutation.mutateAsync({ staffId: selectedItem.staffId });
+            const messageToast = getMessageConfigResponse("Personal");
+            showToast({ ...messageToast.activate, permanent: true });
           }
         }}
         entityName="Personal"
