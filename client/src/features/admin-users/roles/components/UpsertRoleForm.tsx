@@ -72,7 +72,6 @@ export const UpsertRoleForm = ({ onEditRole }: { onEditRole: UpdateRoleSelected 
         placeholder="Ingresa el rol"
         required
         autoFocus
-        maxLength={20}
         tabIndex={1}
         aria-label="Campo para ingresar el rol"
         {...register("description")}
@@ -94,7 +93,7 @@ export const UpsertRoleForm = ({ onEditRole }: { onEditRole: UpdateRoleSelected 
               <Icon.Edit size={28} strokeWidth={1.2} />
             )
           }
-          disabled={isSubmitting}
+          disabled={isSubmitting || !!errors.description}
         >
           <span>{`${!selectedRole ? "Agregar" : "Actualizar"}`}</span>
         </Button>
