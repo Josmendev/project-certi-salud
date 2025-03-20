@@ -1,4 +1,4 @@
-import { getDNI } from "../../../../shared/helpers/getDNI";
+import { getNumbersInString } from "../../../../shared/helpers/getNumbersInString";
 import { handleApiError } from "../../../../shared/utils/handleApiError";
 import type { Staff, StaffResponse } from "../types/Staff";
 import { ENDPOINT_STAFF } from "../utils/endpoints";
@@ -29,7 +29,9 @@ export const CreateStaffService = async ({
       const messageWithStaffId = errorResponse.message[1] ?? "";
       // Manejo de casos específicos del backend
       if (response.status === 400 && messageResponse.includes("DNI")) {
-        const DNI = getDNI(messageResponse);
+        const DNI = getNumbersInString(messageResponse)?.[0];
+        if (!DNI) return Promise.reject("No se encontró un DNI");
+
         return { DNI, message: messageResponse, staffId: messageWithStaffId };
       }
 
