@@ -7,7 +7,7 @@
 }
 
 .textInput {
-  @apply w-full rounded-md outline-none border focus:border-primary-500 border-neutral-400 px-4 py-3 pr-14;
+  @apply w-full rounded-md outline-none border focus:border-primary-500 border-neutral-400 px-4 py-3;
 }
 
 .icon-input-left {

@@ -84,7 +84,7 @@ export const TextInput = React.forwardRef<HTMLInputElement, TextInputProps>(
             minLength={minLength}
             maxLength={maxLength}
             value={value}
-            className={`textInput ${
+            className={`textInput ${iconRight && "pr-14"} ${
               readOnly
                 ? "cursor-not-allowed bg-neutral-50 focus:border-neutral-400 text-neutral-500"
                 : classTextInput
