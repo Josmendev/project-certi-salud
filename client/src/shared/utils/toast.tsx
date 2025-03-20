@@ -8,7 +8,7 @@ const TOAST_ICONS = {
   INFO: <Icon.InfoFill size={32} />,
 };
 
-type ToastType = "success" | "error" | "warning" | "info";
+export type ToastType = "success" | "error" | "warning" | "info";
 
 interface ToastProps {
   title: string;

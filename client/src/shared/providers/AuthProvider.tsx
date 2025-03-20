@@ -1,5 +1,4 @@
 import { useReducer, useState } from "react";
-import type { DataOfUser } from "../../features/admin-users/users/types/userTypes";
 import { ConfirmUserService } from "../../features/auth/services/ConfirmUserService";
 import { LoginService } from "../../features/auth/services/LoginService";
 import { LogoutService } from "../../features/auth/services/LogoutService";
@@ -9,6 +8,7 @@ import type {
   AuthUserLogin,
   AuthUserResponse,
 } from "../../features/auth/types/authTypes";
+import type { User } from "../../features/auth/types/User";
 import { AuthContext } from "../contexts/AuthContext";
 import useTokenExpiration from "../hooks/useTokenExpiration";
 import { authReducer } from "../reducer/authReducer";
@@ -126,7 +126,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
-  const updateUserInSession = (updatedUser: DataOfUser) => {
+  const updateUserInSession = (updatedUser: User) => {
     const storedUser = JSON.parse(sessionStorage.getItem("user") || "{}");
 
     // Solo actualizar si el usuario en sesión, es el mismo que se edita
@@ -140,8 +140,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   //Verifico la expiración del token
   useTokenExpiration(authStateUser?.token, async () => {
     if (!authStateUser?.token) return;
-
     await logout();
+
     showToast({
       title: "Sesión cerrada",
       description: "Su token de sesión ha expirado. Vuelve a iniciar sesión",

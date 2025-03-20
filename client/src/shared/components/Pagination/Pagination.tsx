@@ -5,12 +5,14 @@ interface Props {
   currentPage?: number;
   totalPages?: number;
   onPageChange?: (page: number) => void;
+  className?: string;
 }
 
 export const Pagination: React.FC<Props> = ({
   totalPages = 1,
   currentPage = 1,
   onPageChange = () => {},
+  className = "",
 }) => {
   const pages: number[] = Array.from({ length: totalPages }, (_, i) => i + 1);
   const isLastPage = currentPage === totalPages;
@@ -19,7 +21,7 @@ export const Pagination: React.FC<Props> = ({
   const classPageDisabled = "cursor-not-allowed";
 
   return (
-    <div className="flex items-center justify-between bg-shades-light px-6 pb-4">
+    <div className={`flex items-center justify-between bg-shades-light px-6 pb-4 ${className}`}>
       <p>
         Mostrando {currentPage} de {totalPages} páginas
       </p>

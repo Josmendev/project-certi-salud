@@ -8,6 +8,7 @@ import Loader from "../../../shared/components/Loader";
 import { TextInput } from "../../../shared/components/TextInput/TextInput";
 import { AuthContext } from "../../../shared/contexts/AuthContext";
 import { BASE_ROUTES } from "../../../shared/utils/constants";
+import { getMessageConfigResponse } from "../../../shared/utils/getMessageConfig";
 import { showToast } from "../../../shared/utils/toast";
 import { getLoginSchema } from "../schemas/LoginSchema";
 import type { AuthUserLogin } from "../types/authTypes";
@@ -34,21 +35,17 @@ export const LoginForm = () => {
     const { token, isConfirm } = userData;
 
     if (!isConfirm) {
-      showToast({
-        title: "Confirmación de cuenta",
-        description: `Procede a confirmar tu cuenta para iniciar sesión.`,
-        type: "info",
-      });
+      const messageToast = getMessageConfigResponse("Usuario", ["confirmAccount"]);
+      showToast({ ...messageToast.confirmAccount });
+
       navigate("/" + BASE_ROUTES.PUBLIC.CONFIRM_ACCOUNT);
       return;
     }
 
     if (token && token.length > 0 && isConfirm) {
-      showToast({
-        title: "Inicio de sesión",
-        description: `Has iniciado sesión correctamente!`,
-        type: "success",
-      });
+      const messageToast = getMessageConfigResponse("Usuario", ["userInSession"]);
+      showToast({ ...messageToast.userInSession });
+
       navigate("/" + BASE_ROUTES.PRIVATE.DASHBOARD);
       await profileUser(token);
     }

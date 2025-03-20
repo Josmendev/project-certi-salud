@@ -1,5 +1,5 @@
 import { handleApiError } from "../../../../shared/utils/handleApiError";
-import type { StaffResponse, StaffUpdateRequest } from "../types/Staff";
+import type { Staff, StaffResponse } from "../types/Staff";
 import { ENDPOINT_STAFF } from "../utils/endpoints";
 
 // Creo la funcion updateStaff que se conecta a la API del backend
@@ -7,7 +7,7 @@ export const UpdateStaffService = async ({
   staff,
   staffId,
 }: {
-  staff: StaffUpdateRequest;
+  staff: Staff;
   staffId: number;
 }): Promise<StaffResponse> => {
   try {

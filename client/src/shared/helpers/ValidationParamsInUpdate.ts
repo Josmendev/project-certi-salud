@@ -1,6 +1,6 @@
 import { useLocation, useParams } from "react-router";
 
-export const ValidationParams = (mainRoute: string) => {
+export const ValidationParamsInUpdate = (mainRoute: string) => {
   // 📌 Hooks
   const { id } = useParams();
   const location = useLocation();

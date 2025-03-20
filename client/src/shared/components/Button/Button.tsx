@@ -54,9 +54,9 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         tabIndex={tabIndex || 0}
         onClick={onClick}
       >
-        {iconLeft && <span className="btn-icon-left">{iconLeft}</span>}
+        {iconLeft && <>{iconLeft}</>}
         {children}
-        {iconRight && <span className="btn-icon-right">{iconRight}</span>}
+        {iconRight && <>{iconRight}</>}
       </button>
     );
   }

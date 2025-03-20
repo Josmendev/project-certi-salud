@@ -5,7 +5,7 @@ import type { StaffResponse } from "../types/Staff";
 import { ENDPOINT_STAFF } from "../utils/endpoints";
 
 // Creo la funcion listStaff que se conecta a la API del backend
-export const ListStaffService = async ({
+export const ListStaffsService = async ({
   limit = LIMIT_PAGE,
   page = INITIAL_PAGE,
 }: {

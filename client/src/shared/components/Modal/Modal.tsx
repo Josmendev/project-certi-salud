@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { Button } from "../Button/Button";
 import ClickOutside from "../ClickOutside";
+import { Spinner } from "../Spinner/Spinner";
 
 interface Props {
   title: string;
@@ -8,9 +9,17 @@ interface Props {
   isOpen: boolean;
   onClose: () => void;
   onClickSuccess: () => void;
+  isLoadingIcon?: boolean;
 }
 
-export const Modal: React.FC<Props> = ({ title, subtitle, isOpen, onClose, onClickSuccess }) => {
+export const Modal: React.FC<Props> = ({
+  title,
+  subtitle,
+  isOpen,
+  onClose,
+  onClickSuccess,
+  isLoadingIcon,
+}) => {
   useEffect(() => {
     const handleEsc = (event: KeyboardEvent) => {
       if (event.key === "Escape") onClose();
@@ -37,8 +46,10 @@ export const Modal: React.FC<Props> = ({ title, subtitle, isOpen, onClose, onCli
               classButton="btn-primary text-paragraph-medium"
               type="button"
               onClick={onClickSuccess}
+              disabled={isLoadingIcon}
+              iconLeft={isLoadingIcon && <Spinner className="mr-1" />}
             >
-              ACEPTAR
+              {isLoadingIcon ? "Procesando..." : "ACEPTAR"}
             </Button>
 
             <Button
@@ -46,6 +57,7 @@ export const Modal: React.FC<Props> = ({ title, subtitle, isOpen, onClose, onCli
               classButton="btn-primary bg-red-500 hover:bg-red-600 text-paragraph-medium"
               type="button"
               onClick={onClose}
+              disabled={isLoadingIcon}
             >
               CANCELAR
             </Button>

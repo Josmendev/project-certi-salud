@@ -19,7 +19,7 @@ export const Card: React.FC<Props> = ({
         <p className="text-paragraph-semibold text-left">{headerCard}</p>
         {headerRightContentCard && <>{headerRightContentCard}</>}
       </header>
-      <div className="px-8 py-8 bg-shades-light">{children}</div>
+      <div className="px-8 py-8 bg-shades-light min-h-[44vh]">{children}</div>
       {footerCard && <div>{footerCard}</div>}
     </article>
   );

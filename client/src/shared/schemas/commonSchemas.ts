@@ -16,3 +16,22 @@ export const SecurePasswordSchema = PasswordSchema.regex(
   /^(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{8,16}$/,
   "La contraseña debe tener al menos una mayúscula y un número"
 );
+
+export const DNISchema = z
+  .string()
+  .nonempty("El DNI no puede ser un campo vacío")
+  .regex(/^\d+$/, "El DNI solo debe contener números")
+  .length(8, "El DNI debe tener exactamente 8 dígitos");
+
+export const FullNameSchema = z
+  .string()
+  .nonempty("Los nombres no puede ser un campo vacío")
+  .min(2, "Los nombres debe tener al menos 2 caracteres") // Longitud mínima de 2
+  .max(50, "El nombre debe tener como máximo 50 caracteres"); // Longitud máxima de 50
+
+export const LastNameSchema = (label: string) =>
+  z
+    .string()
+    .nonempty({ message: `El ${label} no puede ser un campo vacío` })
+    .min(2, { message: `El ${label} debe tener al menos 2 caracteres` })
+    .max(30, { message: `El ${label} debe tener como máximo 30 caracteres` });

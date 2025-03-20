@@ -1,78 +1,41 @@
-import { useState } from "react";
 import { Card } from "../../../../shared/components/Card/Card";
+import { GenericModal } from "../../../../shared/components/GenericModal";
 import Loader from "../../../../shared/components/Loader";
-import { Modal } from "../../../../shared/components/Modal/Modal";
 import { Pagination } from "../../../../shared/components/Pagination/Pagination";
 import { Search } from "../../../../shared/components/Search";
 import { Table } from "../../../../shared/components/Table/Table";
-import { useModal } from "../../../../shared/hooks/useModal";
+import { useModalManager } from "../../../../shared/hooks/useModalManager";
 import DefaultLayout from "../../../../shared/layouts/DefaultLayout";
 import { SectionLayout } from "../../../../shared/layouts/SectionLayout";
-import { showToast } from "../../../../shared/utils/toast";
 import { TableRoleItem } from "../components/TableRoleItem";
 import { UpsertRoleForm } from "../components/UpsertRoleForm";
+import { useRoleManagement } from "../hooks/useRoleManagement";
 import { useRoles } from "../hooks/useRoles";
-import type { Role, UpdateRoleSelected } from "../types/Role";
+import type { Role } from "../types/Role";
 
 export const RoleListPage = () => {
-  const [onEditRole, setOnEditRoleRole] = useState<UpdateRoleSelected>({
-    selectedRole: null,
-    clearSelectedRole: () => {
-      setOnEditRoleRole((prev) => ({ ...prev, selectedRole: null }));
-    },
-  });
-  const { modalType, openModal, closeModal } = useModal();
-
-  const headersTable = ["N°", "Rol", "Estado"];
   const {
-    data,
-    isLoading,
-    isError,
-    error,
     currentPage,
-    handlePageChangeInRole,
-    handleSearchRole,
-    handleActivateRoleMutation,
-    handleDeleteRoleMutation,
-  } = useRoles();
+    searchQuery,
+    handlePageChange,
+    handleSearch,
+    onEditRole,
+    handleStateRole,
+    handleEditRoleInRow,
+    handleActivateRoleInRow,
+    handleDeleteRoleInRow,
+  } = useRoleManagement();
 
-  const handleEditRoleInRow = (data: Role) => {
-    if (!data) {
-      showToast({
-        title: "Advertencia",
-        description: "Debes seleccionar previamente una fila",
-        type: "warning",
-      });
-      return;
-    }
-    setOnEditRoleRole((prev) => ({ ...prev, selectedRole: data }));
-  };
+  const { data, isLoading, isError, error } = useRoles({
+    currentPage,
+    searchQuery,
+  });
 
-  const handleDeleteRoleInRow = (data: Role) => {
-    if (!data || !data.roleId) {
-      showToast({
-        title: "Advertencia",
-        description: "Debes seleccionar previamente una fila",
-        type: "warning",
-      });
-      return;
-    }
-    setOnEditRoleRole((prev) => ({ ...prev, selectedRole: data }));
-    handleDeleteRoleMutation.mutate({ roleId: data.roleId });
-  };
+  const { modalType, openModal, closeModal, selectedItem } = useModalManager<Role>();
+  const headersTable = ["N°", "Rol", "Estado"];
 
-  const handleActivateRoleInRow = (data: Role) => {
-    if (!data || !data.roleId) {
-      showToast({
-        title: "Advertencia",
-        description: "Debes seleccionar previamente una fila",
-        type: "warning",
-      });
-      return;
-    }
-    setOnEditRoleRole((prev) => ({ ...prev, selectedRole: data }));
-    handleActivateRoleMutation.mutate({ roleId: data.roleId });
-  };
+  if (isLoading) return <Loader />;
+  if (isError) return <b>Error: {error?.message || "Error desconocido"}</b>;
 
   return (
     <DefaultLayout>
@@ -81,12 +44,9 @@ export const RoleListPage = () => {
         subtitle="Administración de usuarios"
         classNameForChildren="flex gap-4"
       >
-        <Card headerCard="Registro" className="min-w-96">
+        <Card headerCard="Registro" className="min-w-96 overflow-hidden !h-[310px]">
           <UpsertRoleForm onEditRole={onEditRole} />
         </Card>
-
-        {isLoading && <Loader />}
-        {isError && <b>Error: {error?.message || "Error desconocido"}</b>}
 
         <Card
           headerCard="Listado"
@@ -97,14 +57,15 @@ export const RoleListPage = () => {
               name="txtSearchRole"
               placeholder="Buscar rol"
               className="!mt-0 !mb-0"
-              onSearch={handleSearchRole}
+              onSearch={handleSearch}
             />
           }
           footerCard={
             <Pagination
               currentPage={currentPage}
               totalPages={data?.totalPages ?? 1}
-              onPageChange={handlePageChangeInRole}
+              onPageChange={handlePageChange}
+              className="-mt-12"
             />
           }
         >
@@ -114,62 +75,31 @@ export const RoleListPage = () => {
               currentPage={currentPage}
               editRow={handleEditRoleInRow}
               deleteRow={(data) => {
-                openModal("delete");
-                setOnEditRoleRole((prev) => ({ ...prev, selectedRole: data }));
+                openModal("delete", data);
+                handleStateRole(data);
               }}
               activateRow={(data) => {
-                openModal("activate");
-                setOnEditRoleRole((prev) => ({ ...prev, selectedRole: data }));
+                openModal("activate", data);
+                handleStateRole(data);
               }}
             />
           </Table>
         </Card>
 
-        <Modal
-          title="Eliminar Rol"
-          subtitle="¿Deseas eliminar el rol seleccionado?"
-          isOpen={modalType === "delete"}
+        <GenericModal
+          modalType={modalType}
           onClose={() => {
             onEditRole.clearSelectedRole();
             closeModal();
           }}
-          onClickSuccess={() => {
-            console.log(onEditRole.selectedRole);
-            if (onEditRole.selectedRole) {
-              handleDeleteRoleInRow(onEditRole.selectedRole);
-              closeModal();
-              showToast({
-                title: "Rol eliminado",
-                description: `El rol ${onEditRole.selectedRole?.description} ha sido eliminado`,
-                type: "success",
-              });
-
+          onConfirm={() => {
+            if (selectedItem) {
+              if (modalType === "delete") handleDeleteRoleInRow(selectedItem);
+              if (modalType === "activate") handleActivateRoleInRow(selectedItem);
               onEditRole.clearSelectedRole();
             }
           }}
-        />
-
-        <Modal
-          title="Activar Rol"
-          subtitle="¿Deseas activar el rol seleccionado?"
-          isOpen={modalType === "activate"}
-          onClose={() => {
-            onEditRole.clearSelectedRole();
-            closeModal();
-          }}
-          onClickSuccess={() => {
-            if (onEditRole.selectedRole) {
-              handleActivateRoleInRow(onEditRole.selectedRole);
-              closeModal();
-              showToast({
-                title: "Rol activado",
-                description: `El rol ${onEditRole.selectedRole?.description} ha sido activado`,
-                type: "success",
-              });
-
-              onEditRole.clearSelectedRole();
-            }
-          }}
+          entityName="Rol"
         />
       </SectionLayout>
     </DefaultLayout>

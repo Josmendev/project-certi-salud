@@ -1,5 +1,5 @@
 .btn-primary {
-  @apply flex items-center justify-center gap-2 p-3 bg-primary-500 rounded-md text-shades-light text-paragraph-semibold w-full transition-all duration-300 ease-in-out;
+  @apply flex items-center justify-center gap-2 p-3.5 bg-primary-500 rounded-md text-shades-light text-paragraph-semibold w-full transition-all duration-300 ease-in-out;
 
   &:hover {
     @apply bg-primary-600;
@@ -7,5 +7,5 @@
 }
 
 .btn-base {
-  @apply flex items-center gap-2 p-3 rounded-md text-paragraph-semibold w-full transition-all duration-300 ease-in-out;
+  @apply flex items-center gap-2 p-3.5 rounded-md text-paragraph-semibold w-full transition-all duration-300 ease-in-out;
 }

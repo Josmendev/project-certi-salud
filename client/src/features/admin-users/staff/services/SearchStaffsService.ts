@@ -4,8 +4,8 @@ import { handleApiError } from "../../../../shared/utils/handleApiError";
 import type { StaffResponse } from "../types/Staff";
 import { ENDPOINT_STAFF } from "../utils/endpoints";
 
-// Creo la funcion searchForRoles que se conecta a la API del backend
-export const SearchRolesService = async ({
+// Creo la funcion searchForStaffs que se conecta a la API del backend
+export const SearchStaffsService = async ({
   limit = LIMIT_PAGE,
   page = INITIAL_PAGE,
   query = "",

@@ -1,44 +1,76 @@
 import { useState } from "react";
-import { useLocation } from "react-router";
-import { useModal } from "../../../../shared/hooks/useModal";
+import { useLocation, useNavigate } from "react-router";
+import { ValidationParamsInUpdate } from "../../../../shared/helpers/ValidationParamsInUpdate";
+import { usePagination } from "../../../../shared/hooks/usePagination";
 import { BASE_ROUTES, ROLES_MAPPING, type ROLES_KEYS } from "../../../../shared/utils/constants";
+import { getMessageConfigResponse } from "../../../../shared/utils/getMessageConfig";
 import { showToast } from "../../../../shared/utils/toast";
+import type { User } from "../../../auth/types/User";
 import { ADMIN_USERS_ROUTES } from "../../utils/constants";
-import { ValidationParams } from "../helpers/ValidationParams";
-import type { DataOfUser } from "../types/userTypes";
 import { useUsers } from "./useUsers";
 
 export const useUserManagement = () => {
   // 📌 Hooks
   const location = useLocation();
-  const selectedUser = location.state?.user as DataOfUser;
-  const currentPage = location.state?.page as number;
-  const { handleUpdateUserMutation, handleResetPasswordUserMutation } = useUsers();
-  const { modalType, openModal, closeModal } = useModal();
+  const navigate = useNavigate();
+  const { currentPage: pageOfPagination, searchQuery } = usePagination();
+  const selectedUser = location.state?.user as User;
+  const currentPage = (location.state?.pageOfUsers as number) ?? pageOfPagination ?? 1;
+  const MAIN_ROUTE = `/${BASE_ROUTES.PRIVATE.ADMIN}/${ADMIN_USERS_ROUTES.USERS}`;
+  const { handleUpdateUserMutation, handleResetPasswordUserMutation } = useUsers({
+    currentPage,
+    searchQuery,
+  });
 
-  // 📌 Estado
+  // 📌 Estados
   const [roles, setRoles] = useState<ROLES_KEYS[]>((selectedUser?.role as ROLES_KEYS[]) || []);
 
-  // 📌 Variables y rutas con validaciones antes del renderizado
-  const MAIN_ROUTE = `/${BASE_ROUTES.PRIVATE.ADMIN}/${ADMIN_USERS_ROUTES.USERS}`;
-  const isValidateParams = ValidationParams(MAIN_ROUTE);
-  if (!isValidateParams) return { shouldRedirect: true };
+  // 📌 Validaciones antes del renderizado (edit)
+  const isUpdating = location.pathname.includes("/edit");
+  if (isUpdating) {
+    const isValidateParams = ValidationParamsInUpdate(MAIN_ROUTE);
+    if (!isValidateParams) return { shouldRedirect: true };
+  }
 
-  // 📌 Handlers de eventos
+  // Eventos al seleccionar fila
+  const onEditRowSelected = (data: User) => {
+    navigate(`${MAIN_ROUTE}/${data.userId}/edit`, {
+      state: { user: data, pageOfUsers: pageOfPagination },
+    });
+  };
+
+  // Handlers de eventos generales
   const handleUpdateUser = (e: React.FormEvent) => {
     e.preventDefault();
     const rolesId = roles?.map((role) => ROLES_MAPPING[role]).filter(Number.isFinite);
+
+    if (rolesId.length === 0) {
+      showToast({
+        title: "No hay roles seleccionados",
+        description: `Tiene que seleccionar un rol como mínimo`,
+        type: "error",
+      });
+      return false;
+    }
 
     handleUpdateUserMutation.mutate({
       userId: selectedUser?.userId,
       role: rolesId,
     });
 
-    showToast({
-      title: "Usuario actualiizado",
-      description: "Los datos del usuario han sido actualizados con éxito!",
-      type: "success",
+    const messageToast = getMessageConfigResponse("Usuario", ["update"]);
+    showToast({ ...messageToast.update });
+    return true;
+  };
+
+  // Confirmo la acción en el modal
+  const handleResetPasswordUser = () => {
+    handleResetPasswordUserMutation.mutate({
+      userId: selectedUser?.userId,
     });
+
+    const messageToast = getMessageConfigResponse("Personal", ["refreshPassword"]);
+    showToast({ ...messageToast.refreshPassword });
   };
 
   const handleChangeRole = (role: ROLES_KEYS) => {
@@ -50,27 +82,11 @@ export const useUserManagement = () => {
     );
   };
 
-  // Confirmo la acción en el modal
-  const handleResetPasswordUser = () => {
-    handleResetPasswordUserMutation.mutate({
-      userId: selectedUser?.userId,
-    });
-
-    showToast({
-      title: "Contraseña restablecida",
-      description:
-        "Se restableció la contraseña de manera exitosa. Para iniciar sesión, el usuario debe confirmar sus credenciales.",
-      type: "success",
-    });
-  };
-
   return {
     selectedUser,
     currentPage,
-    modalType,
     roles,
-    openModal,
-    closeModal,
+    onEditRowSelected,
     handleUpdateUser,
     handleChangeRole,
     handleResetPasswordUser,

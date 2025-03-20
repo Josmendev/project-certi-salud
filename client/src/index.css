@@ -4,6 +4,7 @@
 @import "./shared/components/Header/Header.module.css";
 @import "./shared/components/Checkbox/Checkbox.module.css";
 @import "./shared/components/Modal/Modal.module.css";
+@import "./shared/components/Spinner/Spinner.module.css";
 
 @tailwind base;
 @tailwind components;

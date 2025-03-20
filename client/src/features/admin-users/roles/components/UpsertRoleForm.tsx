@@ -4,6 +4,7 @@ import { useForm, type SubmitHandler } from "react-hook-form";
 import { Button } from "../../../../shared/components/Button/Button";
 import { Icon } from "../../../../shared/components/Icon";
 import { TextInput } from "../../../../shared/components/TextInput/TextInput";
+import { usePagination } from "../../../../shared/hooks/usePagination";
 import { handleApiError } from "../../../../shared/utils/handleApiError";
 import { useRoles } from "../hooks/useRoles";
 import { getRoleSchema } from "../schemas/RoleSchema";
@@ -11,53 +12,54 @@ import type { RoleResponse, UpdateRoleSelected } from "../types/Role";
 
 export const UpsertRoleForm = ({ onEditRole }: { onEditRole: UpdateRoleSelected }) => {
   const { selectedRole, clearSelectedRole } = onEditRole;
+
   const {
     register,
     handleSubmit,
-    resetField,
+    reset,
     setFocus,
     setValue,
-    formState: { errors, isLoading },
+    formState: { errors, isSubmitting },
   } = useForm<RoleResponse>({
     resolver: zodResolver(getRoleSchema()),
     mode: "onChange", // Valido cuando el usuario escribe
   });
 
-  const { handleCreateRoleMutation, handleUpdateRoleMutation } = useRoles();
+  const { currentPage, searchQuery } = usePagination();
+  const { handleCreateRoleMutation, handleUpdateRoleMutation } = useRoles({
+    currentPage,
+    searchQuery,
+  });
 
   //Asigno el valor de descripcion al campo del register
   useEffect(() => {
-    if (selectedRole) setValue("description", selectedRole?.description);
-    else setValue("description", "");
-  }, [selectedRole, setValue]);
+    if (selectedRole) setValue("description", selectedRole.description);
+    else reset();
+  }, [selectedRole, setValue, reset]);
 
   const onSubmit: SubmitHandler<RoleResponse> = async (data) => {
     try {
-      //Edición de rol
+      // Update
       if (selectedRole) {
-        handleUpdateRoleMutation.mutate({
-          role: { description: data?.description },
-          roleId: selectedRole?.roleId,
+        await handleUpdateRoleMutation.mutateAsync({
+          role: { description: data.description },
+          roleId: selectedRole.roleId,
         });
-        clearSelectedRole();
-        onReset();
-        return;
+        // Create
+      } else {
+        await handleCreateRoleMutation.mutateAsync({
+          role: { description: data.description },
+        });
       }
 
-      // Adición de rol
-      handleCreateRoleMutation.mutate({
-        role: { description: data.description },
-      });
-
-      resetField("description");
-      setFocus("description");
+      onReset();
     } catch (error) {
       handleApiError(error);
     }
   };
 
   const onReset = () => {
-    resetField("description");
+    reset();
     setFocus("description");
     clearSelectedRole();
   };
@@ -92,8 +94,7 @@ export const UpsertRoleForm = ({ onEditRole }: { onEditRole: UpdateRoleSelected 
               <Icon.Edit size={28} strokeWidth={1.2} />
             )
           }
-          onClick={handleSubmit(onSubmit)}
-          disabled={isLoading}
+          disabled={isSubmitting}
         >
           <span>{`${!selectedRole ? "Agregar" : "Actualizar"}`}</span>
         </Button>
@@ -115,7 +116,7 @@ export const UpsertRoleForm = ({ onEditRole }: { onEditRole: UpdateRoleSelected 
             )
           }
           onClick={onReset}
-          disabled={isLoading}
+          disabled={isSubmitting}
         >
           <span>
             <span>{`${!selectedRole ? "Limpiar" : "Cancelar"}`}</span>
