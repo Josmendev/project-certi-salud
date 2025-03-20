@@ -29,6 +29,15 @@ export const FullNameSchema = z
   .min(2, "Los nombres debe tener al menos 2 caracteres") // Longitud mínima de 2
   .max(50, "El nombre debe tener como máximo 50 caracteres"); // Longitud máxima de 50
 
+export const AgeSchema = z
+  .number({
+    required_error: "La edad es un campo requerido",
+    invalid_type_error: "La edad debe ser un campo numérico",
+  })
+  .int()
+  .min(0, { message: "La edad mínima permitida es 0 ('0' para bebés menores a 1 año)" })
+  .max(120, { message: "La edad máxima permitida es 120" });
+
 export const LastNameSchema = (label: string) =>
   z
     .string()
