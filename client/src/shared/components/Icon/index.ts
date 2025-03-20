@@ -1,6 +1,8 @@
 import ActiveIcon from "./ActiveIcon";
 import ArrowLeftIcon from "./ArrowLeftIcon";
 import ArrowRightIcon from "./ArrowRightIcon";
+import AssignPacientIcon from "./AssignPacientIcon";
+import AssignStaffIcon from "./AssignStaffIcon";
 import BackIcon from "./BackIcon";
 import CertificateIcon from "./CertificateIcon";
 import CheckIcon from "./CheckIcon";
@@ -17,6 +19,7 @@ import LogoutIcon from "./LogoutIcon";
 import MenuIcon from "./MenuIcon";
 import PasswordIcon from "./PasswordIcon";
 import PatientIcon from "./PatientIcon";
+import PlusIcon from "./PlusIcon";
 import ProfileIcon from "./ProfileIcon";
 import RefreshIcon from "./RefreshIcon";
 import ReportCertificateIcon from "./ReportCertificateIcon";
@@ -59,6 +62,9 @@ export const Icon = {
   Refresh: RefreshIcon,
   Close: CloseIcon,
   Clear: ClearIcon,
+  Plus: PlusIcon,
+  AssignStaff: AssignStaffIcon,
+  AssignPacient: AssignPacientIcon,
   HiddenPassword: HiddenPasswordIcon,
   SuccessFill: SuccessFillIcon,
   InfoFill: InfoFillIcon,
