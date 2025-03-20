@@ -5,9 +5,15 @@ interface Props {
   headersTable: Array<string>;
   response: DataResponseFromAPI<DataCollectionType>;
   children: React.ReactNode;
+  hasButtonActions?: boolean;
 }
 
-export const Table: React.FC<Props> = ({ headersTable, response, children }) => {
+export const Table: React.FC<Props> = ({
+  headersTable,
+  response,
+  hasButtonActions = true,
+  children,
+}) => {
   return response.data.length === 0 ? (
     <div>No hay datos para mostrar</div>
   ) : (
@@ -20,7 +26,9 @@ export const Table: React.FC<Props> = ({ headersTable, response, children }) => 
                 {header}
               </th>
             ))}
-            <th className="p-4 text-paragraph-semibold w-[150px]">Acciones</th>
+            {hasButtonActions && (
+              <th className="p-4 text-paragraph-semibold w-[150px]">Acciones</th>
+            )}
           </tr>
         </thead>
         <tbody>{children}</tbody>
