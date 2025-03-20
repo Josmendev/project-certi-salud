@@ -34,10 +34,7 @@ export const getMessageConfigRequest = (
   } as Record<Exclude<EventType, null>, { title: string; subtitle: string }>;
 };
 
-export const getMessageConfigResponse = (
-  entityName: string,
-  entitiesInMessage: Array<string> = []
-) => {
+export const getMessageConfigResponse = (entityName: string, entitiesInMessage?: Array<string>) => {
   const [firstItem = "Paciente", secondItem = "Personal"] = entitiesInMessage ?? [];
   return {
     create: {
