@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router";
 import { AuthContext } from "../../contexts/AuthContext";
 import { getUserInformation } from "../../helpers/getUserInformation";
 import { BASE_ROUTES } from "../../utils/constants";
+import { getMessageConfigResponse } from "../../utils/getMessageConfig";
 import { handleApiError } from "../../utils/handleApiError";
 import { showToast } from "../../utils/toast";
 import { Button } from "../Button/Button";
@@ -24,11 +25,8 @@ const DropdownUser = () => {
 
   const handleLogout = async () => {
     await logout();
-    showToast({
-      title: "Sesión cerrada",
-      description: "Se cerró la sesión de forma exitosa",
-      type: "success",
-    });
+    const messageToast = getMessageConfigResponse("Usuario", ["userLogout"]);
+    showToast({ ...messageToast.userLogout });
     navigate(BASE_ROUTES.PUBLIC.HOME);
   };
 
