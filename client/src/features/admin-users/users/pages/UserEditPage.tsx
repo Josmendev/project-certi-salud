@@ -2,31 +2,31 @@ import { Navigate, useNavigate } from "react-router";
 import { Button } from "../../../../shared/components/Button/Button";
 import { Card } from "../../../../shared/components/Card/Card";
 import { Checkbox } from "../../../../shared/components/Checkbox/Checkbox";
+import { GenericModal } from "../../../../shared/components/GenericModal";
 import { Icon } from "../../../../shared/components/Icon";
-import { Modal } from "../../../../shared/components/Modal/Modal";
 import { TextInput } from "../../../../shared/components/TextInput/TextInput";
 import { getUserInformation } from "../../../../shared/helpers/getUserInformation";
+import { useModalManager } from "../../../../shared/hooks/useModalManager";
 import DefaultLayout from "../../../../shared/layouts/DefaultLayout";
 import { SectionLayout } from "../../../../shared/layouts/SectionLayout";
+import type { User } from "../../../auth/types/User";
 import { useUserManagement } from "../hooks/useUserManagement";
 
 //📌 => Orden convencional para estructura de componentes
 export const UserEditPage = () => {
   const {
     selectedUser,
-    modalType,
     roles,
     currentPage,
     handleUpdateUser,
     handleChangeRole,
     handleResetPasswordUser,
-    openModal,
-    closeModal,
     shouldRedirect,
     MAIN_ROUTE,
   } = useUserManagement();
 
   const navigate = useNavigate();
+  const { modalType, openModal, closeModal, selectedItem } = useModalManager<User>();
   const ROUTE_INITIAL = `${MAIN_ROUTE}?page=${currentPage}`;
   if (!selectedUser || !roles) return <Navigate to={ROUTE_INITIAL} />;
   if (shouldRedirect) return <Navigate to={ROUTE_INITIAL} />;
@@ -43,8 +43,8 @@ export const UserEditPage = () => {
               title="Regresar"
               classButton="btn-primary w-auto text-paragraph-regular py-2"
               type="button"
-              iconLeft={<Icon.Back />}
-              onClick={() => navigate(ROUTE_INITIAL, { replace: true })}
+              iconLeft={<Icon.Back size={28} strokeWidth={1.2} />}
+              onClick={() => navigate(ROUTE_INITIAL)}
             >
               Regresar
             </Button>
@@ -97,10 +97,10 @@ export const UserEditPage = () => {
                 id="btnSaveUser"
                 type="submit"
                 classButton="btn-primary text-paragraph-medium"
-                iconLeft={<Icon.Save />}
+                iconLeft={<Icon.Save size={28} strokeWidth={1.2} />}
                 onClick={(e) => {
-                  handleUpdateUser(e);
-                  navigate(ROUTE_INITIAL);
+                  const responseUpdated = handleUpdateUser(e);
+                  if (responseUpdated) navigate(ROUTE_INITIAL, { replace: true });
                 }}
               >
                 Guardar
@@ -111,25 +111,27 @@ export const UserEditPage = () => {
                 id="btnResetUser"
                 type="button"
                 classButton="btn-primary text-paragraph-medium bg-neutral-600 hover:bg-neutral-700"
-                iconLeft={<Icon.Refresh />}
-                onClick={() => openModal("resetPasswordUser")}
+                iconLeft={<Icon.Refresh size={28} strokeWidth={1.2} />}
+                onClick={() => {
+                  const userToShow = selectedItem ?? selectedUser;
+                  if (userToShow) openModal("refreshPassword", userToShow);
+                }}
               >
                 Refrescar contraseña
               </Button>
             </div>
           </form>
-
-          <Modal
-            title="Refrescar contraseña"
-            subtitle="¿Desea restaurar la contraseña a su estado inicial?"
-            isOpen={modalType == "resetPasswordUser"}
-            onClose={closeModal}
-            onClickSuccess={() => {
-              handleResetPasswordUser();
-              navigate(ROUTE_INITIAL);
-            }}
-          />
         </Card>
+
+        <GenericModal
+          modalType={modalType}
+          onClose={closeModal}
+          onConfirm={() => {
+            handleResetPasswordUser();
+            navigate(ROUTE_INITIAL, { replace: true });
+          }}
+          entityName="User"
+        />
       </SectionLayout>
     </DefaultLayout>
   );
