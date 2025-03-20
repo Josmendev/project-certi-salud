@@ -1,12 +1,12 @@
 import { Button } from "../../../../shared/components/Button/Button";
 import { Icon } from "../../../../shared/components/Icon";
 import { LIMIT_PAGE } from "../../../../shared/utils/constants";
-import type { DataOfUser } from "../types/userTypes";
+import type { User } from "../../../auth/types/User";
 
 export interface TableUserItemProps {
-  listOfUsers: Array<DataOfUser>;
+  listOfUsers: Array<User>;
   currentPage: number;
-  editRow?: (data: DataOfUser) => void;
+  editRow?: (data: User) => void;
 }
 
 export const TableUserItem: React.FC<TableUserItemProps> = ({
@@ -44,6 +44,7 @@ export const TableUserItem: React.FC<TableUserItemProps> = ({
           <td className="p-2">{row.role.join(", ")}</td>
           <td className="p-2">{textIsConfirm(row.isConfirm)}</td>
           <td className="p-2">{textIsActive(row.isActive)}</td>
+
           <td className="p-3 w-[180px] flex gap-1.5 items-center justify-center">
             {editRow && (
               <Button
@@ -51,7 +52,11 @@ export const TableUserItem: React.FC<TableUserItemProps> = ({
                 id={`btnEditRow-${row.userId}`}
                 aria-data={row}
                 classButton="transition-all duration-200 ease-in-out hover:text-warning-400"
-                onClick={() => editRow(row)}
+                onClick={() => {
+                  if (editRow) {
+                    editRow(row);
+                  }
+                }}
               >
                 <Icon.Edit className="w-6 h-6" strokeWidth={1.2} />
               </Button>
