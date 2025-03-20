@@ -1,8 +1,6 @@
 import { useCallback } from "react";
 import { useLocation, useNavigate } from "react-router";
 import { usePagination } from "../../../../shared/hooks/usePagination";
-import { BASE_ROUTES } from "../../../../shared/utils/constants";
-import { ADMIN_USERS_ROUTES } from "../../utils/constants";
 import type { StaffResponse } from "../types/Staff";
 import { useStaff } from "./useStaff";
 
@@ -10,7 +8,6 @@ export const useStaffManagement = () => {
   // 📌 Hooks
   const location = useLocation();
   const navigate = useNavigate();
-  const MAIN_ROUTE = `/${BASE_ROUTES.PRIVATE.ADMIN}/${ADMIN_USERS_ROUTES.STAFF}`;
   const {
     currentPage: pageOfPagination,
     searchQuery,
@@ -19,7 +16,7 @@ export const useStaffManagement = () => {
   } = usePagination();
   const currentPage = location.state?.pageOfStaff ?? pageOfPagination ?? 1;
 
-  const { handleDeleteStaffMutation } = useStaff({ currentPage, searchQuery });
+  const { handleDeleteStaffMutation, MAIN_ROUTE } = useStaff({ currentPage, searchQuery });
 
   const handleUpdateStaffInRow = useCallback(
     (data: StaffResponse) => {

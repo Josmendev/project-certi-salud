@@ -18,7 +18,7 @@ export const Pagination: React.FC<Props> = ({
   const isLastPage = currentPage === totalPages;
   const isFirstPage = currentPage === 1;
   const classPageActive = "bg-primary-600 text-white text-paragraph-medium";
-  const classPageDisabled = "cursor-not-allowed";
+  const classPageDisabled = "cursor-not-allowed bg-transparent hover:bg-transparent";
 
   return (
     <div className={`flex items-center justify-between bg-shades-light px-6 pb-4 ${className}`}>

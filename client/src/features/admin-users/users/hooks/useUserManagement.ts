@@ -58,7 +58,7 @@ export const useUserManagement = () => {
       role: rolesId,
     });
 
-    const messageToast = getMessageConfigResponse("Usuario", ["update"]);
+    const messageToast = getMessageConfigResponse("Usuario");
     showToast({ ...messageToast.update });
     return true;
   };
@@ -69,7 +69,7 @@ export const useUserManagement = () => {
       userId: selectedUser?.userId,
     });
 
-    const messageToast = getMessageConfigResponse("Personal", ["refreshPassword"]);
+    const messageToast = getMessageConfigResponse("Personal");
     showToast({ ...messageToast.refreshPassword });
   };
 

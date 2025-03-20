@@ -35,7 +35,7 @@ export const LoginForm = () => {
     const { token, isConfirm } = userData;
 
     if (!isConfirm) {
-      const messageToast = getMessageConfigResponse("Usuario", ["confirmAccount"]);
+      const messageToast = getMessageConfigResponse("Usuario");
       showToast({ ...messageToast.confirmAccount });
 
       navigate("/" + BASE_ROUTES.PUBLIC.CONFIRM_ACCOUNT);
@@ -43,7 +43,7 @@ export const LoginForm = () => {
     }
 
     if (token && token.length > 0 && isConfirm) {
-      const messageToast = getMessageConfigResponse("Usuario", ["userInSession"]);
+      const messageToast = getMessageConfigResponse("Usuario");
       showToast({ ...messageToast.userInSession });
 
       navigate("/" + BASE_ROUTES.PRIVATE.DASHBOARD);

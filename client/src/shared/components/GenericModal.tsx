@@ -20,8 +20,6 @@ export const GenericModal = ({
   onConfirm,
   entityName,
   isLoadingData,
-  isMessagePermanent = false,
-  messagePermanent = "",
   entitiesInMessage = [],
 }: GenericModalProps) => {
   if (!modalType) return null;
@@ -37,8 +35,7 @@ export const GenericModal = ({
       await onConfirm();
       showToast({
         ...toastConfig,
-        description: isMessagePermanent ? messagePermanent : toastConfig.description,
-        permanent: isMessagePermanent,
+        description: toastConfig.description || "Operación realizada correctamente.",
       });
       onClose();
     } catch (error) {

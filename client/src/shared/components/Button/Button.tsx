@@ -44,7 +44,10 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         id={id}
         name={name}
         type={type}
-        className={`${classButton}`}
+        className={`${
+          disabled &&
+          "cursor-not-allowed bg-neutral-100 hover:bg-neutral-100 focus:border-neutral-100 text-neutral-600"
+        } ${classButton}`}
         disabled={disabled}
         aria-label={ariaLabel || title}
         aria-disabled={disabled ? "true" : "false"}

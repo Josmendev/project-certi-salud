@@ -25,7 +25,7 @@ const DropdownUser = () => {
 
   const handleLogout = async () => {
     await logout();
-    const messageToast = getMessageConfigResponse("Usuario", ["userLogout"]);
+    const messageToast = getMessageConfigResponse("Usuario");
     showToast({ ...messageToast.userLogout });
     navigate(BASE_ROUTES.PUBLIC.HOME);
   };

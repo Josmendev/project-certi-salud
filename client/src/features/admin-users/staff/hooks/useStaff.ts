@@ -77,6 +77,7 @@ export const useStaff = ({
     isSuccess,
     error,
     currentPage,
+    MAIN_ROUTE,
     handleCreateStaffMutation,
     handleUpdateStaffMutation,
     handleDeleteStaffMutation,
