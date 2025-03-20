@@ -1,17 +1,20 @@
 import type { Person } from "../../../../shared/types/Person";
 
-export interface Staff {
-  identityDocumentNumber: number;
-  name: number;
-  paternalSurname: boolean;
-  maternalSurname: boolean;
-}
+//Types of Request
+export type Staff = Omit<Person, "personId">;
+export type StaffAssignRequest = Pick<Person, "identityDocumentNumber">;
 
+//Types of Response
 export interface StaffResponse {
   staffId: number;
   isActive: boolean;
   person: Person;
 }
 
-export type StaffUpdateRequest = Partial<Staff>;
-export type StaffAssignRequest = Pick<Staff, "identityDocumentNumber">;
+export interface StaffResponseConditional {
+  DNI: string;
+  staffId?: number;
+  isPacientToAssignStaff?: boolean;
+  isStaffDesactivated?: boolean;
+  isRegistered?: boolean;
+}
