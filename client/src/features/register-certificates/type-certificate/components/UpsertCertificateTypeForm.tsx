@@ -9,12 +9,19 @@ import { usePagination } from "../../../../shared/hooks/usePagination";
 import { getMessageConfigResponse } from "../../../../shared/utils/getMessageConfig";
 import { handleApiError } from "../../../../shared/utils/handleApiError";
 import { showToast } from "../../../../shared/utils/toast";
-import { useRoles } from "../hooks/useRoles";
-import { getRoleSchema } from "../schemas/RoleSchema";
-import type { RoleResponse, UpdateRoleSelected } from "../types/Role";
+import { useCertificateTypes } from "../hooks/useCertificateTypes";
+import { getCertificateTypeSchema } from "../schemas/getCertificateTypeSchema";
+import type {
+  CertificateTypeResponse,
+  UpdateCertificateTypeSelected,
+} from "../types/CertificateType";
 
-export const UpsertRoleForm = ({ onEditRole }: { onEditRole: UpdateRoleSelected }) => {
-  const { selectedRole, clearSelectedRole } = onEditRole;
+export const UpsertCertificateTypeForm = ({
+  onEditCertificateType,
+}: {
+  onEditCertificateType: UpdateCertificateTypeSelected;
+}) => {
+  const { selectedCertificateType, clearSelectedCertificateType } = onEditCertificateType;
 
   const {
     register,
@@ -23,42 +30,43 @@ export const UpsertRoleForm = ({ onEditRole }: { onEditRole: UpdateRoleSelected 
     setFocus,
     setValue,
     formState: { errors, isSubmitting },
-  } = useForm<RoleResponse>({
-    resolver: zodResolver(getRoleSchema()),
+  } = useForm<CertificateTypeResponse>({
+    resolver: zodResolver(getCertificateTypeSchema()),
     mode: "onChange", // Valido cuando el usuario escribe
   });
 
   const { currentPage, searchQuery } = usePagination();
-  const { handleCreateRoleMutation, handleUpdateRoleMutation } = useRoles({
-    currentPage,
-    searchQuery,
-  });
+  const { handleCreateCertificateTypeMutation, handleUpdateCertificateTypeMutation } =
+    useCertificateTypes({
+      currentPage,
+      searchQuery,
+    });
 
   //Asigno el valor de descripcion al campo del register
   useEffect(() => {
-    if (selectedRole) setValue("description", selectedRole.description);
+    if (selectedCertificateType) setValue("description", selectedCertificateType.description);
     else reset();
-  }, [selectedRole, setValue, reset]);
+  }, [selectedCertificateType, setValue, reset]);
 
-  const onSubmit: SubmitHandler<RoleResponse> = async (data) => {
+  const onSubmit: SubmitHandler<CertificateTypeResponse> = async (data) => {
     try {
       // Update
-      if (selectedRole) {
-        await handleUpdateRoleMutation.mutateAsync({
-          role: { description: data.description },
-          roleId: selectedRole.roleId,
+      if (selectedCertificateType) {
+        await handleUpdateCertificateTypeMutation.mutateAsync({
+          certificateType: { description: data.description },
+          certificateTypeId: selectedCertificateType.certificateTypeId,
         });
 
-        const messageToast = getMessageConfigResponse("Rol");
+        const messageToast = getMessageConfigResponse("Tipo de certificado");
         showToast({ ...messageToast.update });
         setFocus("description");
         // Create
       } else {
-        await handleCreateRoleMutation.mutateAsync({
-          role: { description: data.description },
+        await handleCreateCertificateTypeMutation.mutateAsync({
+          certificateType: { description: data.description },
         });
 
-        const messageToast = getMessageConfigResponse("Rol");
+        const messageToast = getMessageConfigResponse("Tipo de certificado");
         showToast({ ...messageToast.create });
         setFocus("description");
       }
@@ -72,36 +80,37 @@ export const UpsertRoleForm = ({ onEditRole }: { onEditRole: UpdateRoleSelected 
   const onReset = () => {
     reset();
     setFocus("description");
-    clearSelectedRole();
+    clearSelectedCertificateType();
   };
 
   return (
     <>
-      {(handleUpdateRoleMutation.isPending || handleCreateRoleMutation.isPending) && <Loader />}
+      {(handleUpdateCertificateTypeMutation.isPending ||
+        handleCreateCertificateTypeMutation.isPending) && <Loader />}
 
-      <form className="form-role" onSubmit={handleSubmit(onSubmit)}>
+      <form className="form-certificateType" onSubmit={handleSubmit(onSubmit)}>
         <TextInput
           label="Descripción"
           type="text"
-          placeholder="Ingresa el rol"
+          placeholder="Ingresa el tipo de certificado"
           required
           autoFocus
           tabIndex={1}
-          aria-label="Campo para ingresar el rol"
+          aria-label="Campo para ingresar el tipo de certificado"
           {...register("description")}
           error={errors.description?.message as string}
         />
 
         <div className="flex gap-4 mt-8">
           <Button
-            title={`${!selectedRole ? "Agregar" : "Actualizar"}`}
+            title={`${!selectedCertificateType ? "Agregar" : "Actualizar"}`}
             type="submit"
             tabIndex={2}
             classButton={`btn-primary text-paragraph-regular ${
-              !selectedRole ? "" : "bg-warning-400 hover:bg-warning-500"
+              !selectedCertificateType ? "" : "bg-warning-400 hover:bg-warning-500"
             }`}
             iconLeft={
-              !selectedRole ? (
+              !selectedCertificateType ? (
                 <Icon.Save size={28} strokeWidth={1.2} />
               ) : (
                 <Icon.Edit size={28} strokeWidth={1.2} />
@@ -109,20 +118,20 @@ export const UpsertRoleForm = ({ onEditRole }: { onEditRole: UpdateRoleSelected 
             }
             disabled={isSubmitting || !!errors.description}
           >
-            <span>{`${!selectedRole ? "Agregar" : "Actualizar"}`}</span>
+            <span>{`${!selectedCertificateType ? "Agregar" : "Actualizar"}`}</span>
           </Button>
 
           <Button
-            title={`${!selectedRole ? "Limpiar" : "Cancelar"}`}
+            title={`${!selectedCertificateType ? "Limpiar" : "Cancelar"}`}
             type="button"
             tabIndex={3}
             classButton={`btn-primary text-paragraph-regular ${
-              !selectedRole
+              !selectedCertificateType
                 ? "bg-neutral-600 hover:bg-neutral-700"
                 : "bg-error-500 hover:bg-error-600"
             }`}
             iconLeft={
-              !selectedRole ? (
+              !selectedCertificateType ? (
                 <Icon.Clear size={28} strokeWidth={1.2} />
               ) : (
                 <Icon.Close size={28} strokeWidth={1.2} />
@@ -132,7 +141,7 @@ export const UpsertRoleForm = ({ onEditRole }: { onEditRole: UpdateRoleSelected 
             disabled={isSubmitting}
           >
             <span>
-              <span>{`${!selectedRole ? "Limpiar" : "Cancelar"}`}</span>
+              <span>{`${!selectedCertificateType ? "Limpiar" : "Cancelar"}`}</span>
             </span>
           </Button>
         </div>

@@ -7,31 +7,32 @@ import { Table } from "../../../../shared/components/Table/Table";
 import { useModalManager } from "../../../../shared/hooks/useModalManager";
 import DefaultLayout from "../../../../shared/layouts/DefaultLayout";
 import { SectionLayout } from "../../../../shared/layouts/SectionLayout";
-import { TableRoleItem } from "../components/TableRoleItem";
-import { UpsertRoleForm } from "../components/UpsertRoleForm";
-import { useRoleManagement } from "../hooks/useRoleManagement";
-import { useRoles } from "../hooks/useRoles";
-import type { Role } from "../types/Role";
+import { TableCertificateTypeItem } from "../components/TableTypeCertificateItem";
+import { UpsertCertificateTypeForm } from "../components/UpsertCertificateTypeForm";
+import { useCertificateTypeManagement } from "../hooks/useCertificateTypeManagement";
+import { useCertificateTypes } from "../hooks/useCertificateTypes";
+import type { CertificateTypeResponse } from "../types/CertificateType";
 
-export const RoleListPage = () => {
+export const CertificateTypeListPage = () => {
   const {
     currentPage,
     searchQuery,
     handlePageChange,
     handleSearch,
-    onEditRole,
-    handleStateRole,
-    handleEditRoleInRow,
-    handleActivateRoleInRow,
-    handleDeleteRoleInRow,
-  } = useRoleManagement();
+    onEditCertificateType,
+    handleStateCertificateType,
+    handleEditCertificateTypeInRow,
+    handleActivateCertificateTypeInRow,
+    handleDeleteCertificateTypeInRow,
+  } = useCertificateTypeManagement();
 
-  const { data, isLoading, isError, error } = useRoles({
+  const { data, isLoading, isError, error } = useCertificateTypes({
     currentPage,
     searchQuery,
   });
 
-  const { modalType, openModal, closeModal, selectedItem } = useModalManager<Role>();
+  const { modalType, openModal, closeModal, selectedItem } =
+    useModalManager<CertificateTypeResponse>();
   const headersTable = ["N°", "Rol", "Estado"];
 
   if (isLoading) return <Loader />;
@@ -40,12 +41,12 @@ export const RoleListPage = () => {
   return (
     <DefaultLayout>
       <SectionLayout
-        title="Roles"
-        subtitle="Administración de usuarios"
+        title="Tipo de Certificado"
+        subtitle="Registro de Certificados"
         classNameForChildren="flex gap-4"
       >
         <Card headerCard="Registro" className="min-w-[460px] overflow-hidden !h-[310px]">
-          <UpsertRoleForm onEditRole={onEditRole} />
+          <UpsertCertificateTypeForm onEditCertificateType={onEditCertificateType} />
         </Card>
 
         <Card
@@ -53,9 +54,9 @@ export const RoleListPage = () => {
           className="flex-auto items-center"
           headerRightContentCard={
             <Search
-              id="txtSearchRole"
-              name="txtSearchRole"
-              placeholder="Buscar rol"
+              id="txtSearchCertificateType"
+              name="txtSearchCertificateType"
+              placeholder="Buscar tipo de certificado"
               className="!mt-0 !mb-0"
               onSearch={handleSearch}
             />
@@ -70,17 +71,17 @@ export const RoleListPage = () => {
           }
         >
           <Table headersTable={headersTable} response={data}>
-            <TableRoleItem
-              listOfRoles={data?.data ?? []}
+            <TableCertificateTypeItem
+              listOfCertificateTypes={data?.data ?? []}
               currentPage={currentPage}
-              editRow={handleEditRoleInRow}
+              editRow={handleEditCertificateTypeInRow}
               deleteRow={(data) => {
                 openModal("delete", data);
-                handleStateRole(data);
+                handleStateCertificateType(data);
               }}
               activateRow={(data) => {
                 openModal("activate", data);
-                handleStateRole(data);
+                handleStateCertificateType(data);
               }}
             />
           </Table>
@@ -89,17 +90,17 @@ export const RoleListPage = () => {
         <GenericModal
           modalType={modalType}
           onClose={() => {
-            onEditRole.clearSelectedRole();
+            onEditCertificateType.clearSelectedCertificateType();
             closeModal();
           }}
           onConfirm={() => {
             if (selectedItem) {
-              if (modalType === "delete") handleDeleteRoleInRow(selectedItem);
-              if (modalType === "activate") handleActivateRoleInRow(selectedItem);
-              onEditRole.clearSelectedRole();
+              if (modalType === "delete") handleDeleteCertificateTypeInRow(selectedItem);
+              if (modalType === "activate") handleActivateCertificateTypeInRow(selectedItem);
+              onEditCertificateType.clearSelectedCertificateType();
             }
           }}
-          entityName="Rol"
+          entityName="Tipo de Certificado"
         />
       </SectionLayout>
     </DefaultLayout>
