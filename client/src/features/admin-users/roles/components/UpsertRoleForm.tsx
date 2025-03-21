@@ -3,9 +3,12 @@ import { useEffect } from "react";
 import { useForm, type SubmitHandler } from "react-hook-form";
 import { Button } from "../../../../shared/components/Button/Button";
 import { Icon } from "../../../../shared/components/Icon";
+import Loader from "../../../../shared/components/Loader";
 import { TextInput } from "../../../../shared/components/TextInput/TextInput";
 import { usePagination } from "../../../../shared/hooks/usePagination";
+import { getMessageConfigResponse } from "../../../../shared/utils/getMessageConfig";
 import { handleApiError } from "../../../../shared/utils/handleApiError";
+import { showToast } from "../../../../shared/utils/toast";
 import { useRoles } from "../hooks/useRoles";
 import { getRoleSchema } from "../schemas/RoleSchema";
 import type { RoleResponse, UpdateRoleSelected } from "../types/Role";
@@ -45,11 +48,19 @@ export const UpsertRoleForm = ({ onEditRole }: { onEditRole: UpdateRoleSelected 
           role: { description: data.description },
           roleId: selectedRole.roleId,
         });
+
+        const messageToast = getMessageConfigResponse("Rol");
+        showToast({ ...messageToast.update });
+        setFocus("description");
         // Create
       } else {
         await handleCreateRoleMutation.mutateAsync({
           role: { description: data.description },
         });
+
+        const messageToast = getMessageConfigResponse("Rol");
+        showToast({ ...messageToast.create });
+        setFocus("description");
       }
 
       onReset();
@@ -65,63 +76,67 @@ export const UpsertRoleForm = ({ onEditRole }: { onEditRole: UpdateRoleSelected 
   };
 
   return (
-    <form className="form-role" onSubmit={handleSubmit(onSubmit)}>
-      <TextInput
-        label="Descripción"
-        type="text"
-        placeholder="Ingresa el rol"
-        required
-        autoFocus
-        tabIndex={1}
-        aria-label="Campo para ingresar el rol"
-        {...register("description")}
-        error={errors.description?.message as string}
-      />
+    <>
+      {(handleUpdateRoleMutation.isPending || handleCreateRoleMutation.isPending) && <Loader />}
 
-      <div className="flex gap-4 mt-8">
-        <Button
-          title={`${!selectedRole ? "Agregar" : "Actualizar"}`}
-          type="submit"
-          tabIndex={2}
-          classButton={`btn-primary text-paragraph-regular ${
-            !selectedRole ? "" : "bg-warning-400 hover:bg-warning-500"
-          }`}
-          iconLeft={
-            !selectedRole ? (
-              <Icon.Save size={28} strokeWidth={1.2} />
-            ) : (
-              <Icon.Edit size={28} strokeWidth={1.2} />
-            )
-          }
-          disabled={isSubmitting || !!errors.description}
-        >
-          <span>{`${!selectedRole ? "Agregar" : "Actualizar"}`}</span>
-        </Button>
+      <form className="form-role" onSubmit={handleSubmit(onSubmit)}>
+        <TextInput
+          label="Descripción"
+          type="text"
+          placeholder="Ingresa el rol"
+          required
+          autoFocus
+          tabIndex={1}
+          aria-label="Campo para ingresar el rol"
+          {...register("description")}
+          error={errors.description?.message as string}
+        />
 
-        <Button
-          title={`${!selectedRole ? "Limpiar" : "Cancelar"}`}
-          type="button"
-          tabIndex={3}
-          classButton={`btn-primary text-paragraph-regular ${
-            !selectedRole
-              ? "bg-neutral-600 hover:bg-neutral-700"
-              : "bg-error-500 hover:bg-error-600"
-          }`}
-          iconLeft={
-            !selectedRole ? (
-              <Icon.Clear size={28} strokeWidth={1.2} />
-            ) : (
-              <Icon.Close size={28} strokeWidth={1.2} />
-            )
-          }
-          onClick={onReset}
-          disabled={isSubmitting}
-        >
-          <span>
-            <span>{`${!selectedRole ? "Limpiar" : "Cancelar"}`}</span>
-          </span>
-        </Button>
-      </div>
-    </form>
+        <div className="flex gap-4 mt-8">
+          <Button
+            title={`${!selectedRole ? "Agregar" : "Actualizar"}`}
+            type="submit"
+            tabIndex={2}
+            classButton={`btn-primary text-paragraph-regular ${
+              !selectedRole ? "" : "bg-warning-400 hover:bg-warning-500"
+            }`}
+            iconLeft={
+              !selectedRole ? (
+                <Icon.Save size={28} strokeWidth={1.2} />
+              ) : (
+                <Icon.Edit size={28} strokeWidth={1.2} />
+              )
+            }
+            disabled={isSubmitting || !!errors.description}
+          >
+            <span>{`${!selectedRole ? "Agregar" : "Actualizar"}`}</span>
+          </Button>
+
+          <Button
+            title={`${!selectedRole ? "Limpiar" : "Cancelar"}`}
+            type="button"
+            tabIndex={3}
+            classButton={`btn-primary text-paragraph-regular ${
+              !selectedRole
+                ? "bg-neutral-600 hover:bg-neutral-700"
+                : "bg-error-500 hover:bg-error-600"
+            }`}
+            iconLeft={
+              !selectedRole ? (
+                <Icon.Clear size={28} strokeWidth={1.2} />
+              ) : (
+                <Icon.Close size={28} strokeWidth={1.2} />
+              )
+            }
+            onClick={onReset}
+            disabled={isSubmitting}
+          >
+            <span>
+              <span>{`${!selectedRole ? "Limpiar" : "Cancelar"}`}</span>
+            </span>
+          </Button>
+        </div>
+      </form>
+    </>
   );
 };
