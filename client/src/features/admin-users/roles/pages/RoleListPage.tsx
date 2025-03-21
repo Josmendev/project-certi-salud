@@ -44,7 +44,7 @@ export const RoleListPage = () => {
         subtitle="Administración de usuarios"
         classNameForChildren="flex gap-4"
       >
-        <Card headerCard="Registro" className="min-w-96 overflow-hidden !h-[310px]">
+        <Card headerCard="Registro" className="min-w-[460px] overflow-hidden !h-[310px]">
           <UpsertRoleForm onEditRole={onEditRole} />
         </Card>
 
