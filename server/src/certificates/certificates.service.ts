@@ -103,6 +103,8 @@ export class CertificatesService {
   async getCertificateByCode(): Promise<string> {
     const [[{ certificate_code: certificateCode }]] =
       await this.certificateRepository.query('CALL GenerateCertificateCode()');
+    if (!certificateCode)
+      throw new NotFoundException('El código de certificado no existe');
     return certificateCode;
   }
 
