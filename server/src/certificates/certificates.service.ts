@@ -26,6 +26,8 @@ import { PatientsService } from 'src/patients/patients.service';
 import { Patient } from 'src/patients/entities/patient.entity';
 import { CreatePatientDto } from 'src/patients/dto/create-patient.dto';
 import { Role } from 'src/auth/enums/role.enum';
+import { CertificateTypeResponse } from 'src/certificate-types/interfaces/certificate-type-response.interface';
+import { DiseaseResponse } from 'src/diseases/interfaces/disease-response.interface';
 
 @Injectable()
 export class CertificatesService {
@@ -103,7 +105,17 @@ export class CertificatesService {
   async getCertificateByCode(): Promise<string> {
     const [[{ certificate_code: certificateCode }]] =
       await this.certificateRepository.query('CALL GenerateCertificateCode()');
+    if (!certificateCode)
+      throw new NotFoundException('El código de certificado no existe');
     return certificateCode;
+  }
+
+  async getCertificateType(): Promise<CertificateTypeResponse[]> {
+    return await this.certificateTypesService.findAllIsActive();
+  }
+
+  async getDiseases(): Promise<DiseaseResponse[]> {
+    return await this.diseasesService.findAllIsActive();
   }
 
   async remove(certificateId: string): Promise<void> {
