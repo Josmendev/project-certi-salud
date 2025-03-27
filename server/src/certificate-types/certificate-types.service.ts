@@ -111,4 +111,11 @@ export class CertificateTypesService extends BaseService<CertificateType> {
       );
     return certificateType;
   }
+
+  async findAllIsActive(): Promise<CertificateTypeResponse[]> {
+    const certificateTypes = await this.certificateTypeRepository.find({
+      where: { isActive: true },
+    });
+    return certificateTypes.map(formatCertificateTypeResponse);
+  }
 }

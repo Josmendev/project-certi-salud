@@ -64,4 +64,11 @@ export class DiseasesService extends BaseService<Disease> {
       );
     return disease;
   }
+
+  async findAllIsActive(): Promise<DiseaseResponse[]> {
+    const diseases = await this.diseaseRepository.find({
+      where: { isActive: true },
+    });
+    return diseases.map(formatDiseaseResponse);
+  }
 }

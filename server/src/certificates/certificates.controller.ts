@@ -30,6 +30,16 @@ export class CertificatesController {
     return this.certificatesService.getCertificateByCode();
   }
 
+  @Get('certificate-types')
+  getCertificateType() {
+    return this.certificatesService.getCertificateType();
+  }
+
+  @Get('diseases')
+  getDiseases() {
+    return this.certificatesService.getDiseases();
+  }
+
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.certificatesService.remove(id);
