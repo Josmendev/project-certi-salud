@@ -1,4 +1,12 @@
-import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Query,
+} from '@nestjs/common';
 import { CertificatesService } from './certificates.service';
 import { GetPersonByDniDto } from 'src/common/dto/get-person-by-dni.dto';
 import { CreateCertificateDto } from './dto/create-certificate.dto';
@@ -6,6 +14,7 @@ import { GetUser } from 'src/auth/decorators/get-user.decorator';
 import { Auth } from 'src/auth/decorators/auth.decorator';
 import { Role } from 'src/auth/enums/role.enum';
 import { ValidateUserResponse } from 'src/auth/interfaces/validate-user-response.interface';
+import { PaginationDto } from 'src/common/dto/pagination.dto';
 
 @Controller('certificates')
 @Auth(Role.Admin, Role.Register)
@@ -36,8 +45,8 @@ export class CertificatesController {
   }
 
   @Get('diseases')
-  getDiseases() {
-    return this.certificatesService.getDiseases();
+  getDiseases(@Query() paginationDto: PaginationDto) {
+    return this.certificatesService.getDiseases(paginationDto);
   }
 
   @Delete(':id')
