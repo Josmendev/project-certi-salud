@@ -28,6 +28,8 @@ import { CreatePatientDto } from 'src/patients/dto/create-patient.dto';
 import { Role } from 'src/auth/enums/role.enum';
 import { CertificateTypeResponse } from 'src/certificate-types/interfaces/certificate-type-response.interface';
 import { DiseaseResponse } from 'src/diseases/interfaces/disease-response.interface';
+import { PaginationDto } from 'src/common/dto/pagination.dto';
+import { Paginated } from 'src/common/interfaces/paginated.interface';
 
 @Injectable()
 export class CertificatesService {
@@ -114,8 +116,10 @@ export class CertificatesService {
     return await this.certificateTypesService.findAllIsActive();
   }
 
-  async getDiseases(): Promise<DiseaseResponse[]> {
-    return await this.diseasesService.findAllIsActive();
+  async getDiseases(
+    paginationDto: PaginationDto,
+  ): Promise<Paginated<DiseaseResponse>> {
+    return await this.diseasesService.findAll(paginationDto);
   }
 
   async remove(certificateId: string): Promise<void> {
