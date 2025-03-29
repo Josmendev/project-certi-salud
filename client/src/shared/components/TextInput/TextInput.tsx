@@ -1,5 +1,5 @@
 import React from "react";
-import type { TextInputType } from "../../types/textInputType";
+import type { TextInputType } from "../../types/TextInputType";
 
 interface TextInputProps {
   label: string;
