@@ -1,18 +1,28 @@
 import { useState } from "react";
 import { useSearchParams } from "react-router";
+import type { PageType } from "../types/PageType";
 
-export const usePagination = () => {
+export const usePagination = ({ pageURL }: { pageURL?: PageType } = {}) => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [searchQuery, setSearchQuery] = useState("");
-  const currentPage = Number(searchParams.get("page")) || 1;
+  const param = pageURL ?? "page";
+  const currentPage = Number(searchParams.get(param)) || 1;
 
   const handlePageChange = (page: number) => {
-    setSearchParams({ page: page.toString() });
+    setSearchParams((prev) => {
+      const updatePageParam = new URLSearchParams(prev);
+      updatePageParam.set(param, page.toString());
+      return updatePageParam;
+    });
   };
 
   const handleSearch = (query: string) => {
     setSearchQuery(query);
-    setSearchParams({ page: "1" });
+    handlePageChange(1);
+  };
+
+  const clearPageParam = () => {
+    setSearchParams(new URLSearchParams()); // Reinicia los parámetros de la URL
   };
 
   return {
@@ -20,5 +30,6 @@ export const usePagination = () => {
     searchQuery,
     handlePageChange,
     handleSearch,
+    clearPageParam,
   };
 };
