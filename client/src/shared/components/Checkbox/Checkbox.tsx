@@ -1,7 +1,7 @@
 interface Props {
   id: string;
   name?: string;
-  labelText: string;
+  labelText?: string;
   checked?: boolean;
   defaultChecked?: boolean;
   onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;

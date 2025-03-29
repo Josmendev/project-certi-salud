@@ -9,8 +9,6 @@ interface GenericModalProps {
   onConfirm: () => void | Promise<void>;
   entityName: string;
   isLoadingData?: boolean;
-  isMessagePermanent?: boolean;
-  messagePermanent?: string;
   entitiesInMessage?: Array<string>;
 }
 

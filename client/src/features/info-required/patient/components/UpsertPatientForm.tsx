@@ -76,8 +76,16 @@ export const UpsertPatientForm = () => {
     const { identityDocumentNumber, name, paternalSurname, maternalSurname, age } = data;
     try {
       // Update
+      const upsertPatient = {
+        identityDocumentNumber: identityDocumentNumber ?? "",
+        name: transformToCapitalize(name ?? ""),
+        paternalSurname: transformToCapitalize(paternalSurname ?? ""),
+        maternalSurname: transformToCapitalize(maternalSurname ?? ""),
+        age,
+      };
+
       if (selectedPatient) {
-        const updatePatient = { ...data };
+        const updatePatient = upsertPatient;
 
         await handleUpdatePatientMutation.mutateAsync({
           patient: updatePatient,
@@ -91,15 +99,7 @@ export const UpsertPatientForm = () => {
       }
 
       // Create
-      const newPatient = {
-        identityDocumentNumber: identityDocumentNumber ?? "",
-        name: transformToCapitalize(name ?? ""),
-        paternalSurname: transformToCapitalize(paternalSurname ?? ""),
-        maternalSurname: transformToCapitalize(maternalSurname ?? ""),
-        age,
-      };
-
-      const response = await handleCreatePatientMutation.mutateAsync({ patient: newPatient });
+      const response = await handleCreatePatientMutation.mutateAsync({ patient: upsertPatient });
 
       if ("isStaffToAssignPacient" in response) {
         getAgeRef.current = data.age;

@@ -18,6 +18,10 @@
   position: relative;
 }
 
+.modal-expand {
+  width: 968px;
+}
+
 .modal-close {
   position: absolute;
   top: 10px;

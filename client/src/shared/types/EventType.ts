@@ -8,4 +8,5 @@ export type EventType =
   | "confirmAccount"
   | "userInSession"
   | "userLogout"
+  | "tableData"
   | null;

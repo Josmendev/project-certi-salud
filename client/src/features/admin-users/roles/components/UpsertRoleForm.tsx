@@ -5,6 +5,7 @@ import { Button } from "../../../../shared/components/Button/Button";
 import { Icon } from "../../../../shared/components/Icon";
 import Loader from "../../../../shared/components/Loader";
 import { TextInput } from "../../../../shared/components/TextInput/TextInput";
+import { transformToCapitalize } from "../../../../shared/helpers/transformToCapitalize";
 import { usePagination } from "../../../../shared/hooks/usePagination";
 import { getMessageConfigResponse } from "../../../../shared/utils/getMessageConfig";
 import { handleApiError } from "../../../../shared/utils/handleApiError";
@@ -42,10 +43,11 @@ export const UpsertRoleForm = ({ onEditRole }: { onEditRole: UpdateRoleSelected 
 
   const onSubmit: SubmitHandler<RoleResponse> = async (data) => {
     try {
+      const roleDescriptionToCapitalize = transformToCapitalize(data?.description);
       // Update
       if (selectedRole) {
         await handleUpdateRoleMutation.mutateAsync({
-          role: { description: data.description },
+          role: { description: roleDescriptionToCapitalize },
           roleId: selectedRole.roleId,
         });
 
@@ -55,7 +57,7 @@ export const UpsertRoleForm = ({ onEditRole }: { onEditRole: UpdateRoleSelected 
         // Create
       } else {
         await handleCreateRoleMutation.mutateAsync({
-          role: { description: data.description },
+          role: { description: roleDescriptionToCapitalize },
         });
 
         const messageToast = getMessageConfigResponse("Rol");

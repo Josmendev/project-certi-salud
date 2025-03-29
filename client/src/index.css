@@ -5,6 +5,7 @@
 @import "./shared/components/Checkbox/Checkbox.module.css";
 @import "./shared/components/Modal/Modal.module.css";
 @import "./shared/components/Spinner/Spinner.module.css";
+@import "./shared/components/SelectGroup/SelectGroup.module.css";
 
 @tailwind base;
 @tailwind components;

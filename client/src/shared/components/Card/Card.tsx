@@ -4,6 +4,7 @@ interface Props {
   headerRightContentCard?: React.ReactNode;
   footerCard?: React.ReactNode;
   className?: string;
+  classCardName?: string;
 }
 
 export const Card: React.FC<Props> = ({
@@ -12,6 +13,7 @@ export const Card: React.FC<Props> = ({
   children,
   footerCard,
   className = "",
+  classCardName = "",
 }) => {
   return (
     <article className={`shadow-lg h-max ${className}`}>
@@ -19,7 +21,7 @@ export const Card: React.FC<Props> = ({
         <p className="text-paragraph-semibold text-left">{headerCard}</p>
         {headerRightContentCard && <>{headerRightContentCard}</>}
       </header>
-      <div className="px-8 py-8 bg-shades-light min-h-[44vh]">{children}</div>
+      <div className={`px-8 py-8 bg-shades-light min-h-[44vh] ${classCardName}`}>{children}</div>
       {footerCard && <div>{footerCard}</div>}
     </article>
   );

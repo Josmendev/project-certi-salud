@@ -25,7 +25,7 @@ export const DNISchema = z
 
 export const FullNameSchema = z
   .string()
-  .nonempty("Los nombres no puede ser un campo vacío")
+  .nonempty("Los nombres no pueden ser un campo vacío")
   .min(2, "Los nombres debe tener al menos 2 caracteres") // Longitud mínima de 2
   .max(50, "El nombre debe tener como máximo 50 caracteres"); // Longitud máxima de 50
 

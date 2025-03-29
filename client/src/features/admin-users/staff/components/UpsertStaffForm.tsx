@@ -72,9 +72,16 @@ export const UpsertStaffForm = () => {
   const onSubmit: SubmitHandler<Staff> = async (data) => {
     const { identityDocumentNumber, name, paternalSurname, maternalSurname } = data;
     try {
+      const upsertStaff = {
+        identityDocumentNumber: identityDocumentNumber ?? "",
+        name: transformToCapitalize(name ?? ""),
+        paternalSurname: transformToCapitalize(paternalSurname ?? ""),
+        maternalSurname: transformToCapitalize(maternalSurname ?? ""),
+      };
+
       // Update
       if (selectedStaff) {
-        const updateStaff = { ...data };
+        const updateStaff = upsertStaff;
         await handleUpdateStaffMutation.mutateAsync({
           staff: updateStaff,
           staffId: selectedStaff.staffId,
@@ -87,14 +94,7 @@ export const UpsertStaffForm = () => {
       }
 
       // Create
-      const newStaff = {
-        identityDocumentNumber: identityDocumentNumber ?? "",
-        name: transformToCapitalize(name ?? ""),
-        paternalSurname: transformToCapitalize(paternalSurname ?? ""),
-        maternalSurname: transformToCapitalize(maternalSurname ?? ""),
-      };
-
-      const response = await handleCreateStaffMutation.mutateAsync({ staff: newStaff });
+      const response = await handleCreateStaffMutation.mutateAsync({ staff: upsertStaff });
 
       if ("isPacientToAssignStaff" in response) {
         openModal("assign", response);

@@ -5,8 +5,8 @@ export const useModalManager = <T>() => {
   const [modalType, setModalType] = useState<EventType>(null);
   const [selectedItem, setSelectedItem] = useState<T | null>(null);
 
-  const openModal = (type: EventType, item: T) => {
-    setSelectedItem(item);
+  const openModal = (type: EventType, item?: T) => {
+    if (item) setSelectedItem(item);
     setModalType(type);
   };
 

@@ -1,6 +1,6 @@
 interface Props {
-  title: string;
-  subtitle: string;
+  title?: string;
+  subtitle?: string;
   children: React.ReactNode;
   classNameForChildren?: string;
 }
@@ -16,7 +16,7 @@ export const SectionLayout: React.FC<Props> = ({
       <header className="flex items-center justify-between">
         <h2 className="text-h4-semibold">{title}</h2>
         <h4 className="text-h6-semibold">
-          {subtitle} / <span className="text-primary-600">{title}</span>
+          {subtitle} {subtitle && "/"} <span className="text-primary-600">{title}</span>
         </h4>
       </header>
       <div className={`card mt-8 ${classNameForChildren}`}>{children}</div>

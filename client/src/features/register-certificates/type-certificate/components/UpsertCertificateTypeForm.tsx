@@ -5,6 +5,7 @@ import { Button } from "../../../../shared/components/Button/Button";
 import { Icon } from "../../../../shared/components/Icon";
 import Loader from "../../../../shared/components/Loader";
 import { TextInput } from "../../../../shared/components/TextInput/TextInput";
+import { transformToCapitalize } from "../../../../shared/helpers/transformToCapitalize";
 import { usePagination } from "../../../../shared/hooks/usePagination";
 import { getMessageConfigResponse } from "../../../../shared/utils/getMessageConfig";
 import { handleApiError } from "../../../../shared/utils/handleApiError";
@@ -50,10 +51,12 @@ export const UpsertCertificateTypeForm = ({
 
   const onSubmit: SubmitHandler<CertificateTypeResponse> = async (data) => {
     try {
+      const typeCertificateToCapitalize = transformToCapitalize(data?.description);
+
       // Update
       if (selectedCertificateType) {
         await handleUpdateCertificateTypeMutation.mutateAsync({
-          certificateType: { description: data.description },
+          certificateType: { description: typeCertificateToCapitalize },
           certificateTypeId: selectedCertificateType.certificateTypeId,
         });
 
@@ -63,7 +66,7 @@ export const UpsertCertificateTypeForm = ({
         // Create
       } else {
         await handleCreateCertificateTypeMutation.mutateAsync({
-          certificateType: { description: data.description },
+          certificateType: { description: typeCertificateToCapitalize },
         });
 
         const messageToast = getMessageConfigResponse("Tipo de certificado");
