@@ -3,7 +3,7 @@ import type { DataResponseFromAPI } from "../../types/DataResponse";
 
 interface Props {
   headersTable: Array<string>;
-  response: DataResponseFromAPI<DataCollectionType>;
+  response: DataResponseFromAPI<DataCollectionType> | Array<DataCollectionType>;
   children: React.ReactNode;
   hasButtonActions?: boolean;
 }
@@ -14,7 +14,9 @@ export const Table: React.FC<Props> = ({
   hasButtonActions = true,
   children,
 }) => {
-  return response.data.length === 0 ? (
+  const hasData = Array.isArray(response) ? response.length > 0 : response?.data?.length > 0;
+
+  return !hasData ? (
     <div>No hay datos para mostrar</div>
   ) : (
     <div className="overflow-x-auto bg-shades-light">
