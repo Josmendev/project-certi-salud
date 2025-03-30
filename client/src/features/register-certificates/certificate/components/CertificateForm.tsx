@@ -2,11 +2,9 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useForm, type SubmitHandler } from "react-hook-form";
 import { Button } from "../../../../shared/components/Button/Button";
-import { Card } from "../../../../shared/components/Card/Card";
 import { Icon } from "../../../../shared/components/Icon";
 import Loader from "../../../../shared/components/Loader";
 import { Modal } from "../../../../shared/components/Modal/Modal";
-import { Pagination } from "../../../../shared/components/Pagination/Pagination";
 import { Search } from "../../../../shared/components/Search";
 import SelectGroup from "../../../../shared/components/SelectGroup/SelectGroup";
 import { Table } from "../../../../shared/components/Table/Table";
@@ -16,35 +14,53 @@ import { useModalManager } from "../../../../shared/hooks/useModalManager";
 import { usePagination } from "../../../../shared/hooks/usePagination";
 import { LIMIT_PAGE } from "../../../../shared/utils/constants";
 import { getCurrentDate } from "../../../../shared/utils/getCurrentDate";
-import { handleApiError } from "../../../../shared/utils/handleApiError";
+import { getMessageConfigResponse } from "../../../../shared/utils/getMessageConfig";
 import { showToast } from "../../../../shared/utils/toast";
-import type { DiseaseResponse } from "../../../info-required/disease/types/Disease";
 import type { CertificateTypeResponse } from "../../type-certificate/types/CertificateType";
-import { isValidDni } from "../helpers/validateDni";
 import { useDiseaseCertificate } from "../hooks/useDiseaseCertificate";
+import { useDiseasePaginationTable } from "../hooks/useDiseasePaginationTable";
+import { useDiseaseSelection } from "../hooks/useDiseaseSelection";
+import { useExternalCertificateService } from "../hooks/useExternalCertificateService";
 import { useTypeCertificate } from "../hooks/useTypeCertificate";
-import { generateCodeCertificate, getPersonByDni } from "../repositories/certificateRepository";
+import { createCertificate } from "../repositories/certificateRepository";
 import { getCertificateSchema } from "../schemas/CertificateSchema";
-import type { Certificate, PersonByDniResponse } from "../types/Certificate";
+import { DiagnosisSection } from "../sections/DiagnosisSection";
+import { DiseaseSection } from "../sections/DiseaseSection";
+import type { Certificate } from "../types/Certificate";
+import { STATUS_TYPE_CERTIFICATE, TEXTS_OPERATIONS } from "../utils/constants";
+import { RestOfDaysInput } from "./RestOfDaysInput";
 import { TableDiseaseItem } from "./TableDiseaseItem";
 
-export const CreateCertificateForm = () => {
-  const [generateCodeForCertificate, setGenerateCodeForCertificate] = useState<string>("");
-  const [selectedOption, setSelectedOption] = useState<CertificateTypeResponse | undefined>();
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+export const CertificateForm = () => {
+  //Hook para revisar el cargado al crear un certificado
+  const [isLoadingCreateCertificate, setIsLoadingCreateCertificate] = useState<boolean>(false);
+
+  // Estado del combobox del tipo de certificado
+  const [selectedOptionTypeCertificate, setSelectedOptionTypeCertificate] = useState<
+    CertificateTypeResponse | undefined
+  >();
   const dniRef = useRef<boolean>(false);
-  const [selectedDiseases, setSelectedDiseases] = useState<DiseaseResponse[]>([]); // Estado para checkbox
-  const [selectedConfirmDiseases, setSelectedConfirmDiseases] = useState<DiseaseResponse[]>([]); // Estado para tabla
+  // Hook para gestionar los servicios externos
+  const { fetchCodeForCertificate, isLoading, generateCodeForCertificate, searchPersonByDni } =
+    useExternalCertificateService();
 
-  // Valores de la tabla
-  const headersTableModal = ["Estado", "N°", "CIE 10", "Nombre"];
+  // Hook para controlar el toggle de diseases
+  const {
+    selectedDiseases,
+    selectedConfirmDiseases,
+    toggleCheckboxDisease,
+    resetSelection,
+    syncDiseasesOnClose,
+    confirmSelection,
+  } = useDiseaseSelection();
+
+  // Hook para controlar la paginación de la tabla del formulario
+  const { diseaseCurrentPage, handleDiseasePageChange, paginatedDiseases } =
+    useDiseasePaginationTable({ selectedConfirmDiseases });
+
+  // Encabezados de tablas (modal y principal)
   const headersTable = ["N°", "CIE 10", "Nombre"];
-
-  const { currentPage: diseaseCurrentPage, handlePageChange: handleDiseasePageChange } =
-    usePagination();
-  const startIndex = (diseaseCurrentPage - 1) * LIMIT_PAGE;
-  const endIndex = startIndex + LIMIT_PAGE;
-  const paginatedDiseases = selectedConfirmDiseases.slice(startIndex, endIndex);
+  const headersTableModal = ["Estado", "N°", "CIE 10", "Nombre"];
 
   // Paginación del Modal y servicio externo para consumo de la tabla
   const { currentPage, searchQuery, handlePageChange, handleSearch, clearPageParam } =
@@ -56,6 +72,12 @@ export const CreateCertificateForm = () => {
     { currentPage, searchQuery }
   );
 
+  const totalPagesInFormTable = Math.ceil(selectedConfirmDiseases.length / LIMIT_PAGE);
+  const isMedicalRest =
+    selectedOptionTypeCertificate &&
+    selectedOptionTypeCertificate.description === STATUS_TYPE_CERTIFICATE.MEDICAL_REST;
+
+  // Obtengo los tipos de certificado
   const {
     dataOfTypeCertificate,
     isLoadingOfTypeCertificate,
@@ -82,7 +104,7 @@ export const CreateCertificateForm = () => {
   });
 
   const onSubmit: SubmitHandler<Certificate> = async (data) => {
-    if (!selectedOption) {
+    if (!selectedOptionTypeCertificate) {
       showToast({
         title: "Tipo de certificado",
         description: "Debes seleccionar una opción en tipo de certificado",
@@ -91,71 +113,57 @@ export const CreateCertificateForm = () => {
       return;
     }
 
-    console.log(data);
-    console.log("OPTION SELECTED -> ID", selectedOption.certificateTypeId);
-    // Desactivo el readonly para el DNI
-    dniRef.current = false;
+    // Validacion para la tabla de descanso medico (al menos una enfermedad como min.)
+    if (isMedicalRest && selectedDiseases.length === 0) {
+      showToast({
+        title: "Registro de Enfermedades",
+        description: "Debes añadir una enfermedad como mínimo, para el descanso médico",
+        type: "error",
+      });
+      return;
+    }
+
+    const newCertificate: Certificate = {
+      ...data,
+      restDays: isMedicalRest ? data.restDays : 0,
+      certificateTypeId: selectedOptionTypeCertificate.certificateTypeId,
+      diseases: isMedicalRest ? selectedDiseases.map((disease) => disease.diseaseId) : [],
+      issueDate: new Date(),
+    };
+
+    try {
+      // Creo y desactivo el readonly para el DNI
+      setIsLoadingCreateCertificate(true); // Activa el loader
+      await createCertificate({ certificate: newCertificate });
+      dniRef.current = false;
+      const messageToast = getMessageConfigResponse("Certificado");
+      showToast({ ...messageToast.create });
+      onReset();
+    } finally {
+      setIsLoadingCreateCertificate(false); // Desactiva el loader
+    }
   };
 
   const onReset = () => {
-    setFocus("identityDocumentNumber");
+    onResetDni();
     reset();
-    dniRef.current = false;
-    setSelectedDiseases([]);
-    setSelectedConfirmDiseases([]);
-    setSelectedOption(undefined);
+    resetSelection(); // Reinicio de valores para diseases (select)
+    setSelectedOptionTypeCertificate(undefined);
   };
 
-  // Genero funcion de proc. almacenado para los certificados (valores unicos)
-  const fetchCodeForCertificate = async () => {
-    try {
-      setIsLoading(true);
-      const code = await generateCodeCertificate();
-      setGenerateCodeForCertificate(code);
-    } catch (error) {
-      handleApiError(error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  // Genero busqueda de dni por persona de la BD
-  const SearchPersonByDni = async ({ dni }: { dni: string }) => {
-    if (!isValidDni(dni)) return;
-
-    try {
-      setIsLoading(true);
-      const response = await getPersonByDni({ dni });
-
-      if ("message" in response) {
-        showToast({
-          title: "Registro de DNI",
-          description: "Debes ingresar un DNI válido",
-          type: "error",
-        });
-
-        onResetDni();
-        return;
-      }
-
-      // Si no hay error, extraemos los datos
-      const { identityDocumentNumber, name, maternalSurname, paternalSurname } =
-        response as PersonByDniResponse;
-
-      setValue("identityDocumentNumber", identityDocumentNumber);
-      setValue("name", transformToCapitalize(name));
-      setValue("maternalSurname", transformToCapitalize(maternalSurname));
-      setValue("paternalSurname", transformToCapitalize(paternalSurname));
-    } catch (error) {
-      handleApiError(error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleSearchPersonByDni = () => {
+  const handleSearchPersonByDni = async () => {
     const dniValue = watch("identityDocumentNumber");
-    SearchPersonByDni({ dni: dniValue });
+    const personData = await searchPersonByDni({ dni: dniValue });
+
+    if (!personData) {
+      onResetDni();
+      return;
+    }
+
+    setValue("identityDocumentNumber", personData.identityDocumentNumber);
+    setValue("name", transformToCapitalize(personData.name) ?? "");
+    setValue("maternalSurname", transformToCapitalize(personData.maternalSurname) ?? "");
+    setValue("paternalSurname", transformToCapitalize(personData.paternalSurname) ?? "");
     dniRef.current = true;
   };
 
@@ -165,28 +173,17 @@ export const CreateCertificateForm = () => {
     dniRef.current = false;
   }, [resetField, setFocus]);
 
-  const handleCheckboxChange = (disease: DiseaseResponse) => {
-    setSelectedDiseases(
-      (prev) =>
-        prev.some((d) => d.diseaseId === disease.diseaseId)
-          ? prev.filter((d) => d.diseaseId !== disease.diseaseId) // Deseleccionar
-          : [...prev, disease] // Seleccionar
-    );
-  };
-
   useEffect(() => {
     fetchCodeForCertificate();
-    onResetDni();
-  }, [onResetDni]);
+  }, [fetchCodeForCertificate]);
 
+  // Validaciones antes del render
   if (isLoadingDiseases || isLoadingOfTypeCertificate) return <Loader />;
-  if (isErrorDisease) {
-    return <b>Error: {errorDisease?.message || "Error al cargar enfermedades"}</b>;
-  }
-
-  if (isErrorOfTypeCertificate) {
+  if (isErrorDisease || isErrorOfTypeCertificate) {
     return (
-      <b>Error: {errorOfTypeCertificate?.message || "Error al cargar tipo de certificados"}</b>
+      <b>
+        Error: {errorDisease?.message || errorOfTypeCertificate?.message || "Error desconocido"}
+      </b>
     );
   }
 
@@ -194,7 +191,7 @@ export const CreateCertificateForm = () => {
 
   return (
     <>
-      {isLoading && <Loader />}
+      {(isLoading || isLoadingCreateCertificate) && <Loader />}
       <form className="flex flex-col gap-5" onSubmit={handleSubmit(onSubmit)}>
         {/* First Row */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
@@ -213,7 +210,7 @@ export const CreateCertificateForm = () => {
             />
 
             <Button
-              title="Buscar por DNI"
+              title={TEXTS_OPERATIONS.SEARCH_DNI}
               classButton={`${
                 dniRef.current
                   ? "bg-neutral-100 border-neutral-100 hover:bg-none"
@@ -303,16 +300,12 @@ export const CreateCertificateForm = () => {
           <SelectGroup
             label="Tipo de Certificado"
             options={dataOfTypeCertificate}
-            selectedOption={selectedOption}
-            onChange={setSelectedOption}
+            selectedOption={selectedOptionTypeCertificate}
+            onChange={setSelectedOptionTypeCertificate}
           />
 
-          {selectedOption?.description === "Descanso Médico" && (
-            <TextInput
-              label="Días de descanso"
-              type="number"
-              ariaLabel="Días de descanso por paciente"
-              placeholder="Ingrese los días de descanso"
+          {selectedOptionTypeCertificate?.description === "Descanso Médico" && (
+            <RestOfDaysInput
               tabIndex={8}
               {...register("restDays", { valueAsNumber: true })}
               error={errors.restDays?.message as string}
@@ -321,67 +314,43 @@ export const CreateCertificateForm = () => {
         </div>
 
         {/* Diagnostico Section */}
-        {selectedOption?.description === "Descanso Médico" && (
-          <div>
-            <div className="flex justify-between gap-4 items-center">
-              <h4 className="text-paragraph-semibold">Diagnóstico</h4>
-              <Button
-                title="Añadir enfermedad"
-                id="btnSearchDiseases"
-                type="button"
-                classButton="btn-primary text-paragraph-medium w-max py-2.5"
-                iconLeft={<Icon.Save size={28} strokeWidth={1.2} />}
-                onClick={() => {
-                  openModal("tableData");
-                  clearPageParam();
-                }}
+        {selectedOptionTypeCertificate?.description === "Descanso Médico" && (
+          <DiagnosisSection openModal={openModal} clearPageParam={clearPageParam}>
+            <DiseaseSection
+              classCardName="min-h-max"
+              currentPage={diseaseCurrentPage}
+              handleDiseasePageChange={handleDiseasePageChange}
+              totalPages={totalPagesInFormTable}
+            >
+              <Table
+                headersTable={headersTable}
+                response={selectedConfirmDiseases}
+                hasButtonActions={false}
               >
-                <span>Añadir enfermedad</span>
-              </Button>
-            </div>
-
-            <div>
-              <Card
-                headerCard="Listado"
-                classCardName="min-h-max"
-                footerCard={
-                  <Pagination
-                    currentPage={diseaseCurrentPage}
-                    totalPages={Math.ceil(selectedConfirmDiseases.length / LIMIT_PAGE) || 1}
-                    onPageChange={handleDiseasePageChange}
-                  />
-                }
-              >
-                <Table
-                  headersTable={headersTable}
-                  response={selectedConfirmDiseases}
-                  hasButtonActions={false}
-                >
-                  <TableDiseaseItem
-                    listOfDisease={paginatedDiseases ?? []}
-                    currentPage={diseaseCurrentPage}
-                  />
-                </Table>
-              </Card>
-            </div>
-          </div>
+                <TableDiseaseItem
+                  listOfDisease={paginatedDiseases ?? []}
+                  currentPage={diseaseCurrentPage}
+                />
+              </Table>
+            </DiseaseSection>
+          </DiagnosisSection>
         )}
 
         {/* Buttons Section */}
         <div className="flex gap-20 mt-5">
           <Button
-            title="Guardar"
+            title={TEXTS_OPERATIONS.SAVE}
             id="btnSaveCertificate"
             type="submit"
             classButton="btn-primary text-paragraph-medium"
             iconLeft={<Icon.Save size={28} strokeWidth={1.2} />}
-            disabled={Object.keys(errors).length > 0}
+            disabled={Object.keys(errors).length > 0 || isLoadingCreateCertificate}
           >
-            <span>Guardar</span>
+            <span>{isLoadingCreateCertificate ? "Guardando..." : "Guardar"}</span>
           </Button>
 
           <Button
-            title="Limpiar registros"
+            title={TEXTS_OPERATIONS.CLEAR}
             id="btnClearFieldsOfPatient"
             type="button"
             classButton="btn-primary text-paragraph-medium bg-neutral-600 hover:bg-neutral-700"
@@ -394,30 +363,24 @@ export const CreateCertificateForm = () => {
       </form>
 
       <Modal
-        title="Listado de Enfermedades según CIE 10"
+        title={TEXTS_OPERATIONS.HEADER_TITLE_MODAL}
         isOpen={!!modalType}
         onClose={() => {
-          // Mantengo los datos de la tabla general seleccionados en el Modal
-          setSelectedDiseases(selectedConfirmDiseases);
+          syncDiseasesOnClose(); // Restauramos la selección confirmada
           clearPageParam();
           closeModal();
         }}
         onClickSuccess={() => {
-          setSelectedConfirmDiseases(selectedDiseases);
+          confirmSelection(); // Confirmamos selección de enfermedades
           clearPageParam();
           closeModal();
         }}
       >
-        <Card
-          headerCard="Listado"
+        <DiseaseSection
+          currentPage={currentPage}
+          handleDiseasePageChange={handlePageChange}
+          totalPages={dataOfDiseases.totalPages}
           className="my-8"
-          footerCard={
-            <Pagination
-              currentPage={currentPage}
-              totalPages={dataOfDiseases.totalPages || 1}
-              onPageChange={handlePageChange}
-            />
-          }
         >
           <Search
             id="txtSearchDiseaseInCertificate"
@@ -435,11 +398,11 @@ export const CreateCertificateForm = () => {
               currentPage={currentPage}
               listOfDisease={dataOfDiseases.data ?? []}
               selectedDiseases={selectedDiseases ?? []}
-              handleCheckboxChange={handleCheckboxChange}
+              handleCheckboxChange={toggleCheckboxDisease}
               isTableInModal
             />
           </Table>
-        </Card>
+        </DiseaseSection>
       </Modal>
     </>
   );
