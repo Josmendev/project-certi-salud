@@ -1,12 +1,11 @@
 import type { Person } from "../../../../shared/types/Person";
-import type { DiseaseResponse } from "../../../info-required/disease/types/Disease";
 import type { Patient } from "../../../info-required/patient/types/Patient";
 
 export interface Certificate extends Patient {
-  issueDate: string;
+  issueDate: string | Date;
   certificateTypeId: number;
   restDays: number;
-  diseases: Array<Pick<DiseaseResponse, "diseaseId">>;
+  diseases: Array<number>;
 }
 
 export type PersonByDniResponse = Omit<Person, "personId">;
