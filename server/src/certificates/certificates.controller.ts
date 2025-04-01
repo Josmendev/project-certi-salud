@@ -49,6 +49,14 @@ export class CertificatesController {
     return this.certificatesService.getDiseases(paginationDto);
   }
 
+  @Get('diseases/search/:term')
+  searchDiseases(
+    @Param('term') term: string,
+    @Query() paginationDto: PaginationDto,
+  ) {
+    return this.certificatesService.searchDiseases(term, paginationDto);
+  }
+
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.certificatesService.remove(id);
