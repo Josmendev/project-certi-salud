@@ -2,7 +2,7 @@ import type { DataResponseFromAPI } from "../../../../shared/types/DataResponse"
 import { LIMIT_PAGE } from "../../../../shared/utils/constants";
 import { handleApiError } from "../../../../shared/utils/handleApiError";
 import type { DiseaseResponse } from "../../../info-required/disease/types/Disease";
-import { ENDPOINT_CERTYFICATE } from "../utils/endpoints";
+import { ENDPOINT_CERTIFICATE } from "../utils/endpoints";
 
 // Creo la funcion listDiseases que se conecta a la API del backend
 export const ListExternalDiseaseService = async ({
@@ -16,7 +16,7 @@ export const ListExternalDiseaseService = async ({
     const { token } = JSON.parse(sessionStorage.getItem("user") as string);
     if (!token) throw new Error("Token inválido");
 
-    const response = await fetch(`${ENDPOINT_CERTYFICATE}/diseases?limit=${limit}&page=${page}`, {
+    const response = await fetch(`${ENDPOINT_CERTIFICATE}/diseases?limit=${limit}&page=${page}`, {
       method: "GET",
       headers: {
         "Content-type": "application/json",
