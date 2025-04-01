@@ -1,5 +1,5 @@
 import { handleApiError } from "../../../../shared/utils/handleApiError";
-import { ENDPOINT_CERTYFICATE_TYPE } from "../utils/endpoints";
+import { ENDPOINT_CERTIFICATE_TYPE } from "../utils/endpoints";
 
 // Creo la funcion ActivateCertificateType que se conecta a la API del backend
 export const ActivateCertificateTypeService = async ({
@@ -11,7 +11,7 @@ export const ActivateCertificateTypeService = async ({
     const { token } = JSON.parse(sessionStorage.getItem("user") as string);
     if (!token) throw new Error("Token inválido");
 
-    const response = await fetch(`${ENDPOINT_CERTYFICATE_TYPE}/${certificateTypeId}/activate`, {
+    const response = await fetch(`${ENDPOINT_CERTIFICATE_TYPE}/${certificateTypeId}/activate`, {
       method: "PATCH",
       headers: {
         "Content-type": "application/json",
