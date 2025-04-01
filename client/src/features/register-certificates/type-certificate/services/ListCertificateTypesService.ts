@@ -2,7 +2,7 @@ import type { DataResponseFromAPI } from "../../../../shared/types/DataResponse"
 import { INITIAL_PAGE, LIMIT_PAGE } from "../../../../shared/utils/constants";
 import { handleApiError } from "../../../../shared/utils/handleApiError";
 import type { CertificateTypeResponse } from "../types/CertificateType";
-import { ENDPOINT_CERTYFICATE_TYPE } from "../utils/endpoints";
+import { ENDPOINT_CERTIFICATE_TYPE } from "../utils/endpoints";
 
 // Creo la funcion listCertificateType que se conecta a la API del backend
 export const ListCertificateTypeService = async ({
@@ -16,7 +16,7 @@ export const ListCertificateTypeService = async ({
     const { token } = JSON.parse(sessionStorage.getItem("user") as string);
     if (!token) throw new Error("Token inválido");
 
-    const response = await fetch(`${ENDPOINT_CERTYFICATE_TYPE}?limit=${limit}&page=${page}`, {
+    const response = await fetch(`${ENDPOINT_CERTIFICATE_TYPE}?limit=${limit}&page=${page}`, {
       method: "GET",
       headers: {
         "Content-type": "application/json",
