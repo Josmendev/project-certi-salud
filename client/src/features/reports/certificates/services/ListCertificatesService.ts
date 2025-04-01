@@ -1,24 +1,22 @@
-import { DataResponseFromAPI } from "../../../../shared/types/DataResponse";
+import type { DataResponseFromAPI } from "../../../../shared/types/DataResponse";
 import { INITIAL_PAGE, LIMIT_PAGE } from "../../../../shared/utils/constants";
 import { handleApiError } from "../../../../shared/utils/handleApiError";
-import type { CertificateResponse } from "../types/Certificate";
-import { ENDPOINT_CERTIFICATE } from "../utils/endpoints";
+import type { CertificateResponse } from "../../../register-certificates/certificate/types/Certificate";
+import { ENDPOINT_REPORTS } from "../utils/endpoints";
 
-// Creo la funcion searchForCertificate que se conecta a la API del backend
-export const SearchCertificateService = async ({
+// Creo la funcion listCertificate que se conecta a la API del backend
+export const ListCertificatesService = async ({
   limit = LIMIT_PAGE,
   page = INITIAL_PAGE,
-  query = "",
 }: {
   limit?: number;
   page: number;
-  query: string;
 }): Promise<DataResponseFromAPI<CertificateResponse>> => {
   try {
     const { token } = JSON.parse(sessionStorage.getItem("user") as string);
     if (!token) throw new Error("Token inválido");
 
-    const response = await fetch(`${ENDPOINT_CERTIFICATE}/${query}?limit=${limit}&page=${page}`, {
+    const response = await fetch(`${ENDPOINT_REPORTS}?limit=${limit}&page=${page}`, {
       method: "GET",
       headers: {
         "Content-type": "application/json",

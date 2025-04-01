@@ -1,7 +1,7 @@
 import { INITIAL_PAGE, LIMIT_PAGE } from "../../../../shared/utils/constants";
 import { handleApiError } from "../../../../shared/utils/handleApiError";
 import type { CertificateTypeResponse } from "../types/CertificateType";
-import { ENDPOINT_CERTYFICATE_TYPE } from "../utils/endpoints";
+import { ENDPOINT_CERTIFICATE_TYPE } from "../utils/endpoints";
 import { DataResponseFromAPI } from "./../../../../shared/types/DataResponse";
 
 // Creo la funcion searchForCertificateType que se conecta a la API del backend
@@ -19,7 +19,7 @@ export const SearchCertificateTypeService = async ({
     if (!token) throw new Error("Token inválido");
 
     const response = await fetch(
-      `${ENDPOINT_CERTYFICATE_TYPE}/${query}?limit=${limit}&page=${page}`,
+      `${ENDPOINT_CERTIFICATE_TYPE}/${query}?limit=${limit}&page=${page}`,
       {
         method: "GET",
         headers: {

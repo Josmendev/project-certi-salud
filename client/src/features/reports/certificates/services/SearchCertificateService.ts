@@ -1,8 +1,8 @@
 import { DataResponseFromAPI } from "../../../../shared/types/DataResponse";
 import { INITIAL_PAGE, LIMIT_PAGE } from "../../../../shared/utils/constants";
 import { handleApiError } from "../../../../shared/utils/handleApiError";
-import type { CertificateResponse } from "../types/Certificate";
-import { ENDPOINT_CERTIFICATE } from "../utils/endpoints";
+import type { CertificateResponse } from "../../../register-certificates/certificate/types/Certificate";
+import { ENDPOINT_REPORTS } from "../utils/endpoints";
 
 // Creo la funcion searchForCertificate que se conecta a la API del backend
 export const SearchCertificateService = async ({
@@ -18,13 +18,16 @@ export const SearchCertificateService = async ({
     const { token } = JSON.parse(sessionStorage.getItem("user") as string);
     if (!token) throw new Error("Token inválido");
 
-    const response = await fetch(`${ENDPOINT_CERTIFICATE}/${query}?limit=${limit}&page=${page}`, {
-      method: "GET",
-      headers: {
-        "Content-type": "application/json",
-        "Authorization": `Bearer ${token}`,
-      },
-    });
+    const response = await fetch(
+      `${ENDPOINT_REPORTS}/certificates/search/${query}?limit=${limit}&page=${page}`,
+      {
+        method: "GET",
+        headers: {
+          "Content-type": "application/json",
+          "Authorization": `Bearer ${token}`,
+        },
+      }
+    );
 
     // Respuesta no exitosa, lanzo excepcion del backend
     if (!response.ok) throw await response.json();

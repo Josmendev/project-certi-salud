@@ -83,5 +83,10 @@ export const getMessageConfigResponse = (entityName: string, entitiesInMessage?:
         "Se restableció la contraseña de manera exitosa. Para iniciar sesión, el usuario debe confirmar sus credenciales.",
       type: "success",
     },
+    reportCertificate: {
+      title: "Reporte de Certificado",
+      description: `Se generó el reporte de ${entityName || "Certificado"} de forma exitosa!`,
+      type: "success",
+    },
   } as Record<Exclude<EventType, null>, { title: string; description: string; type: ToastType }>;
 };

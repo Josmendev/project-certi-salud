@@ -1,7 +1,7 @@
 import type { ErrorResponse } from "../../../../shared/types/ErrorResponse";
 import { handleApiError } from "../../../../shared/utils/handleApiError";
 import type { PersonByDniResponse } from "../types/Certificate";
-import { ENDPOINT_CERTYFICATE } from "../utils/endpoints";
+import { ENDPOINT_CERTIFICATE } from "../utils/endpoints";
 
 // Creo la funcion searchForPersonForDni que se conecta a la API del backend
 export const SearchPersonForDniService = async ({
@@ -13,7 +13,7 @@ export const SearchPersonForDniService = async ({
     const { token } = JSON.parse(sessionStorage.getItem("user") as string);
     if (!token) throw new Error("Token inválido");
 
-    const response = await fetch(`${ENDPOINT_CERTYFICATE}/person/dni`, {
+    const response = await fetch(`${ENDPOINT_CERTIFICATE}/person/dni`, {
       method: "POST",
       headers: {
         "Content-type": "application/json",

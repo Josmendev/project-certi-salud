@@ -4,6 +4,7 @@ import { NavLink, useLocation } from "react-router";
 import { ADMIN_USERS_ROUTES } from "../../../features/admin-users/utils/constants";
 import { INFO_REQUIRED_ROUTES } from "../../../features/info-required/utils/constants";
 import { REGISTER_CERTIFICATE_ROUTES } from "../../../features/register-certificates/utils/constants";
+import { REPORT_CERTIFICATE_ROUTES } from "../../../features/reports/certificates/utils/constants";
 import { BASE_ROUTES } from "../../utils/constants";
 import { Button } from "../Button/Button";
 import { Icon } from "../Icon";
@@ -23,12 +24,13 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
   const sidebar = useRef<any>(null);
 
   const {
-    PRIVATE: { DASHBOARD, ADMIN, INFO_REQUIRED, REGISTER_CERTIFICATE },
+    PRIVATE: { DASHBOARD, ADMIN, INFO_REQUIRED, REGISTER_CERTIFICATE, REPORTS },
   } = BASE_ROUTES;
 
   const { USERS, ROLES, STAFF } = ADMIN_USERS_ROUTES;
   const { PATIENTS, DISEASES } = INFO_REQUIRED_ROUTES;
   const { CERTIFICATES, TYPE_CERTIFICATES } = REGISTER_CERTIFICATE_ROUTES;
+  const { REPORT: REPORT_CERTIFICATE } = REPORT_CERTIFICATE_ROUTES;
 
   const storedSidebarExpanded = localStorage.getItem("sidebar-expanded");
   const [sidebarExpanded, setSidebarExpanded] = useState(
@@ -352,7 +354,9 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
 
               {/* <!-- Menu Item Reporte de Certificados --> */}
               <SidebarLinkGroup
-                activeCondition={pathname === "/reports" || pathname.includes("reports")}
+                activeCondition={
+                  pathname === `/${REPORT_CERTIFICATE}` || pathname.includes(REPORT_CERTIFICATE)
+                }
               >
                 {(handleClick, open) => {
                   return (
@@ -360,7 +364,9 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                       <NavLink
                         to="#"
                         className={`menu-list relative group ${
-                          (pathname === "/reports" || pathname.includes("reports")) && "bg-graydark"
+                          (pathname === `/${REPORT_CERTIFICATE}` ||
+                            pathname.includes(REPORT_CERTIFICATE)) &&
+                          "bg-graydark"
                         }`}
                         onClick={(e) => {
                           e.preventDefault();
@@ -380,7 +386,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                         <ul className="flex flex-col gap-2.5 pl-6">
                           <li>
                             <NavLink
-                              to="/reports/certificates"
+                              to={`/${REPORTS}/${REPORT_CERTIFICATE}`}
                               className={"group relative menu-item"}
                             >
                               {({ isActive }) => (
@@ -389,7 +395,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                                     className={"menu-item-icon " + (isActive && "stroke-white")}
                                   />
                                   <p className={"menu-item-text " + (isActive && "text-white")}>
-                                    Reporte de Certificado
+                                    Reporte Certificado
                                   </p>
                                 </>
                               )}

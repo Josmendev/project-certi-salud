@@ -9,4 +9,5 @@ export type EventType =
   | "userInSession"
   | "userLogout"
   | "tableData"
+  | "reportCertificate"
   | null;
