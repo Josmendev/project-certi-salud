@@ -1,6 +1,6 @@
 import { handleApiError } from "../../../../shared/utils/handleApiError";
 import type { CertificateTypeResponse } from "../../type-certificate/types/CertificateType";
-import { ENDPOINT_CERTYFICATE } from "../utils/endpoints";
+import { ENDPOINT_CERTIFICATE } from "../utils/endpoints";
 
 // Creo la funcion listCertificateType que se conecta a la API del backend
 export const ListExternalCertificateTypeService = async (): Promise<
@@ -10,7 +10,7 @@ export const ListExternalCertificateTypeService = async (): Promise<
     const { token } = JSON.parse(sessionStorage.getItem("user") as string);
     if (!token) throw new Error("Token inválido");
 
-    const response = await fetch(`${ENDPOINT_CERTYFICATE}/certificate-types`, {
+    const response = await fetch(`${ENDPOINT_CERTIFICATE}/certificate-types`, {
       method: "GET",
       headers: {
         "Content-type": "application/json",
