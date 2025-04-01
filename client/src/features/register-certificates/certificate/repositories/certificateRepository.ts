@@ -1,5 +1,4 @@
 import type { ErrorResponse } from "../../../../shared/types/ErrorResponse";
-import { SearchDiseasesService } from "../../../info-required/disease/services/SearchDiseasesService";
 import { CreateCertificateService } from "../../../register-certificates/certificate/services/CreateCertificateService";
 import { SearchPersonForDniService } from "../../../register-certificates/certificate/services/SearchPersonByIdService";
 import {
@@ -9,6 +8,7 @@ import {
 import { GenerateCodeCertificateService } from "../services/GenerateCodeCertificateService";
 import { ListExternalCertificateTypeService } from "../services/ListCertificateTypeService";
 import { ListExternalDiseaseService } from "../services/ListExternalDiseaseService";
+import { SearchExternalDiseasesService } from "../services/SearchExternalDiseaseService";
 
 //Funcion para agregar certificate
 export const createCertificate = async ({ certificate }: { certificate: Certificate }) => {
@@ -33,7 +33,7 @@ export const getAllDiseasesInCertificate = async ({
   query?: string;
 }) => {
   return query
-    ? SearchDiseasesService({ limit, page, query }) // corregir con el endpoint de disease en certificate
+    ? SearchExternalDiseasesService({ limit, page, query })
     : ListExternalDiseaseService({ limit, page });
 };
 // Funcion para generar code por certificate
