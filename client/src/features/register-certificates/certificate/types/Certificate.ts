@@ -16,8 +16,9 @@ export interface DiseaseInCertificate {
 }
 
 export interface CertificateResponse {
-  certificateId: number;
+  certificateId: string;
   certificateCode: string;
+  issueDate: Date;
   certificateTypeDescription: string;
   staffDni: string;
   staffName: string;
@@ -25,5 +26,5 @@ export interface CertificateResponse {
   patientName: string;
   patientAge: number;
   restDays: string;
-  diseases: Array<DiseaseInCertificate>;
+  diseases: Array<DiseaseInCertificate> | null;
 }
