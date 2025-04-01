@@ -1,5 +1,5 @@
 import { handleApiError } from "../../../../shared/utils/handleApiError";
-import { ENDPOINT_CERTYFICATE } from "../utils/endpoints";
+import { ENDPOINT_CERTIFICATE } from "../utils/endpoints";
 
 // Creo la funcion GenerateCodeCertificateService que se conecta a la API del backend
 export const GenerateCodeCertificateService = async (): Promise<string> => {
@@ -7,7 +7,7 @@ export const GenerateCodeCertificateService = async (): Promise<string> => {
     const { token } = JSON.parse(sessionStorage.getItem("user") as string);
     if (!token) throw new Error("Token inválido");
 
-    const response = await fetch(`${ENDPOINT_CERTYFICATE}/certificate-code`, {
+    const response = await fetch(`${ENDPOINT_CERTIFICATE}/certificate-code`, {
       method: "GET",
       headers: {
         "Content-type": "application/json",
