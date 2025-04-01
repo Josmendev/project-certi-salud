@@ -1,10 +1,11 @@
-import { Controller, Get, Param, Res } from '@nestjs/common';
+import { Controller, Get, Param, Query, Res } from '@nestjs/common';
 import { CertificatesReportsService } from './certificates-reports.service';
 import { GetUser } from 'src/auth/decorators/get-user.decorator';
 import { ValidateUserResponse } from 'src/auth/interfaces/validate-user-response.interface';
 import { Role } from 'src/auth/enums/role.enum';
 import { Auth } from 'src/auth/decorators/auth.decorator';
 import { Response } from 'express';
+import { PaginationDto } from 'src/common/dto/pagination.dto';
 
 @Controller('certificates-reports')
 @Auth(Role.Admin, Role.Register)
@@ -14,8 +15,24 @@ export class CertificatesReportsController {
   ) {}
 
   @Get()
-  find(@GetUser() user: ValidateUserResponse) {
-    return this.certificatesReportsService.find(user);
+  find(
+    @GetUser() user: ValidateUserResponse,
+    @Query() paginationDto: PaginationDto,
+  ) {
+    return this.certificatesReportsService.find(user, paginationDto);
+  }
+
+  @Get('certificates/search/:term')
+  searchCertificates(
+    @Param('term') term: string,
+    @GetUser() user: ValidateUserResponse,
+    @Query() paginationDto: PaginationDto,
+  ) {
+    return this.certificatesReportsService.searchCertificates(
+      term,
+      user,
+      paginationDto,
+    );
   }
 
   @Get('generate-report-one/:id')

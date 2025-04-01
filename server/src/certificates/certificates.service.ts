@@ -30,9 +30,10 @@ import { CertificateTypeResponse } from 'src/certificate-types/interfaces/certif
 import { DiseaseResponse } from 'src/diseases/interfaces/disease-response.interface';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
 import { Paginated } from 'src/common/interfaces/paginated.interface';
+import { BaseService } from 'src/common/services/base.service';
 
 @Injectable()
-export class CertificatesService {
+export class CertificatesService extends BaseService<Certificate> {
   constructor(
     @InjectRepository(Certificate)
     private readonly certificateRepository: Repository<Certificate>,
@@ -42,7 +43,9 @@ export class CertificatesService {
     private readonly reniecApiService: ReniecApiService,
     private readonly personService: PersonService,
     private readonly patientService: PatientsService,
-  ) {}
+  ) {
+    super(certificateRepository);
+  }
 
   // Methods for endpoints
   async create(
@@ -122,6 +125,13 @@ export class CertificatesService {
     return await this.diseasesService.findAll(paginationDto);
   }
 
+  async searchDiseases(
+    term: string,
+    paginationDto: PaginationDto,
+  ): Promise<Paginated<DiseaseResponse>> {
+    return await this.diseasesService.search(term, paginationDto);
+  }
+
   async remove(certificateId: string): Promise<void> {
     const certificate = await this.certificateRepository.update(
       { certificateId },
@@ -134,7 +144,75 @@ export class CertificatesService {
   }
 
   // Internal helper methods
-  async find(user: ValidateUserResponse): Promise<CertificateResponse[]> {
+  async find(
+    user: ValidateUserResponse,
+    paginationDto: PaginationDto,
+  ): Promise<Paginated<CertificateResponse[]>> {
+    const { role, staffId } = user;
+    const isAdmin = role.includes(Role.Admin);
+    return this.findAllBase(
+      paginationDto,
+      'certificate',
+      formatCertificateResponse,
+      (queryBuilder) => {
+        queryBuilder
+          .leftJoinAndSelect('certificate.certificateType', 'certificateType')
+          .leftJoinAndSelect('certificate.patient', 'patient')
+          .leftJoinAndSelect('patient.person', 'patientPerson')
+          .leftJoinAndSelect('certificate.staff', 'staff')
+          .leftJoinAndSelect('staff.person', 'staffPerson');
+        queryBuilder.where('certificate.status = :status', {
+          status: StatusCertificate.Completed,
+        });
+
+        if (!isAdmin) {
+          queryBuilder.andWhere('certificate.staff.staffId = :staffId', {
+            staffId,
+          });
+        }
+        queryBuilder.orderBy('certificate.createdAt', 'ASC');
+      },
+    );
+  }
+
+  async search(
+    term: string,
+    user: ValidateUserResponse,
+    paginationDto: PaginationDto,
+  ): Promise<Paginated<CertificateResponse[]>> {
+    const { role, staffId } = user;
+    const isAdmin = role.includes(Role.Admin);
+    return this.searchBase(
+      term,
+      paginationDto,
+      'certificate',
+      formatCertificateResponse,
+      (queryBuilder, searchTerm) => {
+        queryBuilder
+          .leftJoinAndSelect('certificate.certificateType', 'certificateType')
+          .leftJoinAndSelect('certificate.patient', 'patient')
+          .leftJoinAndSelect('patient.person', 'patientPerson')
+          .leftJoinAndSelect('certificate.staff', 'staff')
+          .leftJoinAndSelect('staff.person', 'staffPerson')
+          .where('certificate.status = :status', {
+            status: StatusCertificate.Completed,
+          })
+          .andWhere('certificate.certificateCode LIKE :searchTerm ', {
+            searchTerm: `%${searchTerm}%`,
+          });
+        if (!isAdmin) {
+          queryBuilder.andWhere('certificate.staff.staffId = :staffId', {
+            staffId,
+          });
+        }
+        queryBuilder.orderBy('certificate.createdAt', 'ASC');
+      },
+    );
+  }
+
+  async findAllReports(
+    user: ValidateUserResponse,
+  ): Promise<CertificateResponse[]> {
     const { role, staffId } = user;
     const isAdmin = role.some((role) => role === Role.Admin);
     const whereCondition = isAdmin
