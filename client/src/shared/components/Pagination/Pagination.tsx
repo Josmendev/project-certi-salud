@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { Button } from "../Button/Button";
 import { Icon } from "../Icon";
 
@@ -14,11 +15,42 @@ export const Pagination: React.FC<Props> = ({
   onPageChange = () => {},
   className = "",
 }) => {
-  const pages: number[] = Array.from({ length: totalPages }, (_, i) => i + 1);
+  const MAX_TOTALPAGES = 6;
+  const MAX_VIEW_PAGES = 3;
   const isLastPage = currentPage === totalPages;
   const isFirstPage = currentPage === 1;
   const classPageActive = "bg-primary-600 text-white text-paragraph-medium";
   const classPageDisabled = "cursor-not-allowed bg-transparent hover:bg-transparent";
+
+  const currentPagination = useMemo(() => {
+    // Si el total de páginas es menor o igual a MAX_TOTALPAGES, se muestran todas las páginas
+    if (totalPages <= MAX_TOTALPAGES) return Array.from({ length: totalPages }, (_, i) => i + 1);
+
+    // Si la página actual está dentro del rango inicial, se muestran las primeras páginas y el último
+    if (currentPage <= MAX_VIEW_PAGES) {
+      return [...Array.from({ length: MAX_VIEW_PAGES }, (_, i) => i + 1), "ellipsis-1", totalPages];
+    }
+
+    // Si la página actual está cerca del final, se muestra el inicio y las últimas páginas
+    if (currentPage >= totalPages - (MAX_VIEW_PAGES - 1)) {
+      return [
+        1,
+        "ellipsis-2",
+        ...Array.from({ length: MAX_VIEW_PAGES }, (_, i) => totalPages - (MAX_VIEW_PAGES - 1) + i),
+      ];
+    }
+
+    // En caso contrario, se muestra el inicio, la página actual con sus alrededores y el final
+    return [
+      1,
+      "ellipsis-3",
+      currentPage - 1,
+      currentPage,
+      currentPage + 1,
+      "ellipsis-4",
+      totalPages,
+    ];
+  }, [totalPages, currentPage]);
 
   return (
     <div className={`flex items-center justify-between bg-shades-light px-6 pb-4 ${className}`}>
@@ -33,8 +65,8 @@ export const Pagination: React.FC<Props> = ({
           id="btnPagination-prev"
           aria-label="Página anterior"
           classButton={`${isFirstPage ? classPageDisabled : "cursor-pointer"}`}
-          onClick={() => currentPage > 1 && onPageChange?.(currentPage - 1)}
-          disabled={currentPage === 1}
+          onClick={() => !isFirstPage && onPageChange?.(currentPage - 1)}
+          disabled={isFirstPage}
         >
           <Icon.Chevron
             className="text-shades-dark rotate-90 hover:stroke-black hover:scale-x-110"
@@ -44,16 +76,17 @@ export const Pagination: React.FC<Props> = ({
 
         {/* Números de Página */}
         <div className="flex gap-2 items-center justify-center">
-          {pages.map((page) => (
+          {currentPagination.map((page) => (
             <Button
-              key={page}
-              title={`Página ${page}`}
+              key={typeof page === "number" ? page : page + "-key"}
+              title={typeof page === "number" ? `Página ${page}` : "..."}
               classButton={`text-shades-dark text-paragraph-medium cursor-pointer rounded-lg min-w-[36px] py-2 text-center ${
                 page === currentPage ? classPageActive : ""
               }`}
-              onClick={() => onPageChange?.(page)}
+              onClick={() => typeof page === "number" && onPageChange?.(page)}
+              disabled={typeof page !== "number"}
             >
-              {page}
+              {typeof page === "number" ? page : "..."}
             </Button>
           ))}
         </div>
@@ -64,8 +97,8 @@ export const Pagination: React.FC<Props> = ({
           id="btnPagination-next"
           aria-label="Página siguiente"
           classButton={`${isLastPage ? classPageDisabled : "cursor-pointer"}`}
-          onClick={() => currentPage < totalPages && onPageChange?.(currentPage + 1)}
-          disabled={currentPage === totalPages}
+          onClick={() => !isLastPage && onPageChange?.(currentPage + 1)}
+          disabled={isLastPage}
         >
           <Icon.Chevron
             className="text-shades-dark transform -rotate-90 hover:stroke-black hover:scale-x-110"
