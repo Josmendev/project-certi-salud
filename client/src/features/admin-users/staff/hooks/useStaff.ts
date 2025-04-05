@@ -1,7 +1,10 @@
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router";
-import { BASE_ROUTES, initialListOfResponseAPI } from "../../../../shared/utils/constants";
-import { ADMIN_USERS_ROUTES } from "../../utils/constants";
+import {
+  ADMIN_USERS_ROUTES,
+  BASE_ROUTES,
+  initialListOfResponseAPI,
+} from "../../../../shared/utils/constants";
 import { getStaffs } from "../repositories/staffRepository";
 import { useActivateStaff } from "./useActivateStaff";
 import { useAssignStaff } from "./useAssignStaff";
