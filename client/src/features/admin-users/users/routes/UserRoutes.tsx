@@ -1,6 +1,5 @@
 import { Navigate, Route, Routes } from "react-router";
-import { BASE_ROUTES, CRUD_ROUTES } from "../../../../shared/utils/constants";
-import { ADMIN_USERS_ROUTES } from "../../utils/constants";
+import { ADMIN_USERS_ROUTES, BASE_ROUTES, CRUD_ROUTES } from "../../../../shared/utils/constants";
 import { UserEditPage } from "../pages/UserEditPage";
 import { UserListPage } from "../pages/UserListPage";
 

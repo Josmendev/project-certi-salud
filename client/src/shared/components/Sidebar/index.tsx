@@ -1,11 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useEffect, useRef, useState } from "react";
 import { NavLink, useLocation } from "react-router";
-import { ADMIN_USERS_ROUTES } from "../../../features/admin-users/utils/constants";
-import { INFO_REQUIRED_ROUTES } from "../../../features/info-required/utils/constants";
-import { REGISTER_CERTIFICATE_ROUTES } from "../../../features/register-certificates/utils/constants";
-import { REPORT_CERTIFICATE_ROUTES } from "../../../features/reports/certificates/utils/constants";
-import { BASE_ROUTES } from "../../utils/constants";
+import {
+  ADMIN_USERS_ROUTES,
+  BASE_ROUTES,
+  INFO_REQUIRED_ROUTES,
+  REGISTER_CERTIFICATE_ROUTES,
+  REPORT_CERTIFICATE_ROUTES,
+} from "../../utils/constants";
 import { Button } from "../Button/Button";
 import { Icon } from "../Icon";
 import { Image } from "../Image";
@@ -75,7 +77,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
     >
       {/* <!-- SIDEBAR HEADER --> */}
       <div className="sidebar-header">
-        <NavLink to="dashboard">
+        <NavLink to={"/" + DASHBOARD}>
           <Image src="/logo-certisalud.webp" alt="Logo" className="sidebar-header-logo" />
         </NavLink>
 

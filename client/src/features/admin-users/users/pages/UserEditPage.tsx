@@ -9,6 +9,7 @@ import { getUserInformation } from "../../../../shared/helpers/getUserInformatio
 import { useModalManager } from "../../../../shared/hooks/useModalManager";
 import DefaultLayout from "../../../../shared/layouts/DefaultLayout";
 import { SectionLayout } from "../../../../shared/layouts/SectionLayout";
+import { showToast } from "../../../../shared/utils/toast";
 import type { User } from "../../../auth/types/User";
 import { useUserManagement } from "../hooks/useUserManagement";
 
@@ -28,8 +29,21 @@ export const UserEditPage = () => {
   const navigate = useNavigate();
   const { modalType, openModal, closeModal, selectedItem } = useModalManager<User>();
   const ROUTE_INITIAL = `${MAIN_ROUTE}?page=${currentPage}`;
-  if (!selectedUser || !roles) return <Navigate to={ROUTE_INITIAL} />;
+
+  if (!selectedUser || !roles) {
+    showToast({
+      title: "Selección de usuario inválido",
+      description: "Debes seleccionar un usuario previamente",
+      type: "error",
+    });
+    return <Navigate to={ROUTE_INITIAL} />;
+  }
   if (shouldRedirect) return <Navigate to={ROUTE_INITIAL} />;
+
+  const onSaveUser = (e: React.FormEvent) => {
+    const responseUpdated = handleUpdateUser(e);
+    if (responseUpdated) navigate(ROUTE_INITIAL, { replace: true });
+  };
 
   // 📌 Retorno de JSX
   return (
@@ -98,10 +112,7 @@ export const UserEditPage = () => {
                 type="submit"
                 classButton="btn-primary text-paragraph-medium"
                 iconLeft={<Icon.Save size={28} strokeWidth={1.2} />}
-                onClick={(e) => {
-                  const responseUpdated = handleUpdateUser(e);
-                  if (responseUpdated) navigate(ROUTE_INITIAL, { replace: true });
-                }}
+                onClick={onSaveUser}
               >
                 Guardar
               </Button>

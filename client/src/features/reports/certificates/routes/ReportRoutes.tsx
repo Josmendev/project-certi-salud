@@ -1,6 +1,6 @@
 import { Navigate, Route, Routes } from "react-router";
+import { REPORT_CERTIFICATE_ROUTES } from "../../../../shared/utils/constants";
 import { ReportPage } from "../pages/ReportPage";
-import { REPORT_CERTIFICATE_ROUTES } from "../utils/constants";
 
 export const ReportRoutes: React.FC = () => {
   return (

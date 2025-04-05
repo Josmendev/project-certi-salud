@@ -1,6 +1,7 @@
 import { useCallback } from "react";
 import { useLocation, useNavigate } from "react-router";
 import { usePagination } from "../../../../shared/hooks/usePagination";
+import { useValidationParamsInUpdate } from "../../../../shared/hooks/useValidationParamsInUpdate";
 import type { StaffResponse } from "../types/Staff";
 import { useStaff } from "./useStaff";
 
@@ -17,6 +18,11 @@ export const useStaffManagement = () => {
   const currentPage = location.state?.pageOfStaff ?? pageOfPagination ?? 1;
 
   const { handleDeleteStaffMutation, MAIN_ROUTE } = useStaff({ currentPage, searchQuery });
+
+  // 📌 Validaciones antes del renderizado (edit)
+  const isUpdating = location.pathname.includes("/edit");
+  const isValidateParams = useValidationParamsInUpdate(MAIN_ROUTE);
+  const shouldRedirect = isUpdating && !isValidateParams;
 
   const handleUpdateStaffInRow = useCallback(
     (data: StaffResponse) => {
@@ -49,5 +55,6 @@ export const useStaffManagement = () => {
     handleCreateStaff,
     handleUpdateStaffInRow,
     handleDeleteStaffInRow,
+    shouldRedirect,
   };
 };

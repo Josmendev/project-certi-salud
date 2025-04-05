@@ -1,9 +1,8 @@
 import { Navigate, Route, Routes } from "react-router";
-import { BASE_ROUTES } from "../../../shared/utils/constants";
-import { RoleRoutes } from "../roles/routes/RolesRoutes";
-import { StaffRoutes } from "../staff/routes/StaffRoutes";
-import { UserRoutes } from "../users/routes/UserRoutes";
-import { ADMIN_USERS_ROUTES } from "../utils/constants";
+import { RoleRoutes } from "../../features/admin-users/roles/routes/RolesRoutes";
+import { StaffRoutes } from "../../features/admin-users/staff/routes/StaffRoutes";
+import { UserRoutes } from "../../features/admin-users/users/routes/UserRoutes";
+import { ADMIN_USERS_ROUTES, BASE_ROUTES } from "../../shared/utils/constants";
 
 export const AdminRouter = () => {
   return (

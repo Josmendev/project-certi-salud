@@ -1,7 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useRef } from "react";
 import { useForm, type SubmitHandler } from "react-hook-form";
-import { useLocation } from "react-router";
+import { Navigate, useLocation } from "react-router";
 import { Button } from "../../../../shared/components/Button/Button";
 import { GenericModal } from "../../../../shared/components/GenericModal";
 import { Icon } from "../../../../shared/components/Icon";
@@ -14,6 +14,7 @@ import { getMessageConfigResponse } from "../../../../shared/utils/getMessageCon
 import { handleApiError } from "../../../../shared/utils/handleApiError";
 import { showToast } from "../../../../shared/utils/toast";
 import { usePatient } from "../hooks/usePatient";
+import { usePatientManagement } from "../hooks/usePatientManagement";
 import { getPatientSchema } from "../schemas/PatientSchema";
 import type { Patient, PatientResponse, PatientResponseConditional } from "../types/Patient";
 
@@ -22,16 +23,20 @@ export const UpsertPatientForm = () => {
   const selectedPatient: PatientResponse = location.state?.patient;
   const { currentPage, searchQuery } = usePagination();
   const getAgeRef = useRef<number>();
+  const { shouldRedirect } = usePatientManagement();
 
   const {
     handleCreatePatientMutation,
     handleUpdatePatientMutation,
     handleAssignPatientMutation,
     handleActivatePatientMutation,
+    MAIN_ROUTE,
   } = usePatient({ currentPage, searchQuery });
   const { modalType, openModal, closeModal, selectedItem } = useModalManager<
     Patient | PatientResponseConditional
   >();
+
+  const ROUTE_INITIAL = `${MAIN_ROUTE}?page=${currentPage}`;
 
   const {
     register,
@@ -58,6 +63,16 @@ export const UpsertPatientForm = () => {
       setFocus("identityDocumentNumber");
     }
   }, [selectedPatient, setValue, setFocus]);
+
+  //Validacion para redireccionar si digitan en la URL un ID pero no hay datos
+  if (!selectedPatient && !shouldRedirect && !location.pathname.includes("add")) {
+    showToast({
+      title: "Selección de personal inválido",
+      description: "Debes seleccionar un personal previamente",
+      type: "error",
+    });
+    return <Navigate to={ROUTE_INITIAL} />;
+  }
 
   const onErrorMessageInPatient = ({ message }: { message: string }) => {
     showToast({

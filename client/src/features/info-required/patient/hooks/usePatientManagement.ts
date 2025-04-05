@@ -1,6 +1,7 @@
 import { useCallback } from "react";
 import { useLocation, useNavigate } from "react-router";
 import { usePagination } from "../../../../shared/hooks/usePagination";
+import { useValidationParamsInUpdate } from "../../../../shared/hooks/useValidationParamsInUpdate";
 import type { PatientResponse } from "../types/Patient";
 import { usePatient } from "./usePatient";
 
@@ -15,8 +16,12 @@ export const usePatientManagement = () => {
     handleSearch,
   } = usePagination();
   const currentPage = location.state?.pageOfPatient ?? pageOfPagination ?? 1;
-
   const { MAIN_ROUTE, handleDeletePatientMutation } = usePatient({ currentPage, searchQuery });
+
+  // 📌 Validaciones antes del renderizado (edit)
+  const isUpdating = location.pathname.includes("/edit");
+  const isValidateParams = useValidationParamsInUpdate(MAIN_ROUTE);
+  const shouldRedirect = isUpdating && !isValidateParams;
 
   const handleUpdatePatientInRow = useCallback(
     (data: PatientResponse) => {
@@ -49,5 +54,6 @@ export const usePatientManagement = () => {
     handleCreatePatient,
     handleDeletePatientInRow,
     handleUpdatePatientInRow,
+    shouldRedirect,
   };
 };

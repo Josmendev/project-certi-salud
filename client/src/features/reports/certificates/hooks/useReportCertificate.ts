@@ -1,8 +1,11 @@
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router";
-import { BASE_ROUTES, initialListOfResponseAPI } from "../../../../shared/utils/constants";
+import {
+  BASE_ROUTES,
+  initialListOfResponseAPI,
+  REPORT_CERTIFICATE_ROUTES,
+} from "../../../../shared/utils/constants";
 import { getAllCertificatesInReports } from "../repositories/reportsRepository";
-import { REPORT_CERTIFICATE_ROUTES } from "../utils/constants";
 import { useDeleteCertificate } from "./useDeleteCertificate";
 
 export const useReportCertificate = ({
