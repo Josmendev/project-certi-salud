@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router";
+import { Navigate, useNavigate } from "react-router";
 import { Button } from "../../../../shared/components/Button/Button";
 import { Card } from "../../../../shared/components/Card/Card";
 import { Icon } from "../../../../shared/components/Icon";
@@ -9,10 +9,11 @@ import { useStaffManagement } from "../hooks/useStaffManagement";
 
 //📌 => Orden convencional para estructura de componentes
 export const StaffUpsertPage = () => {
-  const { currentPage, MAIN_ROUTE } = useStaffManagement();
+  const { currentPage, MAIN_ROUTE, shouldRedirect } = useStaffManagement();
 
   const navigate = useNavigate();
   const ROUTE_INITIAL = `${MAIN_ROUTE}?page=${currentPage || 1}`;
+  if (shouldRedirect) return <Navigate to={ROUTE_INITIAL} />;
 
   return (
     <DefaultLayout>
