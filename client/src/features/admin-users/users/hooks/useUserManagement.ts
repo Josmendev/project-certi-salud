@@ -1,12 +1,16 @@
 import { useState } from "react";
 import { useLocation, useNavigate } from "react-router";
-import { ValidationParamsInUpdate } from "../../../../shared/helpers/ValidationParamsInUpdate";
 import { usePagination } from "../../../../shared/hooks/usePagination";
-import { BASE_ROUTES, ROLES_MAPPING, type ROLES_KEYS } from "../../../../shared/utils/constants";
+import { useValidationParamsInUpdate } from "../../../../shared/hooks/useValidationParamsInUpdate";
+import {
+  ADMIN_USERS_ROUTES,
+  BASE_ROUTES,
+  ROLES_MAPPING,
+  type ROLES_KEYS,
+} from "../../../../shared/utils/constants";
 import { getMessageConfigResponse } from "../../../../shared/utils/getMessageConfig";
 import { showToast } from "../../../../shared/utils/toast";
 import type { User } from "../../../auth/types/User";
-import { ADMIN_USERS_ROUTES } from "../../utils/constants";
 import { useUsers } from "./useUsers";
 
 export const useUserManagement = () => {
@@ -27,10 +31,8 @@ export const useUserManagement = () => {
 
   // 📌 Validaciones antes del renderizado (edit)
   const isUpdating = location.pathname.includes("/edit");
-  if (isUpdating) {
-    const isValidateParams = ValidationParamsInUpdate(MAIN_ROUTE);
-    if (!isValidateParams) return { shouldRedirect: true };
-  }
+  const isValidateParams = useValidationParamsInUpdate(MAIN_ROUTE);
+  const shouldRedirect = isUpdating && !isValidateParams;
 
   // Eventos al seleccionar fila
   const onEditRowSelected = (data: User) => {
@@ -90,7 +92,7 @@ export const useUserManagement = () => {
     handleUpdateUser,
     handleChangeRole,
     handleResetPasswordUser,
-    shouldRedirect: false,
+    shouldRedirect,
     MAIN_ROUTE,
   };
 };
