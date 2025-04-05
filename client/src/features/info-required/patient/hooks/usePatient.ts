@@ -1,7 +1,10 @@
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router";
-import { BASE_ROUTES, initialListOfResponseAPI } from "../../../../shared/utils/constants";
-import { INFO_REQUIRED_ROUTES } from "../../utils/constants";
+import {
+  BASE_ROUTES,
+  INFO_REQUIRED_ROUTES,
+  initialListOfResponseAPI,
+} from "../../../../shared/utils/constants";
 import { getPatients } from "../repositories/patientRepository";
 import { useActivatePatient } from "./useActivatePatient";
 import { useAssignPatient } from "./useAssignPatient";
