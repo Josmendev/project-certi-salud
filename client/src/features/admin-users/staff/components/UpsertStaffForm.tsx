@@ -1,7 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect } from "react";
 import { useForm, type SubmitHandler } from "react-hook-form";
-import { useLocation } from "react-router";
+import { Navigate, useLocation } from "react-router";
 import { Button } from "../../../../shared/components/Button/Button";
 import { GenericModal } from "../../../../shared/components/GenericModal";
 import { Icon } from "../../../../shared/components/Icon";
@@ -14,12 +14,14 @@ import { getMessageConfigResponse } from "../../../../shared/utils/getMessageCon
 import { handleApiError } from "../../../../shared/utils/handleApiError";
 import { showToast } from "../../../../shared/utils/toast";
 import { useStaff } from "../hooks/useStaff";
+import { useStaffManagement } from "../hooks/useStaffManagement";
 import { getStaffSchema } from "../schemas/StaffSchema";
 import type { Staff, StaffResponse, StaffResponseConditional } from "../types/Staff";
 
 export const UpsertStaffForm = () => {
   const location = useLocation();
   const selectedStaff = location.state?.staff as StaffResponse;
+  const { shouldRedirect } = useStaffManagement();
 
   const { currentPage, searchQuery } = usePagination();
   const {
@@ -27,10 +29,13 @@ export const UpsertStaffForm = () => {
     handleUpdateStaffMutation,
     handleAssignStaffMutation,
     handleActivateStaffMutation,
+    MAIN_ROUTE,
   } = useStaff({ currentPage, searchQuery });
   const { modalType, openModal, closeModal, selectedItem } = useModalManager<
     Staff | StaffResponseConditional
   >();
+
+  const ROUTE_INITIAL = `${MAIN_ROUTE}?page=${currentPage}`;
 
   const {
     register,
@@ -55,6 +60,16 @@ export const UpsertStaffForm = () => {
       setFocus("identityDocumentNumber");
     }
   }, [selectedStaff, setValue, setFocus]);
+
+  //Validacion para redireccionar si digitan en la URL un ID pero no hay datos
+  if (!selectedStaff && !shouldRedirect && !location.pathname.includes("add")) {
+    showToast({
+      title: "Selección de personal inválido",
+      description: "Debes seleccionar un personal previamente",
+      type: "error",
+    });
+    return <Navigate to={ROUTE_INITIAL} />;
+  }
 
   const onErrorMessageInStaff = ({ message }: { message: string }) => {
     showToast({
