@@ -28,7 +28,7 @@ export const Table: React.FC<Props> = ({
     return (
       <div className="text-paragraph-semibold pt-32">
         No hay datos para mostrar{" "}
-        {groupHeadersTable && "ó no buscó por el campo correcto (solo código de certificado)"}
+        {groupHeadersTable && "o no buscó por el campo correcto (solo código de certificado)"}
       </div>
     );
 
