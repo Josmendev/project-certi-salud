@@ -22,13 +22,33 @@ export const CRUD_ROUTES = {
   EDIT: ":id/edit",
 };
 
+// Asiginacion del router en los modulos
+export const ADMIN_USERS_ROUTES = {
+  USERS: "users",
+  ROLES: "roles",
+  STAFF: "staff",
+};
+
+export const INFO_REQUIRED_ROUTES = {
+  PATIENTS: "patients",
+  DISEASES: "diseases",
+};
+
+export const REGISTER_CERTIFICATE_ROUTES = {
+  CERTIFICATES: "certificates",
+  TYPE_CERTIFICATES: "type-certificates",
+};
+
+export const REPORT_CERTIFICATE_ROUTES = {
+  REPORT: "reports-certificates",
+};
+
+
 // Defino un mapa de roles
 export const ROLES_MAPPING: Record<string, number> = { Administrador: 1, Registrador: 2 } as const;
 
-// Defino un tipo con las claves (Administrador, Registrador)
+// Defino un tipo con las claves (Administrador, Registrador) y tipo con valores con 1 y 2
 export type ROLES_KEYS = keyof typeof ROLES_MAPPING;
-
-// Defino un tipo con los valores (1, 2)
 export type ROLES_VALUES = (typeof ROLES_MAPPING)[ROLES_KEYS];
 
 export const INITIAL_PAGE = 1;
@@ -42,3 +62,4 @@ export const initialListOfResponseAPI = {
   total: 1,
   totalPages: 1,
 };
+
