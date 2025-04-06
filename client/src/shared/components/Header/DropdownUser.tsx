@@ -1,6 +1,7 @@
 import { useContext, useState } from "react";
 import { Link, useNavigate } from "react-router";
 import { AuthContext } from "../../contexts/AuthContext";
+import { getRolesOfUser } from "../../helpers/getRolesForDescription";
 import { getUserInformation } from "../../helpers/getUserInformation";
 import { BASE_ROUTES } from "../../utils/constants";
 import { getMessageConfigResponse } from "../../utils/getMessageConfig";
@@ -22,6 +23,7 @@ const DropdownUser = () => {
   }
 
   const { userInformation } = getUserInformation(user);
+  const isUserAdmin = getRolesOfUser(user)?.includes("Administrador");
 
   const handleLogout = async () => {
     await logout();
@@ -44,7 +46,7 @@ const DropdownUser = () => {
 
         <span className="header-profile-img">
           <Image
-            src="/rey-misterio.webp"
+            src={isUserAdmin ? "/administrador.png" : "/registrador.png"}
             alt="Current User Logged"
             className="w-full h-full object-cover"
           />
