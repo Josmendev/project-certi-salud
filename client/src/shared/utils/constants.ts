@@ -43,7 +43,6 @@ export const REPORT_CERTIFICATE_ROUTES = {
   REPORT: "reports-certificates",
 };
 
-
 // Defino un mapa de roles
 export const ROLES_MAPPING: Record<string, number> = { Administrador: 1, Registrador: 2 } as const;
 
@@ -62,4 +61,3 @@ export const initialListOfResponseAPI = {
   total: 1,
   totalPages: 1,
 };
-
