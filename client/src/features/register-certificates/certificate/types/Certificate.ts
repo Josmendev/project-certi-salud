@@ -4,7 +4,7 @@ import type { Patient } from "../../../info-required/patient/types/Patient";
 export interface Certificate extends Patient {
   issueDate: string | Date;
   certificateTypeId: number;
-  restDays: number;
+  restDays: number | null;
   diseases: Array<number>;
 }
 
