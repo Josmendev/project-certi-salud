@@ -38,7 +38,7 @@ export const TableCertificateItem: React.FC<TableCertificateItemProps> = ({
                 title="Ver certificado"
                 id={`btnViewRow-${row?.certificateId}`}
                 aria-data={row}
-                classButton="transition-all duration-200 ease-in-out hover:text-warning-500"
+                classButton="transition-all duration-200 ease-in-out hover:text-primary-700"
                 onClick={() => viewRow(row)}
               >
                 <Icon.Certificate className="w-6 h-6" strokeWidth={1.2} />
@@ -50,7 +50,7 @@ export const TableCertificateItem: React.FC<TableCertificateItemProps> = ({
                 title="Eliminar"
                 id={`btnDeleteRow-${row?.certificateId}`}
                 aria-data={row}
-                classButton="transition-all duration-200 ease-in-out hover:text-warning-500"
+                classButton="transition-all duration-200 ease-in-out hover:text-red-600"
                 onClick={() => deleteRow(row)}
               >
                 <Icon.Trash className="w-6 h-6" strokeWidth={1.2} />
