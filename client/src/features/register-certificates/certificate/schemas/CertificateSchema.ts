@@ -21,6 +21,6 @@ export const getCertificateSchema = () =>
         invalid_type_error: "Días de descanso debe ser un campo numérico",
       })
       .min(1, "Debe ser al menos 1 día de descanso")
-      .optional(),
+      .nullish(),
     diseases: z.array(z.object({ diseaseId: z.number() })),
   });
