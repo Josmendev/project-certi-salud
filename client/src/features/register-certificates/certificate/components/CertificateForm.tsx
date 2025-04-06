@@ -125,7 +125,7 @@ export const CertificateForm = () => {
 
     const newCertificate: Certificate = {
       ...data,
-      restDays: isMedicalRest ? data.restDays : 0,
+      restDays: isMedicalRest ? data.restDays : null,
       certificateTypeId: selectedOptionTypeCertificate.certificateTypeId,
       diseases: isMedicalRest ? selectedDiseases.map((disease) => disease.diseaseId) : [],
       issueDate: new Date(),
