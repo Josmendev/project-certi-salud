@@ -1,6 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React, { useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import { NavLink, useLocation } from "react-router";
+import { AuthContext } from "../../contexts/AuthContext";
+import { getRolesOfUser } from "../../helpers/getRolesForDescription";
 import {
   ADMIN_USERS_ROUTES,
   BASE_ROUTES,
@@ -19,9 +21,9 @@ interface SidebarProps {
 }
 
 const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
+  const { user } = useContext(AuthContext);
   const location = useLocation();
   const { pathname } = location;
-
   const trigger = useRef<any>(null);
   const sidebar = useRef<any>(null);
 
@@ -118,165 +120,170 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
               {/* <!-- Menu Item Dasboard --> */}
 
               {/* <!-- Menu Item Adm. Usuarios --> */}
-              <SidebarLinkGroup
-                activeCondition={pathname === `/${ADMIN}` || pathname.includes(ADMIN)}
-              >
-                {(handleClick, open) => {
-                  return (
-                    <React.Fragment>
-                      <NavLink
-                        to="#"
-                        className={`menu-list relative group ${
-                          (pathname === `/${ADMIN}` || pathname.includes(ADMIN)) && "bg-graydark"
-                        }`}
-                        onClick={(e) => {
-                          e.preventDefault();
-                          if (sidebarExpanded) handleClick();
-                          else setSidebarExpanded(true);
-                        }}
-                      >
-                        <p className="text-paragraph-s-medium">ADMIN. USUARIOS</p>
-                        <Icon.Chevron
-                          color="#C1CDE0"
-                          className={`ml-auto ${open && "rotate-180"}`}
-                        />
-                      </NavLink>
+              {getRolesOfUser(user)?.includes("Administrador") && (
+                <SidebarLinkGroup
+                  activeCondition={pathname === `/${ADMIN}` || pathname.includes(ADMIN)}
+                >
+                  {(handleClick, open) => {
+                    return (
+                      <React.Fragment>
+                        <NavLink
+                          to="#"
+                          className={`menu-list relative group ${
+                            (pathname === `/${ADMIN}` || pathname.includes(ADMIN)) && "bg-graydark"
+                          }`}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            if (sidebarExpanded) handleClick();
+                            else setSidebarExpanded(true);
+                          }}
+                        >
+                          <p className="text-paragraph-s-medium">ADMIN. USUARIOS</p>
+                          <Icon.Chevron
+                            color="#C1CDE0"
+                            className={`ml-auto ${open && "rotate-180"}`}
+                          />
+                        </NavLink>
 
-                      {/* <!-- Dropdown Menu Start --> */}
-                      <div className={`translate transform overflow-hidden ${!open && "hidden"}`}>
-                        <ul className="flex flex-col gap-2.5 pl-6">
-                          <li>
-                            <NavLink
-                              to={`/${ADMIN}/${USERS}`}
-                              className={"group relative menu-item "}
-                            >
-                              {({ isActive }) => (
-                                <>
-                                  <Icon.User
-                                    className={"menu-item-icon " + (isActive && "stroke-white")}
-                                  />
-                                  <p className={"menu-item-text " + (isActive && "text-white")}>
-                                    Usuarios
-                                  </p>
-                                </>
-                              )}
-                            </NavLink>
-                          </li>
-                          <li>
-                            <NavLink
-                              to={`/${ADMIN}/${ROLES}`}
-                              className={"group relative menu-item "}
-                            >
-                              {({ isActive }) => (
-                                <>
-                                  <Icon.Role
-                                    className={"menu-item-icon " + (isActive && "stroke-white")}
-                                  />
-                                  <p className={"menu-item-text " + (isActive && "text-white")}>
-                                    Roles
-                                  </p>
-                                </>
-                              )}
-                            </NavLink>
-                          </li>
-                          <li>
-                            <NavLink
-                              to={`/${ADMIN}/${STAFF}`}
-                              className={"group relative menu-item"}
-                            >
-                              {({ isActive }) => (
-                                <>
-                                  <Icon.Staff
-                                    className={"menu-item-icon " + (isActive && "stroke-white")}
-                                  />
-                                  <p className={"menu-item-text " + (isActive && "text-white")}>
-                                    Personal
-                                  </p>
-                                </>
-                              )}
-                            </NavLink>
-                          </li>
-                        </ul>
-                      </div>
-                      {/* <!-- Dropdown Menu End --> */}
-                    </React.Fragment>
-                  );
-                }}
-              </SidebarLinkGroup>
+                        {/* <!-- Dropdown Menu Start --> */}
+                        <div className={`translate transform overflow-hidden ${!open && "hidden"}`}>
+                          <ul className="flex flex-col gap-2.5 pl-6">
+                            <li>
+                              <NavLink
+                                to={`/${ADMIN}/${USERS}`}
+                                className={"group relative menu-item "}
+                              >
+                                {({ isActive }) => (
+                                  <>
+                                    <Icon.User
+                                      className={"menu-item-icon " + (isActive && "stroke-white")}
+                                    />
+                                    <p className={"menu-item-text " + (isActive && "text-white")}>
+                                      Usuarios
+                                    </p>
+                                  </>
+                                )}
+                              </NavLink>
+                            </li>
+                            <li>
+                              <NavLink
+                                to={`/${ADMIN}/${ROLES}`}
+                                className={"group relative menu-item "}
+                              >
+                                {({ isActive }) => (
+                                  <>
+                                    <Icon.Role
+                                      className={"menu-item-icon " + (isActive && "stroke-white")}
+                                    />
+                                    <p className={"menu-item-text " + (isActive && "text-white")}>
+                                      Roles
+                                    </p>
+                                  </>
+                                )}
+                              </NavLink>
+                            </li>
+                            <li>
+                              <NavLink
+                                to={`/${ADMIN}/${STAFF}`}
+                                className={"group relative menu-item"}
+                              >
+                                {({ isActive }) => (
+                                  <>
+                                    <Icon.Staff
+                                      className={"menu-item-icon " + (isActive && "stroke-white")}
+                                    />
+                                    <p className={"menu-item-text " + (isActive && "text-white")}>
+                                      Personal
+                                    </p>
+                                  </>
+                                )}
+                              </NavLink>
+                            </li>
+                          </ul>
+                        </div>
+                        {/* <!-- Dropdown Menu End --> */}
+                      </React.Fragment>
+                    );
+                  }}
+                </SidebarLinkGroup>
+              )}
               {/* <!-- Menu Item Adm. Usuarios --> */}
 
               {/* <!-- Menu Item Informacion Requerida --> */}
-              <SidebarLinkGroup
-                activeCondition={
-                  pathname === `/${INFO_REQUIRED}` || pathname.includes(INFO_REQUIRED)
-                }
-              >
-                {(handleClick, open) => {
-                  return (
-                    <React.Fragment>
-                      <NavLink
-                        to="#"
-                        className={`menu-list relative group ${
-                          (pathname === `/${INFO_REQUIRED}` || pathname.includes(INFO_REQUIRED)) &&
-                          "bg-graydark"
-                        }`}
-                        onClick={(e) => {
-                          e.preventDefault();
-                          if (sidebarExpanded) handleClick();
-                          else setSidebarExpanded(true);
-                        }}
-                      >
-                        <p className="text-paragraph-s-medium">INFORMACION REQUER.</p>
-                        <Icon.Chevron
-                          color="#C1CDE0"
-                          className={`ml-auto ${open && "rotate-180"}`}
-                        />
-                      </NavLink>
+              {getRolesOfUser(user)?.includes("Administrador") && (
+                <SidebarLinkGroup
+                  activeCondition={
+                    pathname === `/${INFO_REQUIRED}` || pathname.includes(INFO_REQUIRED)
+                  }
+                >
+                  {(handleClick, open) => {
+                    return (
+                      <React.Fragment>
+                        <NavLink
+                          to="#"
+                          className={`menu-list relative group ${
+                            (pathname === `/${INFO_REQUIRED}` ||
+                              pathname.includes(INFO_REQUIRED)) &&
+                            "bg-graydark"
+                          }`}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            if (sidebarExpanded) handleClick();
+                            else setSidebarExpanded(true);
+                          }}
+                        >
+                          <p className="text-paragraph-s-medium">INFORMACION REQUER.</p>
+                          <Icon.Chevron
+                            color="#C1CDE0"
+                            className={`ml-auto ${open && "rotate-180"}`}
+                          />
+                        </NavLink>
 
-                      {/* <!-- Dropdown Menu Start --> */}
-                      <div className={`translate transform overflow-hidden ${!open && "hidden"}`}>
-                        <ul className="flex flex-col gap-2.5 pl-6">
-                          <li>
-                            <NavLink
-                              to={`/${INFO_REQUIRED}/${PATIENTS}`}
-                              className={"group relative menu-item"}
-                            >
-                              {({ isActive }) => (
-                                <>
-                                  <Icon.Patient
-                                    className={"menu-item-icon " + (isActive && "stroke-white")}
-                                  />
-                                  <p className={"menu-item-text " + (isActive && "text-white")}>
-                                    Pacientes
-                                  </p>
-                                </>
-                              )}
-                            </NavLink>
-                          </li>
-                          <li>
-                            <NavLink
-                              to={`/${INFO_REQUIRED}/${DISEASES}`}
-                              className={"group relative menu-item"}
-                            >
-                              {({ isActive }) => (
-                                <>
-                                  <Icon.Disease
-                                    className={"menu-item-icon " + (isActive && "stroke-white")}
-                                  />
-                                  <p className={"menu-item-text " + (isActive && "text-white")}>
-                                    Enfermedades (cie-10)
-                                  </p>
-                                </>
-                              )}
-                            </NavLink>
-                          </li>
-                        </ul>
-                      </div>
-                      {/* <!-- Dropdown Menu End --> */}
-                    </React.Fragment>
-                  );
-                }}
-              </SidebarLinkGroup>
+                        {/* <!-- Dropdown Menu Start --> */}
+                        <div className={`translate transform overflow-hidden ${!open && "hidden"}`}>
+                          <ul className="flex flex-col gap-2.5 pl-6">
+                            <li>
+                              <NavLink
+                                to={`/${INFO_REQUIRED}/${PATIENTS}`}
+                                className={"group relative menu-item"}
+                              >
+                                {({ isActive }) => (
+                                  <>
+                                    <Icon.Patient
+                                      className={"menu-item-icon " + (isActive && "stroke-white")}
+                                    />
+                                    <p className={"menu-item-text " + (isActive && "text-white")}>
+                                      Pacientes
+                                    </p>
+                                  </>
+                                )}
+                              </NavLink>
+                            </li>
+                            <li>
+                              <NavLink
+                                to={`/${INFO_REQUIRED}/${DISEASES}`}
+                                className={"group relative menu-item"}
+                              >
+                                {({ isActive }) => (
+                                  <>
+                                    <Icon.Disease
+                                      className={"menu-item-icon " + (isActive && "stroke-white")}
+                                    />
+                                    <p className={"menu-item-text " + (isActive && "text-white")}>
+                                      Enfermedades (cie-10)
+                                    </p>
+                                  </>
+                                )}
+                              </NavLink>
+                            </li>
+                          </ul>
+                        </div>
+                        {/* <!-- Dropdown Menu End --> */}
+                      </React.Fragment>
+                    );
+                  }}
+                </SidebarLinkGroup>
+              )}
               {/* <!-- Menu Item Informacion Requerida --> */}
 
               {/* <!-- Menu Item Certificados --> */}
@@ -328,23 +335,25 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                               )}
                             </NavLink>
                           </li>
-                          <li>
-                            <NavLink
-                              to={`/${REGISTER_CERTIFICATE}/${TYPE_CERTIFICATES}`}
-                              className={"group relative menu-item"}
-                            >
-                              {({ isActive }) => (
-                                <>
-                                  <Icon.TypeCertificate
-                                    className={"menu-item-icon " + (isActive && "stroke-white")}
-                                  />
-                                  <p className={"menu-item-text " + (isActive && "text-white")}>
-                                    Tipo de Certificado
-                                  </p>
-                                </>
-                              )}
-                            </NavLink>
-                          </li>
+                          {getRolesOfUser(user)?.includes("Administrador") && (
+                            <li>
+                              <NavLink
+                                to={`/${REGISTER_CERTIFICATE}/${TYPE_CERTIFICATES}`}
+                                className={"group relative menu-item"}
+                              >
+                                {({ isActive }) => (
+                                  <>
+                                    <Icon.TypeCertificate
+                                      className={"menu-item-icon " + (isActive && "stroke-white")}
+                                    />
+                                    <p className={"menu-item-text " + (isActive && "text-white")}>
+                                      Tipo de Certificado
+                                    </p>
+                                  </>
+                                )}
+                              </NavLink>
+                            </li>
+                          )}
                         </ul>
                       </div>
                       {/* <!-- Dropdown Menu End --> */}
