@@ -1,4 +1,4 @@
-import * as bcrypt from 'bcrypt';
+import * as bcrypt from 'bcryptjs';
 import { EncryptionService } from '../interfaces/encryption-service.interface';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
