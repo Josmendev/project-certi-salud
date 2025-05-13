@@ -16,7 +16,7 @@ Este es el cliente (frontend) del proyecto **Certi Salud**. Está construido con
 - **Gestión de Rutas:** React Router 🚏
 - **Gestión de Formularios:** React Hook Form (con Zod para validaciones)
 - **Gestión de Estado Global:** Context API (usando el Provider Pattern)
-- **Manejo de Datos:** Fetch
+- **Manejo de Datos:** Fetch y React Query
 - **Estilos:** Tailwind CSS 🎨
 
 ### 🧪 Testing
